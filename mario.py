@@ -189,7 +189,7 @@ class Upper:
         )
 
 
-class Somersault_kick:
+class SomersaultKick:
     l = [141, 141, 14, 57, 113, 156, 200, 244, 287, 316]
     t = [93, 93, 652, 644, 612, 632, 638, 645, 646, 647]
     w = [26, 26, 37, 50, 37, 38, 38, 37, 23, 29]
@@ -204,23 +204,23 @@ class Somersault_kick:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Somersault_kick.nFrame
+        mario.frame = (mario.frame + 1) % SomersaultKick.nFrame
 
     @staticmethod
     def draw(mario):
         mario.img.clip_draw(
-            Somersault_kick.l[mario.frame],
-            mario.img.h - Somersault_kick.t[mario.frame],
-            Somersault_kick.w[mario.frame],
-            Somersault_kick.h[mario.frame],
+            SomersaultKick.l[mario.frame],
+            mario.img.h - SomersaultKick.t[mario.frame],
+            SomersaultKick.w[mario.frame],
+            SomersaultKick.h[mario.frame],
             mario.x,
             mario.y,
-            Somersault_kick.w[mario.frame] * mario.size,
-            Somersault_kick.h[mario.frame] * mario.size,
+            SomersaultKick.w[mario.frame] * mario.size,
+            SomersaultKick.h[mario.frame] * mario.size,
         )
 
 
-class Magic_cape:
+class MagicCape:
     l = [40, 80, 109, 168, 221, 275, 307, 340, 384, 418]
     t = [1337, 1337, 1336, 1340, 1322, 1321, 1336, 1339, 1340, 1340]
     w = [30, 23, 53, 47, 45, 26, 27, 38, 27, 25]
@@ -235,25 +235,25 @@ class Magic_cape:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Magic_cape.nFrame
+        mario.frame = (mario.frame + 1) % MagicCape.nFrame
 
     @staticmethod
     def draw(mario):
         mario.img.clip_draw(
-            Magic_cape.l[mario.frame],
-            mario.img.h - Magic_cape.t[mario.frame],
-            Magic_cape.w[mario.frame],
-            Magic_cape.h[mario.frame],
+            MagicCape.l[mario.frame],
+            mario.img.h - MagicCape.t[mario.frame],
+            MagicCape.w[mario.frame],
+            MagicCape.h[mario.frame],
             mario.x,
-            mario.y + Magic_cape.h[mario.frame] - Magic_cape.h[0],
-            Magic_cape.w[mario.frame] * mario.size,
-            Magic_cape.h[mario.frame] * mario.size,
+            mario.y + MagicCape.h[mario.frame] - MagicCape.h[0],
+            MagicCape.w[mario.frame] * mario.size,
+            MagicCape.h[mario.frame] * mario.size,
         )
 
 
 class StateMachine:
     def __init__(self, mario):
-        self.state = Magic_cape
+        self.state = MagicCape
         self.mario = mario
 
     def draw(self):
