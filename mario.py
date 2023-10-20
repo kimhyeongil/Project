@@ -220,9 +220,40 @@ class Somersault_kick:
         )
 
 
+class Magic_cape:
+    l = [40, 80, 109, 168, 221, 275, 307, 340, 384, 418]
+    t = [1337, 1337, 1336, 1340, 1322, 1321, 1336, 1339, 1340, 1340]
+    w = [30, 23, 53, 47, 45, 26, 27, 38, 27, 25]
+    h = [37, 37, 38, 34, 52, 53, 38, 35, 34, 34]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    @staticmethod
+    def enter(mario, e):
+        mario.frame = 0
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + 1) % Magic_cape.nFrame
+
+    @staticmethod
+    def draw(mario):
+        mario.img.clip_draw(
+            Magic_cape.l[mario.frame],
+            mario.img.h - Magic_cape.t[mario.frame],
+            Magic_cape.w[mario.frame],
+            Magic_cape.h[mario.frame],
+            mario.x,
+            mario.y + Magic_cape.h[mario.frame] - Magic_cape.h[0],
+            Magic_cape.w[mario.frame] * mario.size,
+            Magic_cape.h[mario.frame] * mario.size,
+        )
+
+
 class StateMachine:
     def __init__(self, mario):
-        self.state = Somersault_kick
+        self.state = Magic_cape
         self.mario = mario
 
     def draw(self):
