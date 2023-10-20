@@ -126,10 +126,38 @@ class Attack1:
             Attack1.h[mario.frame] * mario.size,
         )
 
+class Upper:
+    l = [14, 14, 54, 54, 96, 54]
+    t = [557, 557, 550, 550, 535, 550]
+    w = [35, 35, 34, 34, 22, 34]
+    h = [30, 30, 38, 38, 53, 38]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
 
+    @staticmethod
+    def enter(mario, e):
+        mario.frame = 0
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + 1) % Upper.nFrame
+
+    @staticmethod
+    def draw(mario):
+        mario.img.clip_draw(
+            Upper.l[mario.frame],
+            mario.img.h - Upper.t[mario.frame],
+            Upper.w[mario.frame],
+            Upper.h[mario.frame],
+            mario.x,
+            mario.y,
+            Upper.w[mario.frame] * mario.size,
+            Upper.h[mario.frame] * mario.size,
+        )
 class StateMachine:
     def __init__(self, mario):
-        self.state = Attack1
+        self.state = Upper
         self.mario = mario
 
     def draw(self):
