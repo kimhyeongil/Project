@@ -189,9 +189,40 @@ class Upper:
         )
 
 
+class Somersault_kick:
+    l = [141, 141, 14, 57, 113, 156, 200, 244, 287, 316]
+    t = [93, 93, 652, 644, 612, 632, 638, 645, 646, 647]
+    w = [26, 26, 37, 50, 37, 38, 38, 37, 23, 29]
+    h = [33, 33, 37, 26, 52, 32, 30, 31, 37, 42]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    @staticmethod
+    def enter(mario, e):
+        mario.frame = 0
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + 1) % Somersault_kick.nFrame
+
+    @staticmethod
+    def draw(mario):
+        mario.img.clip_draw(
+            Somersault_kick.l[mario.frame],
+            mario.img.h - Somersault_kick.t[mario.frame],
+            Somersault_kick.w[mario.frame],
+            Somersault_kick.h[mario.frame],
+            mario.x,
+            mario.y,
+            Somersault_kick.w[mario.frame] * mario.size,
+            Somersault_kick.h[mario.frame] * mario.size,
+        )
+
+
 class StateMachine:
     def __init__(self, mario):
-        self.state = Attack2
+        self.state = Somersault_kick
         self.mario = mario
 
     def draw(self):
