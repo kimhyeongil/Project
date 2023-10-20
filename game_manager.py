@@ -4,7 +4,7 @@ from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 import mario
 import game_world
 
-time_slice = 0.01
+time_slice = 0.1
 
 
 def handle_events():
