@@ -32,6 +32,37 @@ class Idle:
         )
 
 
+class Run:
+    l = [12, 44, 82, 116, 146, 181, 220, 254]
+    t = [148, 148, 149, 151, 149, 150, 149, 151]
+    w = [28, 30, 29, 24, 28, 30, 28, 24]
+    h = [36, 34, 36, 36, 36, 34, 36, 36]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    @staticmethod
+    def enter(mario, e):
+        mario.frame = 0
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + 1) % Run.nFrame
+
+    @staticmethod
+    def draw(mario):
+        mario.img.clip_draw(
+            Run.l[mario.frame],
+            mario.img.h - Run.t[mario.frame],
+            Run.w[mario.frame],
+            Run.h[mario.frame],
+            mario.x,
+            mario.y,
+            Run.w[mario.frame] * mario.size,
+            Run.h[mario.frame] * mario.size,
+        )
+
+
 class Jump:
     l = [15, 15, 45, 45, 45, 45, 45, 45, 78, 78, 111, 141, 141, 171]
     t = [84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 92, 93, 93, 92]
@@ -65,7 +96,7 @@ class Jump:
 
 class StateMachine:
     def __init__(self, mario):
-        self.state = Jump
+        self.state = Run
         self.mario = mario
 
     def draw(self):
