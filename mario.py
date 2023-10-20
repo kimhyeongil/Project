@@ -251,9 +251,40 @@ class MagicCape:
         )
 
 
+class PalmStrike:
+    l = [13, 43, 76, 108, 141, 141, 189, 232]
+    t = [933, 931, 924, 926, 931, 931, 929, 932]
+    w = [24, 27, 26, 27, 42, 42, 37, 25]
+    h = [35, 32, 42, 40, 35, 35, 37, 34]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    @staticmethod
+    def enter(mario, e):
+        mario.frame = 0
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + 1) % PalmStrike.nFrame
+
+    @staticmethod
+    def draw(mario):
+        mario.img.clip_draw(
+            PalmStrike.l[mario.frame],
+            mario.img.h - PalmStrike.t[mario.frame],
+            PalmStrike.w[mario.frame],
+            PalmStrike.h[mario.frame],
+            mario.x,
+            mario.y + PalmStrike.h[mario.frame] - PalmStrike.h[0],
+            PalmStrike.w[mario.frame] * mario.size,
+            PalmStrike.h[mario.frame] * mario.size,
+        )
+
+
 class StateMachine:
     def __init__(self, mario):
-        self.state = MagicCape
+        self.state = PalmStrike
         self.mario = mario
 
     def draw(self):
