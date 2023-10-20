@@ -32,6 +32,37 @@ class Idle:
         )
 
 
+class Attack2:
+    l = [14, 14, 46, 46, 97, 142, 184, 224, 262, 301, 340, 340, 340]
+    t = [999, 999, 1003, 1003, 1004, 1002, 1000, 1001, 1003, 1004, 1001, 1001, 1001]
+    w = [26, 26, 45, 45, 39, 36, 34, 32, 33, 33, 25, 25, 25]
+    h = [36, 36, 32, 32, 31, 33, 35, 34, 32, 31, 34, 34, 34]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    @staticmethod
+    def enter(mario, e):
+        mario.frame = 0
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + 1) % Attack2.nFrame
+
+    @staticmethod
+    def draw(mario):
+        mario.img.clip_draw(
+            Attack2.l[mario.frame],
+            mario.img.h - Attack2.t[mario.frame],
+            Attack2.w[mario.frame],
+            Idle.h[mario.frame],
+            mario.x,
+            mario.y,
+            Attack2.w[mario.frame] * mario.size,
+            Attack2.h[mario.frame] * mario.size,
+        )
+
+
 class Run:
     l = [12, 44, 82, 116, 146, 181, 220, 254]
     t = [148, 148, 149, 151, 149, 150, 149, 151]
@@ -126,6 +157,7 @@ class Attack1:
             Attack1.h[mario.frame] * mario.size,
         )
 
+
 class Upper:
     l = [14, 14, 54, 54, 96, 54]
     t = [557, 557, 550, 550, 535, 550]
@@ -155,9 +187,11 @@ class Upper:
             Upper.w[mario.frame] * mario.size,
             Upper.h[mario.frame] * mario.size,
         )
+
+
 class StateMachine:
     def __init__(self, mario):
-        self.state = Upper
+        self.state = Attack2
         self.mario = mario
 
     def draw(self):
