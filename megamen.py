@@ -1,4 +1,7 @@
-from pico2d import *
+from pico2d import load_image
+
+import game_world
+import megabuster
 
 
 class Idle:
@@ -95,10 +98,10 @@ class Run:
 
 
 class Jump:
-    l = [16,55,98,142,184,226,268]
-    t = [268,263,262,266,273,274,273]
-    w = [32,36,37,33,38,38,38]
-    h = [44,49,50,46,39,39,39]
+    l = [16, 55, 98, 142, 184, 226, 268]
+    t = [268, 263, 262, 266, 273, 274, 273]
+    w = [32, 36, 37, 33, 38, 38, 38]
+    h = [44, 49, 50, 46, 39, 39, 39]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -126,10 +129,10 @@ class Jump:
 
 
 class SmallShot:
-    l = [13,62,113,163,214,265]
-    t = [399,399,399,399,399,399]
-    w = [44,46,44,45,46,44]
-    h = [44,44,44,44,44,44]
+    l = [13, 62, 113, 163, 214, 265]
+    t = [399, 399, 399, 399, 399, 399]
+    w = [44, 46, 44, 45, 46, 44]
+    h = [44, 44, 44, 44, 44, 44]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -141,6 +144,8 @@ class SmallShot:
     @staticmethod
     def do(megamen):
         megamen.frame = (megamen.frame + 1) % SmallShot.nFrame
+        if megamen.frame == 3:
+            game_world.add_obj(megabuster.MegaBuster(megamen.x + SmallShot.w[megamen.frame], megamen.y), 1)
 
     @staticmethod
     def draw(megamen):
@@ -281,15 +286,15 @@ class PalmStrike:
 
 
 class StateMachine:
-    def __init__(self, megemen):
+    def __init__(self, megamen):
         self.state = SmallShot
-        self.megemen = megemen
+        self.megamen = megamen
 
     def draw(self):
-        self.state.draw(self.megemen)
+        self.state.draw(self.megamen)
 
     def update(self):
-        self.state.do(self.megemen)
+        self.state.do(self.megamen)
 
 
 class MegaMen:
