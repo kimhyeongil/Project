@@ -2,10 +2,10 @@ from pico2d import *
 
 
 class Idle:
-    l = [16,16,16,52,52,]
-    t = [115,115,115,115,115,]
-    w = [31,31,31,31,31]
-    h = [45,45,45,45,45]
+    l = [16, 16, 16, 52, 52, ]
+    t = [115, 115, 115, 115, 115, ]
+    w = [31, 31, 31, 31, 31]
+    h = [45, 45, 45, 45, 45]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -64,10 +64,10 @@ class Attack2:
 
 
 class Run:
-    l = [101,149,189,232,278,326,373,414,457,503]
-    t = [185,184,185,186,186,185,184,185,186,186]
-    w = [30,27,37,42,37,30,28,33,40,38]
-    h = [43,44,44,43,43,44,45,44,42,42]
+    l = [101, 149, 189, 232, 278, 326, 373, 414, 457, 503]
+    t = [185, 184, 185, 186, 186, 185, 184, 185, 186, 186]
+    w = [30, 27, 37, 42, 37, 30, 28, 33, 40, 38]
+    h = [43, 44, 44, 43, 43, 44, 45, 44, 42, 42]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -95,66 +95,64 @@ class Run:
 
 
 class Jump:
-    l = [15, 15, 45, 45, 45, 45, 45, 45, 78, 78, 111, 141, 141, 171]
-    t = [84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 92, 93, 93, 92]
-    w = [24, 24, 27, 27, 27, 27, 27, 27, 29, 29, 26, 26, 26, 26]
-    h = [40, 40, 39, 39, 39, 39, 39, 39, 42, 42, 34, 33, 33, 34]
+    l = [16,55,98,142,184,226,268]
+    t = [268,263,262,266,273,274,273]
+    w = [32,36,37,33,38,38,38]
+    h = [44,49,50,46,39,39,39]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
     @staticmethod
-    def enter(mario, e):
-        mario.frame = 0
+    def enter(megamen, e):
+        megamen.frame = 0
 
     @staticmethod
-    def do(mario):
-        mario.frame = (mario.frame + 1) % Jump.nFrame
+    def do(megamen):
+        megamen.frame = (megamen.frame + 1) % Jump.nFrame
 
     @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            Jump.l[mario.frame],
-            mario.img.h - Jump.t[mario.frame],
-            Jump.w[mario.frame],
-            Jump.h[mario.frame],
-            mario.x,
-            mario.y,
-            Jump.w[mario.frame] * mario.size,
-            Jump.h[mario.frame] * mario.size,
+    def draw(megamen):
+        megamen.img.clip_draw(
+            Jump.l[megamen.frame],
+            megamen.img.h - Jump.t[megamen.frame],
+            Jump.w[megamen.frame],
+            Jump.h[megamen.frame],
+            megamen.x,
+            megamen.y,
+            Jump.w[megamen.frame] * megamen.size,
+            Jump.h[megamen.frame] * megamen.size,
         )
 
 
-class Attack1:
-    l = [12, 12, 54, 105, 152, 193, 233, 270, 307, 356, 356, 400, 400, 13, 13, 46, 46, 73, 73, 125, 125, 169, 169, 205,
-         205, 232, 232]
-    t = [261, 261, 263, 263, 263, 263, 261, 261, 263, 263, 263, 263, 263, 313, 310, 310, 310, 303, 303, 308, 308, 308,
-         308, 308, 308, 314, 314]
-    w = [36, 36, 48, 44, 34, 34, 31, 31, 44, 40, 40, 35, 35, 27, 27, 23, 23, 48, 48, 40, 40, 32, 32, 23, 23, 23, 26]
-    h = [34, 34, 32, 32, 32, 32, 34, 34, 32, 32, 32, 32, 32, 34, 34, 36, 36, 43, 43, 38, 38, 38, 38, 37, 37, 33, 33]
+class SmallShot:
+    l = [13,62,113,163,214,265]
+    t = [399,399,399,399,399,399]
+    w = [44,46,44,45,46,44]
+    h = [44,44,44,44,44,44]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
     @staticmethod
-    def enter(mario, e):
-        mario.frame = 0
+    def enter(megamen, e):
+        megamen.frame = 0
 
     @staticmethod
-    def do(mario):
-        mario.frame = (mario.frame + 1) % Attack1.nFrame
+    def do(megamen):
+        megamen.frame = (megamen.frame + 1) % SmallShot.nFrame
 
     @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            Attack1.l[mario.frame],
-            mario.img.h - Attack1.t[mario.frame],
-            Attack1.w[mario.frame],
-            Attack1.h[mario.frame],
-            mario.x,
-            mario.y,
-            Attack1.w[mario.frame] * mario.size,
-            Attack1.h[mario.frame] * mario.size,
+    def draw(megamen):
+        megamen.img.clip_draw(
+            SmallShot.l[megamen.frame],
+            megamen.img.h - SmallShot.t[megamen.frame],
+            SmallShot.w[megamen.frame],
+            SmallShot.h[megamen.frame],
+            megamen.x,
+            megamen.y,
+            SmallShot.w[megamen.frame] * megamen.size,
+            SmallShot.h[megamen.frame] * megamen.size,
         )
 
 
@@ -284,7 +282,7 @@ class PalmStrike:
 
 class StateMachine:
     def __init__(self, megemen):
-        self.state = Run
+        self.state = SmallShot
         self.megemen = megemen
 
     def draw(self):
