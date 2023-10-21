@@ -3,7 +3,7 @@ from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
 import mario
 import game_world
-
+import megamen
 time_slice = 0.1
 
 
@@ -21,8 +21,8 @@ def create_world():
     global running
     open_canvas()
     running = True
-    game_world.add_obj(mario.Mario(), 1)
-
+    # game_world.add_obj(mario.Mario(), 1)
+    game_world.add_obj(megamen.MegaMen(),1)
 def render():
     clear_canvas()
     game_world.render()
