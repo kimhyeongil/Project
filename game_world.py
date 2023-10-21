@@ -15,3 +15,9 @@ def update():
     for layer in world:
         for o in layer:
             o.update()
+
+def erase_obj(o):
+    for layer in world:
+        if o in layer:
+            layer.remove(o)
+            return
