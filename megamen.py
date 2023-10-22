@@ -192,34 +192,34 @@ class Upper:
         )
 
 
-class SomersaultKick:
-    l = [141, 141, 14, 57, 113, 156, 200, 244, 287, 316]
-    t = [93, 93, 652, 644, 612, 632, 638, 645, 646, 647]
-    w = [26, 26, 37, 50, 37, 38, 38, 37, 23, 29]
-    h = [33, 33, 37, 26, 52, 32, 30, 31, 37, 42]
+class FireSword:
+    l = [23, 67, 123, 185, 248, 309, ]
+    t = [1416, 1418, 1417, 1415, 1419, 1416, ]
+    w = [37, 35, 57, 56, 54, 54, ]
+    h = [46, 44, 55, 55, 45, 46, ]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
     @staticmethod
-    def enter(mario, e):
-        mario.frame = 0
+    def enter(megamen, e):
+        megamen.frame = 0
 
     @staticmethod
-    def do(mario):
-        mario.frame = (mario.frame + 1) % SomersaultKick.nFrame
+    def do(megamen):
+        megamen.frame = (megamen.frame + 1) % FireSword.nFrame
 
     @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            SomersaultKick.l[mario.frame],
-            mario.img.h - SomersaultKick.t[mario.frame],
-            SomersaultKick.w[mario.frame],
-            SomersaultKick.h[mario.frame],
-            mario.x,
-            mario.y,
-            SomersaultKick.w[mario.frame] * mario.size,
-            SomersaultKick.h[mario.frame] * mario.size,
+    def draw(megamen):
+        megamen.img.clip_draw(
+            FireSword.l[megamen.frame],
+            megamen.img.h - FireSword.t[megamen.frame],
+            FireSword.w[megamen.frame],
+            FireSword.h[megamen.frame],
+            megamen.x,
+            megamen.y,
+            FireSword.w[megamen.frame] * megamen.size,
+            FireSword.h[megamen.frame] * megamen.size,
         )
 
 
@@ -287,7 +287,7 @@ class PalmStrike:
 
 class StateMachine:
     def __init__(self, megamen):
-        self.state = Upper
+        self.state = FireSword
         self.megamen = megamen
 
     def draw(self):
