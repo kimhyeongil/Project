@@ -231,7 +231,13 @@ class Tornado:
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
+    tornado_l = [534, 613, 697]
+    tornado_t = [1735, 1732, 1732]
+    tornado_w = [71, 72, 66]
+    tornado_h = [58, 66, 59]
 
+    for i in range(len(tornado_t)):
+        tornado_t[i] += tornado_h[i]
     @staticmethod
     def enter(megamen, e):
         megamen.frame = 0
@@ -242,6 +248,17 @@ class Tornado:
 
     @staticmethod
     def draw(megamen):
+        if megamen.frame < 7:
+            megamen.img.clip_draw(
+                Tornado.tornado_l[megamen.frame % 3],
+                megamen.img.h - Tornado.tornado_t[megamen.frame % 3],
+                Tornado.tornado_w[megamen.frame % 3],
+                Tornado.tornado_h[megamen.frame % 3],
+                megamen.x,
+                megamen.y,
+                Tornado.tornado_w[megamen.frame % 3] * megamen.size,
+                Tornado.tornado_h[megamen.frame % 3] * megamen.size,
+            )
         megamen.img.clip_draw(
             Tornado.l[megamen.frame],
             megamen.img.h - Tornado.t[megamen.frame],
