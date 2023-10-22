@@ -274,40 +274,40 @@ class Tornado:
         )
 
 
-class PalmStrike:
-    l = [13, 43, 76, 108, 141, 141, 189, 232]
-    t = [933, 931, 924, 926, 931, 931, 929, 932]
-    w = [24, 27, 26, 27, 42, 42, 37, 25]
-    h = [35, 32, 42, 40, 35, 35, 37, 34]
+class JumpShot:
+    l = [13,52,95,139,181,223,265]
+    t = [521,516,515,519,526,527,526]
+    w = [37,38,39,38,40,40,40]
+    h = [44,49,50,46,39,38,39]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
     @staticmethod
-    def enter(mario, e):
-        mario.frame = 0
+    def enter(megamen, e):
+        megamen.frame = 0
 
     @staticmethod
-    def do(mario):
-        mario.frame = (mario.frame + 1) % PalmStrike.nFrame
+    def do(megamen):
+        megamen.frame = (megamen.frame + 1) % JumpShot.nFrame
 
     @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            PalmStrike.l[mario.frame],
-            mario.img.h - PalmStrike.t[mario.frame],
-            PalmStrike.w[mario.frame],
-            PalmStrike.h[mario.frame],
-            mario.x,
-            mario.y + PalmStrike.h[mario.frame] - PalmStrike.h[0],
-            PalmStrike.w[mario.frame] * mario.size,
-            PalmStrike.h[mario.frame] * mario.size,
+    def draw(megamen):
+        megamen.img.clip_draw(
+            JumpShot.l[megamen.frame],
+            megamen.img.h - JumpShot.t[megamen.frame],
+            JumpShot.w[megamen.frame],
+            JumpShot.h[megamen.frame],
+            megamen.x,
+            megamen.y + JumpShot.h[megamen.frame] - JumpShot.h[0],
+            JumpShot.w[megamen.frame] * megamen.size,
+            JumpShot.h[megamen.frame] * megamen.size,
         )
 
 
 class StateMachine:
     def __init__(self, megamen):
-        self.state = RunShot
+        self.state = JumpShot
         self.megamen = megamen
 
     def draw(self):
