@@ -55,7 +55,7 @@ class Attack2:
             Attack2.l[mario.frame],
             mario.img.h - Attack2.t[mario.frame],
             Attack2.w[mario.frame],
-            Idle.h[mario.frame],
+            Attack2.h[mario.frame],
             mario.x,
             mario.y,
             Attack2.w[mario.frame] * mario.size,
