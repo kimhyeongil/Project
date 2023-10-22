@@ -223,34 +223,34 @@ class FireSword:
         )
 
 
-class MagicCape:
-    l = [40, 80, 109, 168, 221, 275, 307, 340, 384, 418]
-    t = [1337, 1337, 1336, 1340, 1322, 1321, 1336, 1339, 1340, 1340]
-    w = [30, 23, 53, 47, 45, 26, 27, 38, 27, 25]
-    h = [37, 37, 38, 34, 52, 53, 38, 35, 34, 34]
+class Tornado:
+    l = [22, 60, 102, 134, 174, 216, 253, 292, 336, 380, 424]
+    t = [1744, 1744, 1744, 1744, 1744, 1744, 1747, 1751, 1751, 1750, 1745]
+    w = [34, 37, 26, 31, 34, 26, 31, 40, 38, 38, 34]
+    h = [50, 50, 50, 50, 50, 50, 47, 40, 40, 39, 44]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
     @staticmethod
-    def enter(mario, e):
-        mario.frame = 0
+    def enter(megamen, e):
+        megamen.frame = 0
 
     @staticmethod
-    def do(mario):
-        mario.frame = (mario.frame + 1) % MagicCape.nFrame
+    def do(megamen):
+        megamen.frame = (megamen.frame + 1) % Tornado.nFrame
 
     @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            MagicCape.l[mario.frame],
-            mario.img.h - MagicCape.t[mario.frame],
-            MagicCape.w[mario.frame],
-            MagicCape.h[mario.frame],
-            mario.x,
-            mario.y + MagicCape.h[mario.frame] - MagicCape.h[0],
-            MagicCape.w[mario.frame] * mario.size,
-            MagicCape.h[mario.frame] * mario.size,
+    def draw(megamen):
+        megamen.img.clip_draw(
+            Tornado.l[megamen.frame],
+            megamen.img.h - Tornado.t[megamen.frame],
+            Tornado.w[megamen.frame],
+            Tornado.h[megamen.frame],
+            megamen.x,
+            megamen.y + Tornado.h[megamen.frame] - Tornado.h[0],
+            Tornado.w[megamen.frame] * megamen.size,
+            Tornado.h[megamen.frame] * megamen.size,
         )
 
 
@@ -287,7 +287,7 @@ class PalmStrike:
 
 class StateMachine:
     def __init__(self, megamen):
-        self.state = FireSword
+        self.state = Tornado
         self.megamen = megamen
 
     def draw(self):
