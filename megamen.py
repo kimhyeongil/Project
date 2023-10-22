@@ -162,33 +162,33 @@ class SmallShot:
 
 
 class Upper:
-    l = [14, 14, 54, 54, 96, 54]
-    t = [557, 557, 550, 550, 535, 550]
-    w = [35, 35, 34, 34, 22, 34]
-    h = [30, 30, 38, 38, 53, 38]
+    l = [20, 56, 97, 130]
+    t = [861, 864, 847, 843]
+    w = [29, 35, 24, 21, ]
+    h = [42, 39, 56, 56]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
     @staticmethod
-    def enter(mario, e):
-        mario.frame = 0
+    def enter(megamen, e):
+        megamen.frame = 0
 
     @staticmethod
-    def do(mario):
-        mario.frame = (mario.frame + 1) % Upper.nFrame
+    def do(megamen):
+        megamen.frame = (megamen.frame + 1) % Upper.nFrame
 
     @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            Upper.l[mario.frame],
-            mario.img.h - Upper.t[mario.frame],
-            Upper.w[mario.frame],
-            Upper.h[mario.frame],
-            mario.x,
-            mario.y,
-            Upper.w[mario.frame] * mario.size,
-            Upper.h[mario.frame] * mario.size,
+    def draw(megamen):
+        megamen.img.clip_draw(
+            Upper.l[megamen.frame],
+            megamen.img.h - Upper.t[megamen.frame],
+            Upper.w[megamen.frame],
+            Upper.h[megamen.frame],
+            megamen.x,
+            megamen.y,
+            Upper.w[megamen.frame] * megamen.size,
+            Upper.h[megamen.frame] * megamen.size,
         )
 
 
@@ -287,7 +287,7 @@ class PalmStrike:
 
 class StateMachine:
     def __init__(self, megamen):
-        self.state = SmallShot
+        self.state = Upper
         self.megamen = megamen
 
     def draw(self):
