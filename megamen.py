@@ -36,10 +36,10 @@ class Idle:
 
 
 class RunShot:
-    l = [62,110,218,170,239,287,334,314,394,464]
-    t = [457,456,334,458,458,457,456,328,457,458]
-    w = [42,39,44,46,45,42,40,44,46,45]
-    h = [43,44,44,43,43,44,45,44,42,42]
+    l = [62, 110, 218, 170, 239, 287, 334, 314, 394, 464]
+    t = [457, 456, 334, 458, 458, 457, 456, 328, 457, 458]
+    w = [42, 39, 44, 46, 45, 42, 40, 44, 46, 45]
+    h = [43, 44, 44, 43, 43, 44, 45, 44, 42, 42]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -50,6 +50,8 @@ class RunShot:
 
     @staticmethod
     def do(megamen):
+        if megamen.frame == 3 or megamen.frame == 8:
+            game_world.add_obj(megabuster.MegaBuster(megamen.x + RunShot.w[megamen.frame], megamen.y), 1)
         megamen.frame = (megamen.frame + 1) % RunShot.nFrame
 
     @staticmethod
@@ -238,6 +240,7 @@ class Tornado:
 
     for i in range(len(tornado_t)):
         tornado_t[i] += tornado_h[i]
+
     @staticmethod
     def enter(megamen, e):
         megamen.frame = 0
