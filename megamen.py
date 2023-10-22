@@ -50,9 +50,9 @@ class RunShot:
 
     @staticmethod
     def do(megamen):
+        megamen.frame = (megamen.frame + 1) % RunShot.nFrame
         if megamen.frame == 3 or megamen.frame == 8:
             game_world.add_obj(megabuster.MegaBuster(megamen.x + RunShot.w[megamen.frame], megamen.y), 1)
-        megamen.frame = (megamen.frame + 1) % RunShot.nFrame
 
     @staticmethod
     def draw(megamen):
@@ -290,6 +290,9 @@ class JumpShot:
     @staticmethod
     def do(megamen):
         megamen.frame = (megamen.frame + 1) % JumpShot.nFrame
+        if megamen.frame == 2:
+            game_world.add_obj(megabuster.MegaBuster(megamen.x + JumpShot.w[megamen.frame],
+                                                     megamen.y + JumpShot.h[megamen.frame] // 2),1)
 
     @staticmethod
     def draw(megamen):
@@ -307,7 +310,7 @@ class JumpShot:
 
 class StateMachine:
     def __init__(self, megamen):
-        self.state = JumpShot
+        self.state = RunShot
         self.megamen = megamen
 
     def draw(self):
