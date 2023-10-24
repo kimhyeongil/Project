@@ -76,6 +76,11 @@ class Run:
 
     @staticmethod
     def enter(mario, e):
+        if mario.control_method.move_r_down(e):
+            mario.face_dir = "r"
+            print("r")
+        elif mario.control_method.move_l_down(e):
+            mario.face_dir = "l"
         mario.frame = 0
 
     @staticmethod
@@ -84,16 +89,29 @@ class Run:
 
     @staticmethod
     def draw(mario):
-        mario.img.clip_draw(
-            Run.l[mario.frame],
-            mario.img.h - Run.t[mario.frame],
-            Run.w[mario.frame],
-            Run.h[mario.frame],
-            mario.x,
-            mario.y,
-            Run.w[mario.frame] * mario.size,
-            Run.h[mario.frame] * mario.size,
-        )
+        if mario.face_dir == "r":
+            mario.img.clip_draw(
+                Run.l[mario.frame],
+                mario.img.h - Run.t[mario.frame],
+                Run.w[mario.frame],
+                Run.h[mario.frame],
+                mario.x,
+                mario.y,
+                Run.w[mario.frame] * mario.size,
+                Run.h[mario.frame] * mario.size,
+            )
+        elif mario.face_dir == "l":
+            mario.img.clip_composite_draw(
+                Run.l[mario.frame],
+                mario.img.h - Run.t[mario.frame],
+                Run.w[mario.frame],
+                Run.h[mario.frame],
+                0,'h',
+                mario.x,
+                mario.y,
+                Run.w[mario.frame] * mario.size,
+                Run.h[mario.frame] * mario.size,
+            )
 
 
 class Jump:
@@ -301,7 +319,7 @@ class StateMachine:
         for check, next_state in self.table[self.state].items():
             if check(("INPUT", e)):
                 self.state = next_state
-                self.state.enter(self.mario, e)
+                self.state.enter(self.mario, ("INPUT",e))
 
 
 class Mario:
@@ -312,6 +330,7 @@ class Mario:
         self.frame = 0
         self.size = 2
         self.control_method = control_method
+        self.face_dir = "r"
         self.state_machine = StateMachine(self)
         if Mario.img == None:
             Mario.img = load_image('mario.png')
