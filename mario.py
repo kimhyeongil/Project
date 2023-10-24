@@ -288,7 +288,7 @@ class StateMachine:
     def __init__(self, mario):
         self.state = Idle
         self.mario = mario
-        self.table = {Idle: {control.Player1.move_r_down: Run},
+        self.table = {Idle: {control.Player1.move_r_down: Run, control.Player1.move_l_down: Run},
                       Run: {}}
 
     def draw(self):
