@@ -22,16 +22,29 @@ class Idle:
 
     @staticmethod
     def draw(mario):
-        mario.img.clip_draw(
-            Idle.l[mario.frame],
-            mario.img.h - Idle.t[mario.frame],
-            Idle.w[mario.frame],
-            Idle.h[mario.frame],
-            mario.x,
-            mario.y,
-            Idle.w[mario.frame] * mario.size,
-            Idle.h[mario.frame] * mario.size,
-        )
+        if mario.face_dir == "r":
+            mario.img.clip_draw(
+                Idle.l[mario.frame],
+                mario.img.h - Idle.t[mario.frame],
+                Idle.w[mario.frame],
+                Idle.h[mario.frame],
+                mario.x,
+                mario.y,
+                Idle.w[mario.frame] * mario.size,
+                Idle.h[mario.frame] * mario.size,
+            )
+        elif mario.face_dir == "l":
+            mario.img.clip_composite_draw(
+                Idle.l[mario.frame],
+                mario.img.h - Idle.t[mario.frame],
+                Idle.w[mario.frame],
+                Idle.h[mario.frame],
+                0,'h',
+                mario.x,
+                mario.y,
+                Idle.w[mario.frame] * mario.size,
+                Idle.h[mario.frame] * mario.size,
+            )
 
 
 class Attack2:
