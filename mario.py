@@ -307,7 +307,7 @@ class StateMachine:
         self.state = Idle
         self.mario = mario
         self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run},
-                      Run: {}}
+                      Run: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run}}
 
     def draw(self):
         self.state.draw(self.mario)
