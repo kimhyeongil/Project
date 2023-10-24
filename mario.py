@@ -1,5 +1,7 @@
 from pico2d import *
 
+import control
+
 
 class Idle:
     l = [18, 18, 45, 45, 72, 72, 99, 99, 126, 126, 153, 153, 126, 126, 99, 99, 72, 72, 45, 45]
@@ -284,14 +286,22 @@ class PalmStrike:
 
 class StateMachine:
     def __init__(self, mario):
-        self.state = PalmStrike
+        self.state = Idle
         self.mario = mario
+        self.table = {Idle: {control.Player1.move_r_down: Run},
+                      Run: {}}
 
     def draw(self):
         self.state.draw(self.mario)
 
     def update(self):
         self.state.do(self.mario)
+
+    def handle_events(self, e):
+        for check, next_state in self.table[self.state].items():
+            if check(("INPUT", e)):
+                self.state = next_state
+                self.state.enter(self.mario, e)
 
 
 class Mario:

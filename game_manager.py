@@ -16,14 +16,18 @@ def handle_events():
             running = False
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             running = False
+        else:
+            player1.state_machine.handle_events(event)
 
 
 def create_world():
     global running
+    global player1
     open_canvas()
     running = True
-    # game_world.add_obj(mario.Mario(), 1)
-    game_world.add_obj(megamen.MegaMen(), 1)
+    player1 = mario.Mario()
+    game_world.add_obj(player1, 1)
+    # game_world.add_obj(megamen.MegaMen(), 1)
 
 
 def render():
