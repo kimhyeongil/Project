@@ -76,10 +76,10 @@ class Run:
 
     @staticmethod
     def enter(mario, e):
-        if mario.control_method.move_r_down(e):
+        if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
             mario.face_dir = "r"
             print("r")
-        elif mario.control_method.move_l_down(e):
+        elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
             mario.face_dir = "l"
         mario.frame = 0
 
@@ -306,8 +306,10 @@ class StateMachine:
     def __init__(self, mario):
         self.state = Idle
         self.mario = mario
-        self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run},
-                      Run: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run}}
+        self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run,
+                             mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run},
+                      Run: {mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
+                            mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle}}
 
     def draw(self):
         self.state.draw(self.mario)
