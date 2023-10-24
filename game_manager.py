@@ -1,6 +1,7 @@
 from pico2d import open_canvas, delay, close_canvas, get_events, clear_canvas, update_canvas
 from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
+import control
 import mario
 import game_world
 import megamen
@@ -25,7 +26,7 @@ def create_world():
     global player1
     open_canvas()
     running = True
-    player1 = mario.Mario()
+    player1 = mario.Mario(control.Player1)
     game_world.add_obj(player1, 1)
     # game_world.add_obj(megamen.MegaMen(), 1)
 

@@ -288,7 +288,7 @@ class StateMachine:
     def __init__(self, mario):
         self.state = Idle
         self.mario = mario
-        self.table = {Idle: {control.Player1.move_r_down: Run, control.Player1.move_l_down: Run},
+        self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run},
                       Run: {}}
 
     def draw(self):
@@ -307,10 +307,11 @@ class StateMachine:
 class Mario:
     img = None
 
-    def __init__(self):
+    def __init__(self, control_method):
         self.x, self.y = 400, 300
         self.frame = 0
         self.size = 2
+        self.control_method = control_method
         self.state_machine = StateMachine(self)
         if Mario.img == None:
             Mario.img = load_image('mario.png')
