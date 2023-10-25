@@ -141,10 +141,14 @@ class Jump:
     @staticmethod
     def enter(mario, e):
         mario.frame = 0
+        mario.speed[1] = 100
 
     @staticmethod
     def do(mario):
         mario.frame = (mario.frame + 1) % Jump.nFrame
+        mario.x += mario.speed[0] * game_world.time_slice
+        mario.y += mario.speed[1] * game_world.time_slice
+        mario.speed[1] -= game_world.g * game_world.time_slice
 
     @staticmethod
     def draw(mario):
