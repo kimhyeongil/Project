@@ -142,20 +142,23 @@ class Jump:
     @staticmethod
     def enter(mario, e):
         mario.frame = 0
-        mario.speed[1] = 100
+        mario.speed[1] = 300
 
     @staticmethod
     def do(mario):
-        if mario.y < game_world.ground:
-            mario.y = game_world.ground
-            mario.speed[1] = 0
-            mario.state_machine.state = Idle
-            mario.state_machine.state.enter(mario, ("LAND", 0))
-            return
         mario.frame = (mario.frame + 1) % Jump.nFrame
         mario.x += mario.speed[0] * game_world.time_slice
         mario.y += mario.speed[1] * game_world.time_slice
         mario.speed[1] -= game_world.g * game_world.time_slice
+        if mario.y <= game_world.ground:
+            mario.y = game_world.ground
+            mario.speed[1] = 0
+            if mario.speed[0] == 0:
+                mario.state_machine.state = Idle
+                mario.state_machine.state.enter(mario, ("LAND", 0))
+            else:
+                mario.state_machine.state = Run
+                mario.state_machine.state.enter(mario, ("LAND", 0))
 
     @staticmethod
     def draw(mario):
