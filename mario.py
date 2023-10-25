@@ -15,6 +15,7 @@ class Idle:
     @staticmethod
     def enter(mario, e):
         mario.frame = 0
+        mario.speed = [0, 0]
 
     @staticmethod
     def do(mario):
@@ -145,7 +146,8 @@ class Jump:
 
     @staticmethod
     def do(mario):
-        if mario.y + Jump.h[mario.frame] <= game_world.ground:
+        if mario.y < game_world.ground:
+            mario.y = game_world.ground
             mario.speed[1] = 0
             mario.state_machine.state = Idle
             mario.state_machine.state.enter(mario, ("LAND", 0))
@@ -157,16 +159,30 @@ class Jump:
 
     @staticmethod
     def draw(mario):
-        mario.img.clip_draw(
-            Jump.l[mario.frame],
-            mario.img.h - Jump.t[mario.frame],
-            Jump.w[mario.frame],
-            Jump.h[mario.frame],
-            mario.x,
-            mario.y,
-            Jump.w[mario.frame] * mario.size,
-            Jump.h[mario.frame] * mario.size,
-        )
+        if mario.face_dir == "r":
+            mario.img.clip_draw(
+                Jump.l[mario.frame],
+                mario.img.h - Jump.t[mario.frame],
+                Jump.w[mario.frame],
+                Jump.h[mario.frame],
+                mario.x,
+                mario.y,
+                Jump.w[mario.frame] * mario.size,
+                Jump.h[mario.frame] * mario.size,
+            )
+        elif mario.face_dir == "l":
+            mario.img.clip_composite_draw(
+                Jump.l[mario.frame],
+                mario.img.h - Jump.t[mario.frame],
+                Jump.w[mario.frame],
+                Jump.h[mario.frame],
+                0, 'h',
+                mario.x,
+                mario.y,
+                Jump.w[mario.frame] * mario.size,
+                Jump.h[mario.frame] * mario.size,
+            )
+
 
 
 class Attack1:
@@ -336,7 +352,8 @@ class StateMachine:
                       Run: {mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
                             mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
                             mario.control_method.jump_down: Jump
-                            }, }
+                            },
+                      Jump: {}}
 
     def draw(self):
         self.state.draw(self.mario)
