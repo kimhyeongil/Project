@@ -6,7 +6,6 @@ import mario
 import game_world
 import megamen
 
-time_slice = 0.1
 
 
 def handle_events():
@@ -46,5 +45,5 @@ while running:
     handle_events()
     render()
     update()
-    delay(time_slice)
+    delay(game_world.time_slice)
 close_canvas()

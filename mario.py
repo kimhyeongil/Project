@@ -1,13 +1,13 @@
 from pico2d import *
 
-import control
+import game_world
 
 
 class Idle:
-    l = [18, 18, 45, 45, 72, 72, 99, 99, 126, 126, 153, 153, 126, 126, 99, 99, 72, 72, 45, 45]
-    t = [25, 25, 24, 24, 23, 23, 23, 23, 24, 24, 25, 25, 24, 24, 23, 23, 23, 23, 24, 24]
-    w = [23, 23, 23, 23, 23, 23, 24, 24, 25, 25, 25, 25, 25, 25, 24, 24, 23, 23, 23, 23]
-    h = [36, 36, 37, 37, 38, 38, 38, 38, 37, 37, 36, 36, 37, 37, 38, 38, 38, 38, 37, 37]
+    l = [18, 45, 72, 99, 126, 153, 126, 99, 72, 45]
+    t = [25, 24, 23, 23, 24, 25, 24, 23, 23, 24]
+    w = [23, 23, 23, 24, 25, 25, 25, 24, 23, 23]
+    h = [36, 37, 38, 38, 37, 36, 37, 38, 38, 37]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -39,7 +39,7 @@ class Idle:
                 mario.img.h - Idle.t[mario.frame],
                 Idle.w[mario.frame],
                 Idle.h[mario.frame],
-                0,'h',
+                0, 'h',
                 mario.x,
                 mario.y,
                 Idle.w[mario.frame] * mario.size,
@@ -91,14 +91,16 @@ class Run:
     def enter(mario, e):
         if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
             mario.face_dir = "r"
-            print("r")
+            mario.speed[0] = 100
         elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
             mario.face_dir = "l"
+            mario.speed[0] = -100
         mario.frame = 0
 
     @staticmethod
     def do(mario):
         mario.frame = (mario.frame + 1) % Run.nFrame
+        mario.x += mario.speed[0] * game_world.time_slice
 
     @staticmethod
     def draw(mario):
@@ -119,7 +121,7 @@ class Run:
                 mario.img.h - Run.t[mario.frame],
                 Run.w[mario.frame],
                 Run.h[mario.frame],
-                0,'h',
+                0, 'h',
                 mario.x,
                 mario.y,
                 Run.w[mario.frame] * mario.size,
@@ -334,7 +336,7 @@ class StateMachine:
         for check, next_state in self.table[self.state].items():
             if check(("INPUT", e)):
                 self.state = next_state
-                self.state.enter(self.mario, ("INPUT",e))
+                self.state.enter(self.mario, ("INPUT", e))
 
 
 class Mario:
@@ -346,6 +348,7 @@ class Mario:
         self.size = 2
         self.control_method = control_method
         self.face_dir = "r"
+        self.speed = [0, 0]
         self.state_machine = StateMachine(self)
         if Mario.img == None:
             Mario.img = load_image('mario.png')
