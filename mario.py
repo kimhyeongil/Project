@@ -130,10 +130,10 @@ class Run:
 
 
 class Jump:
-    l = [15, 15, 45, 45, 45, 45, 45, 45, 78, 78, 111, 141, 141, 171]
-    t = [84, 84, 84, 84, 84, 84, 84, 84, 84, 84, 92, 93, 93, 92]
-    w = [24, 24, 27, 27, 27, 27, 27, 27, 29, 29, 26, 26, 26, 26]
-    h = [40, 40, 39, 39, 39, 39, 39, 39, 42, 42, 34, 33, 33, 34]
+    l = [15, 45, 45, 45, 78, 111, 141, 171]
+    t = [84, 84, 84, 84, 84, 92, 93, 92]
+    w = [24, 27, 27, 27, 29, 26, 26, 26]
+    h = [40, 39, 39, 39, 42, 34, 33, 34]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -322,9 +322,12 @@ class StateMachine:
         self.state = Idle
         self.mario = mario
         self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run,
-                             mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run},
+                             mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run,
+                             mario.control_method.jump_down: Jump},
                       Run: {mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
-                            mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle}}
+                            mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
+                            mario.control_method.jump_down: Jump
+                            }, }
 
     def draw(self):
         self.state.draw(self.mario)
