@@ -101,7 +101,7 @@ class Run:
     @staticmethod
     def do(mario):
         mario.frame = (mario.frame + 1) % Run.nFrame
-        mario.x += mario.speed[0] * game_world.time_slice
+        mario.move()
 
     @staticmethod
     def draw(mario):
@@ -147,8 +147,7 @@ class Jump:
     @staticmethod
     def do(mario):
         mario.frame = (mario.frame + 1) % Jump.nFrame
-        mario.x += mario.speed[0] * game_world.time_slice
-        mario.y += mario.speed[1] * game_world.time_slice
+        mario.move()
         if mario.y > game_world.ground:
             mario.speed[1] -= game_world.g * game_world.time_slice
             if mario.frame > 4:
@@ -394,3 +393,7 @@ class Mario:
 
     def update(self):
         self.state_machine.update()
+
+    def move(self):
+        self.x += self.speed[0] * game_world.time_slice
+        self.y += self.speed[1] * game_world.time_slice
