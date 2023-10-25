@@ -149,8 +149,11 @@ class Jump:
         mario.frame = (mario.frame + 1) % Jump.nFrame
         mario.x += mario.speed[0] * game_world.time_slice
         mario.y += mario.speed[1] * game_world.time_slice
-        mario.speed[1] -= game_world.g * game_world.time_slice
-        if mario.y <= game_world.ground:
+        if mario.y > game_world.ground:
+            mario.speed[1] -= game_world.g * game_world.time_slice
+            if mario.frame > 4:
+                mario.frame = 4
+        else:
             mario.y = game_world.ground
             mario.speed[1] = 0
             if mario.speed[0] == 0:
