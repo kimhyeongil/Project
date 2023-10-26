@@ -16,6 +16,7 @@ class Idle:
     def enter(mario, e):
         mario.frame = 0
         mario.speed = [0, 0]
+        mario.dir = 0
 
     @staticmethod
     def do(mario):
@@ -93,9 +94,11 @@ class Run:
         if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
             mario.face_dir = "r"
             mario.speed[0] = 100
+            mario.dir += 1
         elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
             mario.face_dir = "l"
             mario.speed[0] = -100
+            mario.dir -= 1
         mario.frame = 0
 
     @staticmethod
@@ -141,8 +144,13 @@ class Jump:
 
     @staticmethod
     def enter(mario, e):
-        mario.frame = 0
-        mario.speed[1] = 300
+        if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
+            mario.dir += 1
+        elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
+            mario.dir -= 1
+        elif mario.control_method.jump_down(e):
+            mario.frame = 0
+            mario.speed[1] = 300
 
     @staticmethod
     def do(mario):
@@ -156,7 +164,7 @@ class Jump:
             mario.y = game_world.ground
             mario.speed[1] = 0
             if mario.frame == 0:
-                if mario.speed[0] == 0:
+                if mario.dir == 0:
                     mario.state_machine.state = Idle
                     mario.state_machine.state.enter(mario, ("LAND", 0))
                 else:
@@ -359,7 +367,8 @@ class StateMachine:
                             mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
                             mario.control_method.jump_down: Jump
                             },
-                      Jump: {}}
+                      Jump: {mario.control_method.move_r_down: Jump, mario.control_method.move_l_down: Jump,
+                            mario.control_method.move_r_up: Jump, mario.control_method.move_l_up: Jump}}
 
     def draw(self):
         self.state.draw(self.mario)
@@ -383,6 +392,7 @@ class Mario:
         self.size = 2
         self.control_method = control_method
         self.face_dir = "r"
+        self.dir = 0
         self.speed = [0, 0]
         self.state_machine = StateMachine(self)
         if Mario.img == None:
