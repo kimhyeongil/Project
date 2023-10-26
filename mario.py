@@ -155,7 +155,7 @@ class Jump:
         else:
             mario.y = game_world.ground
             mario.speed[1] = 0
-            if mario.frame == Jump.nFrame - 1:
+            if mario.frame == 0:
                 if mario.speed[0] == 0:
                     mario.state_machine.state = Idle
                     mario.state_machine.state.enter(mario, ("LAND", 0))
