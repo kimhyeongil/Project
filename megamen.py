@@ -125,7 +125,7 @@ class Run:
                 Run.w[megamen.frame],
                 Run.h[megamen.frame],
                 megamen.x,
-                megamen.y,
+                megamen.y + Run.h[megamen.frame] * megamen.size // 2,
                 Run.w[megamen.frame] * megamen.size,
                 Run.h[megamen.frame] * megamen.size,
             )
@@ -137,7 +137,7 @@ class Run:
                 Run.h[megamen.frame],
                 0, 'h',
                 megamen.x,
-                megamen.y,
+                megamen.y + Run.h[megamen.frame] * megamen.size // 2,
                 Run.w[megamen.frame] * megamen.size,
                 Run.h[megamen.frame] * megamen.size,
             )
@@ -190,7 +190,7 @@ class Jump:
                 Jump.w[megamen.frame],
                 Jump.h[megamen.frame],
                 megamen.x,
-                megamen.y,
+                megamen.y + Jump.h[megamen.frame] * megamen.size // 2,
                 Jump.w[megamen.frame] * megamen.size,
                 Jump.h[megamen.frame] * megamen.size,
             )
@@ -202,7 +202,7 @@ class Jump:
                 Jump.h[megamen.frame],
                 0, 'h',
                 megamen.x,
-                megamen.y,
+                megamen.y + Jump.h[megamen.frame] * megamen.size // 2,
                 Jump.w[megamen.frame] * megamen.size,
                 Jump.h[megamen.frame] * megamen.size,
             )

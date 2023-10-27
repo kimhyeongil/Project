@@ -122,7 +122,7 @@ class Run:
                 Run.w[mario.frame],
                 Run.h[mario.frame],
                 mario.x,
-                mario.y,
+                mario.y + Run.h[mario.frame] * mario.size // 2,
                 Run.w[mario.frame] * mario.size,
                 Run.h[mario.frame] * mario.size,
             )
@@ -134,7 +134,7 @@ class Run:
                 Run.h[mario.frame],
                 0, 'h',
                 mario.x,
-                mario.y,
+                mario.y + Run.h[mario.frame] * mario.size // 2,
                 Run.w[mario.frame] * mario.size,
                 Run.h[mario.frame] * mario.size,
             )
@@ -187,7 +187,7 @@ class Jump:
                 Jump.w[mario.frame],
                 Jump.h[mario.frame],
                 mario.x,
-                mario.y,
+                mario.y + Jump.h[mario.frame] * mario.size // 2,
                 Jump.w[mario.frame] * mario.size,
                 Jump.h[mario.frame] * mario.size,
             )
@@ -199,7 +199,7 @@ class Jump:
                 Jump.h[mario.frame],
                 0, 'h',
                 mario.x,
-                mario.y,
+                mario.y + Jump.h[mario.frame] * mario.size // 2,
                 Jump.w[mario.frame] * mario.size,
                 Jump.h[mario.frame] * mario.size,
             )
