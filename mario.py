@@ -386,12 +386,12 @@ class StateMachine:
 class Mario:
     img = None
 
-    def __init__(self, control_method):
-        self.x, self.y = 400, 300
+    def __init__(self, control_method): 
+        self.x, self.y = control_method.x, game_world.ground
         self.frame = 0
         self.size = 2
         self.control_method = control_method
-        self.face_dir = "r"
+        self.face_dir = control_method.start_face
         self.dir = 0
         self.speed = [0, 0]
         self.state_machine = StateMachine(self)
