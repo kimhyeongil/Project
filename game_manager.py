@@ -25,7 +25,7 @@ def create_world():
     global player1
     open_canvas()
     running = True
-    player1 = mario.Mario(control.Player1)
+    player1 = mario.Mario(control.Player2)
     game_world.add_obj(player1, 1)
     # game_world.add_obj(megamen.MegaMen(), 1)
 
