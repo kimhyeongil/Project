@@ -18,15 +18,18 @@ def handle_events():
             running = False
         else:
             player1.state_machine.handle_events(event)
+            player2.state_machine.handle_events(event)
 
 
 def create_world():
     global running
-    global player1
+    global player1, player2
     open_canvas()
     running = True
-    player1 = mario.Mario(control.Player2)
+    player1 = megamen.MegaMen(control.Player1)
+    player2 = mario.Mario(control.Player2)
     game_world.add_obj(player1, 1)
+    game_world.add_obj(player2, 1)
     # game_world.add_obj(megamen.MegaMen(), 1)
 
 
