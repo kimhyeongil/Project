@@ -32,7 +32,7 @@ class Idle:
                 Idle.w[megamen.frame],
                 Idle.h[megamen.frame],
                 megamen.x,
-                megamen.y,
+                megamen.y + Idle.h[megamen.frame] * megamen.size // 2,
                 Idle.w[megamen.frame] * megamen.size,
                 Idle.h[megamen.frame] * megamen.size,
             )
@@ -44,7 +44,7 @@ class Idle:
                 Idle.h[megamen.frame],
                 0, 'h',
                 megamen.x,
-                megamen.y,
+                megamen.y + Idle.h[megamen.frame] * megamen.size // 2,
                 Idle.w[megamen.frame] * megamen.size,
                 Idle.h[megamen.frame] * megamen.size,
             )

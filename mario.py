@@ -31,7 +31,7 @@ class Idle:
                 Idle.w[mario.frame],
                 Idle.h[mario.frame],
                 mario.x,
-                mario.y,
+                mario.y + Idle.h[mario.frame] * mario.size // 2,
                 Idle.w[mario.frame] * mario.size,
                 Idle.h[mario.frame] * mario.size,
             )
@@ -43,7 +43,7 @@ class Idle:
                 Idle.h[mario.frame],
                 0, 'h',
                 mario.x,
-                mario.y,
+                mario.y + Idle.h[mario.frame] * mario.size // 2,
                 Idle.w[mario.frame] * mario.size,
                 Idle.h[mario.frame] * mario.size,
             )
