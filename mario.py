@@ -99,6 +99,13 @@ class Run:
             mario.face_dir = "l"
             mario.speed[0] = -100
             mario.dir -= 1
+        elif e[0] == "LAND":
+            if e[1] == 1:
+                mario.face_dir = "r"
+                mario.speed[0] = 100
+            else:
+                mario.face_dir = "l"
+                mario.speed[0] = -100
         mario.frame = 0
 
     @staticmethod
@@ -169,7 +176,7 @@ class Jump:
                     mario.state_machine.state.enter(mario, ("LAND", 0))
                 else:
                     mario.state_machine.state = Run
-                    mario.state_machine.state.enter(mario, ("LAND", 0))
+                    mario.state_machine.state.enter(mario, ("LAND", mario.dir))
 
     @staticmethod
     def draw(mario):
