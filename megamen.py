@@ -1,7 +1,7 @@
 from pico2d import load_image
 
 import game_world
-import megabuster
+import megamen_projectile
 
 
 class Idle:
@@ -24,7 +24,6 @@ class Idle:
         megemen.frame = (megemen.frame + 1) % Idle.nFrame
 
 
-
 class RunShot:
     l = [62, 110, 218, 170, 239, 287, 334, 314, 394, 464]
     t = [457, 456, 334, 458, 458, 457, 456, 328, 457, 458]
@@ -43,8 +42,6 @@ class RunShot:
         megamen.frame = (megamen.frame + 1) % RunShot.nFrame
         if megamen.frame == 3 or megamen.frame == 8:
             game_world.add_obj(megabuster.MegaBuster(megamen.x + RunShot.w[megamen.frame], megamen.y), 1)
-
-
 
 
 class Run:
@@ -120,7 +117,6 @@ class Jump:
                     megamen.state_machine.state.enter(megamen, ("LAND", megamen.dir))
 
 
-
 class SmallShot:
     l = [13, 62, 113, 163, 214, 265]
     t = [399, 399, 399, 399, 399, 399]
@@ -159,7 +155,6 @@ class Upper:
         megamen.frame = (megamen.frame + 1) % Upper.nFrame
 
 
-
 class FireSword:
     l = [23, 67, 123, 185, 248, 309, ]
     t = [1416, 1418, 1417, 1415, 1419, 1416, ]
@@ -178,7 +173,6 @@ class FireSword:
         megamen.frame = (megamen.frame + 1) % FireSword.nFrame
 
 
-
 class Tornado:
     l = [22, 60, 102, 134, 174, 216, 253, 292, 336, 380, 424]
     t = [1744, 1744, 1744, 1744, 1744, 1744, 1747, 1751, 1751, 1750, 1745]
@@ -187,45 +181,15 @@ class Tornado:
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
-    tornado_l = [534, 613, 697]
-    tornado_t = [1735, 1732, 1732]
-    tornado_w = [71, 72, 66]
-    tornado_h = [58, 66, 59]
-
-    for i in range(len(tornado_t)):
-        tornado_t[i] += tornado_h[i]
 
     @staticmethod
     def enter(megamen, e):
         megamen.frame = 0
+        game_world.add_obj(megamen_projectile.MegaTornado(megamen.x, megamen.y + Tornado.h[megamen.frame], 100), 1)
 
     @staticmethod
     def do(megamen):
         megamen.frame = (megamen.frame + 1) % Tornado.nFrame
-
-    @staticmethod
-    def draw(megamen):
-        if megamen.frame < 7:
-            megamen.img.clip_draw(
-                Tornado.tornado_l[megamen.frame % 3],
-                megamen.img.h - Tornado.tornado_t[megamen.frame % 3],
-                Tornado.tornado_w[megamen.frame % 3],
-                Tornado.tornado_h[megamen.frame % 3],
-                megamen.x,
-                megamen.y,
-                Tornado.tornado_w[megamen.frame % 3] * megamen.size,
-                Tornado.tornado_h[megamen.frame % 3] * megamen.size,
-            )
-        megamen.img.clip_draw(
-            Tornado.l[megamen.frame],
-            megamen.img.h - Tornado.t[megamen.frame],
-            Tornado.w[megamen.frame],
-            Tornado.h[megamen.frame],
-            megamen.x,
-            megamen.y + Tornado.h[megamen.frame] - Tornado.h[0],
-            Tornado.w[megamen.frame] * megamen.size,
-            Tornado.h[megamen.frame] * megamen.size,
-        )
 
 
 class JumpShot:
@@ -264,7 +228,7 @@ class JumpShot:
 
 class StateMachine:
     def __init__(self, megamen):
-        self.state = Idle
+        self.state = Tornado
         self.megamen = megamen
         self.table = {Idle: {megamen.control_method.move_r_down: Run, megamen.control_method.move_l_down: Run,
                              megamen.control_method.move_r_up: Run, megamen.control_method.move_l_up: Run,
@@ -274,7 +238,11 @@ class StateMachine:
                             megamen.control_method.jump_down: Jump
                             },
                       Jump: {megamen.control_method.move_r_down: Jump, megamen.control_method.move_l_down: Jump,
-                             megamen.control_method.move_r_up: Jump, megamen.control_method.move_l_up: Jump}}
+                             megamen.control_method.move_r_up: Jump, megamen.control_method.move_l_up: Jump},
+                      Tornado: {}}
+
+    def start(self):
+        self.state.enter(self.megamen, ("START", 0))
 
     def draw(self):
         if self.megamen.face_dir == "r":
