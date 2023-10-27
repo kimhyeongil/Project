@@ -23,31 +23,6 @@ class Idle:
     def do(megemen):
         megemen.frame = (megemen.frame + 1) % Idle.nFrame
 
-    @staticmethod
-    def draw(megamen):
-        if megamen.face_dir == "r":
-            megamen.img.clip_draw(
-                Idle.l[megamen.frame],
-                megamen.img.h - Idle.t[megamen.frame],
-                Idle.w[megamen.frame],
-                Idle.h[megamen.frame],
-                megamen.x,
-                megamen.y + Idle.h[megamen.frame] * megamen.size // 2,
-                Idle.w[megamen.frame] * megamen.size,
-                Idle.h[megamen.frame] * megamen.size,
-            )
-        elif megamen.face_dir == "l":
-            megamen.img.clip_composite_draw(
-                Idle.l[megamen.frame],
-                megamen.img.h - Idle.t[megamen.frame],
-                Idle.w[megamen.frame],
-                Idle.h[megamen.frame],
-                0, 'h',
-                megamen.x,
-                megamen.y + Idle.h[megamen.frame] * megamen.size // 2,
-                Idle.w[megamen.frame] * megamen.size,
-                Idle.h[megamen.frame] * megamen.size,
-            )
 
 
 class RunShot:
@@ -69,18 +44,7 @@ class RunShot:
         if megamen.frame == 3 or megamen.frame == 8:
             game_world.add_obj(megabuster.MegaBuster(megamen.x + RunShot.w[megamen.frame], megamen.y), 1)
 
-    @staticmethod
-    def draw(megamen):
-        megamen.img.clip_draw(
-            RunShot.l[megamen.frame],
-            megamen.img.h - RunShot.t[megamen.frame],
-            RunShot.w[megamen.frame],
-            RunShot.h[megamen.frame],
-            megamen.x,
-            megamen.y,
-            RunShot.w[megamen.frame] * megamen.size,
-            RunShot.h[megamen.frame] * megamen.size,
-        )
+
 
 
 class Run:
@@ -115,32 +79,6 @@ class Run:
     def do(megamen):
         megamen.frame = (megamen.frame + 1) % Run.nFrame
         megamen.move()
-
-    @staticmethod
-    def draw(megamen):
-        if megamen.face_dir == "r":
-            megamen.img.clip_draw(
-                Run.l[megamen.frame],
-                megamen.img.h - Run.t[megamen.frame],
-                Run.w[megamen.frame],
-                Run.h[megamen.frame],
-                megamen.x,
-                megamen.y + Run.h[megamen.frame] * megamen.size // 2,
-                Run.w[megamen.frame] * megamen.size,
-                Run.h[megamen.frame] * megamen.size,
-            )
-        elif megamen.face_dir == "l":
-            megamen.img.clip_composite_draw(
-                Run.l[megamen.frame],
-                megamen.img.h - Run.t[megamen.frame],
-                Run.w[megamen.frame],
-                Run.h[megamen.frame],
-                0, 'h',
-                megamen.x,
-                megamen.y + Run.h[megamen.frame] * megamen.size // 2,
-                Run.w[megamen.frame] * megamen.size,
-                Run.h[megamen.frame] * megamen.size,
-            )
 
 
 class Jump:
@@ -181,31 +119,6 @@ class Jump:
                     megamen.state_machine.state = Run
                     megamen.state_machine.state.enter(megamen, ("LAND", megamen.dir))
 
-    @staticmethod
-    def draw(megamen):
-        if megamen.face_dir == "r":
-            megamen.img.clip_draw(
-                Jump.l[megamen.frame],
-                megamen.img.h - Jump.t[megamen.frame],
-                Jump.w[megamen.frame],
-                Jump.h[megamen.frame],
-                megamen.x,
-                megamen.y + Jump.h[megamen.frame] * megamen.size // 2,
-                Jump.w[megamen.frame] * megamen.size,
-                Jump.h[megamen.frame] * megamen.size,
-            )
-        elif megamen.face_dir == "l":
-            megamen.img.clip_composite_draw(
-                Jump.l[megamen.frame],
-                megamen.img.h - Jump.t[megamen.frame],
-                Jump.w[megamen.frame],
-                Jump.h[megamen.frame],
-                0, 'h',
-                megamen.x,
-                megamen.y + Jump.h[megamen.frame] * megamen.size // 2,
-                Jump.w[megamen.frame] * megamen.size,
-                Jump.h[megamen.frame] * megamen.size,
-            )
 
 
 class SmallShot:
@@ -227,19 +140,6 @@ class SmallShot:
         if megamen.frame == 3:
             game_world.add_obj(megabuster.MegaBuster(megamen.x + SmallShot.w[megamen.frame], megamen.y), 1)
 
-    @staticmethod
-    def draw(megamen):
-        megamen.img.clip_draw(
-            SmallShot.l[megamen.frame],
-            megamen.img.h - SmallShot.t[megamen.frame],
-            SmallShot.w[megamen.frame],
-            SmallShot.h[megamen.frame],
-            megamen.x,
-            megamen.y,
-            SmallShot.w[megamen.frame] * megamen.size,
-            SmallShot.h[megamen.frame] * megamen.size,
-        )
-
 
 class Upper:
     l = [20, 56, 97, 130]
@@ -258,18 +158,6 @@ class Upper:
     def do(megamen):
         megamen.frame = (megamen.frame + 1) % Upper.nFrame
 
-    @staticmethod
-    def draw(megamen):
-        megamen.img.clip_draw(
-            Upper.l[megamen.frame],
-            megamen.img.h - Upper.t[megamen.frame],
-            Upper.w[megamen.frame],
-            Upper.h[megamen.frame],
-            megamen.x,
-            megamen.y,
-            Upper.w[megamen.frame] * megamen.size,
-            Upper.h[megamen.frame] * megamen.size,
-        )
 
 
 class FireSword:
@@ -289,18 +177,6 @@ class FireSword:
     def do(megamen):
         megamen.frame = (megamen.frame + 1) % FireSword.nFrame
 
-    @staticmethod
-    def draw(megamen):
-        megamen.img.clip_draw(
-            FireSword.l[megamen.frame],
-            megamen.img.h - FireSword.t[megamen.frame],
-            FireSword.w[megamen.frame],
-            FireSword.h[megamen.frame],
-            megamen.x,
-            megamen.y,
-            FireSword.w[megamen.frame] * megamen.size,
-            FireSword.h[megamen.frame] * megamen.size,
-        )
 
 
 class Tornado:
@@ -401,15 +277,39 @@ class StateMachine:
                              megamen.control_method.move_r_up: Jump, megamen.control_method.move_l_up: Jump}}
 
     def draw(self):
-        self.state.draw(self.megamen)
+        if self.megamen.face_dir == "r":
+            self.megamen.img.clip_draw(
+                self.state.l[self.megamen.frame],
+                self.megamen.img.h - self.state.t[self.megamen.frame],
+                self.state.w[self.megamen.frame],
+                self.state.h[self.megamen.frame],
+                self.megamen.x,
+                self.megamen.y + self.state.h[self.megamen.frame] * self.megamen.size // 2,
+                self.state.w[self.megamen.frame] * self.megamen.size,
+                self.state.h[self.megamen.frame] * self.megamen.size,
+            )
+        elif self.megamen.face_dir == "l":
+            self.megamen.img.clip_composite_draw(
+                self.state.l[self.megamen.frame],
+                self.megamen.img.h - self.state.t[self.megamen.frame],
+                self.state.w[self.megamen.frame],
+                self.state.h[self.megamen.frame],
+                0, 'h',
+                self.megamen.x,
+                self.megamen.y + self.state.h[self.megamen.frame] * self.megamen.size // 2,
+                self.state.w[self.megamen.frame] * self.megamen.size,
+                self.state.h[self.megamen.frame] * self.megamen.size,
+            )
 
     def update(self):
         self.state.do(self.megamen)
+
     def handle_events(self, e):
         for check, next_state in self.table[self.state].items():
             if check(("INPUT", e)):
                 self.state = next_state
                 self.state.enter(self.megamen, ("INPUT", e))
+
 
 class MegaMen:
     img = None

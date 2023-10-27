@@ -22,32 +22,6 @@ class Idle:
     def do(mario):
         mario.frame = (mario.frame + 1) % Idle.nFrame
 
-    @staticmethod
-    def draw(mario):
-        if mario.face_dir == "r":
-            mario.img.clip_draw(
-                Idle.l[mario.frame],
-                mario.img.h - Idle.t[mario.frame],
-                Idle.w[mario.frame],
-                Idle.h[mario.frame],
-                mario.x,
-                mario.y + Idle.h[mario.frame] * mario.size // 2,
-                Idle.w[mario.frame] * mario.size,
-                Idle.h[mario.frame] * mario.size,
-            )
-        elif mario.face_dir == "l":
-            mario.img.clip_composite_draw(
-                Idle.l[mario.frame],
-                mario.img.h - Idle.t[mario.frame],
-                Idle.w[mario.frame],
-                Idle.h[mario.frame],
-                0, 'h',
-                mario.x,
-                mario.y + Idle.h[mario.frame] * mario.size // 2,
-                Idle.w[mario.frame] * mario.size,
-                Idle.h[mario.frame] * mario.size,
-            )
-
 
 class Attack2:
     l = [14, 14, 46, 46, 97, 142, 184, 224, 262, 301, 340, 340, 340]
@@ -65,19 +39,6 @@ class Attack2:
     @staticmethod
     def do(mario):
         mario.frame = (mario.frame + 1) % Attack2.nFrame
-
-    @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            Attack2.l[mario.frame],
-            mario.img.h - Attack2.t[mario.frame],
-            Attack2.w[mario.frame],
-            Attack2.h[mario.frame],
-            mario.x,
-            mario.y,
-            Attack2.w[mario.frame] * mario.size,
-            Attack2.h[mario.frame] * mario.size,
-        )
 
 
 class Run:
@@ -112,32 +73,6 @@ class Run:
     def do(mario):
         mario.frame = (mario.frame + 1) % Run.nFrame
         mario.move()
-
-    @staticmethod
-    def draw(mario):
-        if mario.face_dir == "r":
-            mario.img.clip_draw(
-                Run.l[mario.frame],
-                mario.img.h - Run.t[mario.frame],
-                Run.w[mario.frame],
-                Run.h[mario.frame],
-                mario.x,
-                mario.y + Run.h[mario.frame] * mario.size // 2,
-                Run.w[mario.frame] * mario.size,
-                Run.h[mario.frame] * mario.size,
-            )
-        elif mario.face_dir == "l":
-            mario.img.clip_composite_draw(
-                Run.l[mario.frame],
-                mario.img.h - Run.t[mario.frame],
-                Run.w[mario.frame],
-                Run.h[mario.frame],
-                0, 'h',
-                mario.x,
-                mario.y + Run.h[mario.frame] * mario.size // 2,
-                Run.w[mario.frame] * mario.size,
-                Run.h[mario.frame] * mario.size,
-            )
 
 
 class Jump:
@@ -178,33 +113,6 @@ class Jump:
                     mario.state_machine.state = Run
                     mario.state_machine.state.enter(mario, ("LAND", mario.dir))
 
-    @staticmethod
-    def draw(mario):
-        if mario.face_dir == "r":
-            mario.img.clip_draw(
-                Jump.l[mario.frame],
-                mario.img.h - Jump.t[mario.frame],
-                Jump.w[mario.frame],
-                Jump.h[mario.frame],
-                mario.x,
-                mario.y + Jump.h[mario.frame] * mario.size // 2,
-                Jump.w[mario.frame] * mario.size,
-                Jump.h[mario.frame] * mario.size,
-            )
-        elif mario.face_dir == "l":
-            mario.img.clip_composite_draw(
-                Jump.l[mario.frame],
-                mario.img.h - Jump.t[mario.frame],
-                Jump.w[mario.frame],
-                Jump.h[mario.frame],
-                0, 'h',
-                mario.x,
-                mario.y + Jump.h[mario.frame] * mario.size // 2,
-                Jump.w[mario.frame] * mario.size,
-                Jump.h[mario.frame] * mario.size,
-            )
-
-
 
 class Attack1:
     l = [12, 12, 54, 105, 152, 193, 233, 270, 307, 356, 356, 400, 400, 13, 13, 46, 46, 73, 73, 125, 125, 169, 169, 205,
@@ -225,19 +133,6 @@ class Attack1:
     def do(mario):
         mario.frame = (mario.frame + 1) % Attack1.nFrame
 
-    @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            Attack1.l[mario.frame],
-            mario.img.h - Attack1.t[mario.frame],
-            Attack1.w[mario.frame],
-            Attack1.h[mario.frame],
-            mario.x,
-            mario.y,
-            Attack1.w[mario.frame] * mario.size,
-            Attack1.h[mario.frame] * mario.size,
-        )
-
 
 class Upper:
     l = [14, 14, 54, 54, 96, 54]
@@ -255,19 +150,6 @@ class Upper:
     @staticmethod
     def do(mario):
         mario.frame = (mario.frame + 1) % Upper.nFrame
-
-    @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            Upper.l[mario.frame],
-            mario.img.h - Upper.t[mario.frame],
-            Upper.w[mario.frame],
-            Upper.h[mario.frame],
-            mario.x,
-            mario.y,
-            Upper.w[mario.frame] * mario.size,
-            Upper.h[mario.frame] * mario.size,
-        )
 
 
 class SomersaultKick:
@@ -287,19 +169,6 @@ class SomersaultKick:
     def do(mario):
         mario.frame = (mario.frame + 1) % SomersaultKick.nFrame
 
-    @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            SomersaultKick.l[mario.frame],
-            mario.img.h - SomersaultKick.t[mario.frame],
-            SomersaultKick.w[mario.frame],
-            SomersaultKick.h[mario.frame],
-            mario.x,
-            mario.y,
-            SomersaultKick.w[mario.frame] * mario.size,
-            SomersaultKick.h[mario.frame] * mario.size,
-        )
-
 
 class MagicCape:
     l = [40, 80, 109, 168, 221, 275, 307, 340, 384, 418]
@@ -317,19 +186,6 @@ class MagicCape:
     @staticmethod
     def do(mario):
         mario.frame = (mario.frame + 1) % MagicCape.nFrame
-
-    @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            MagicCape.l[mario.frame],
-            mario.img.h - MagicCape.t[mario.frame],
-            MagicCape.w[mario.frame],
-            MagicCape.h[mario.frame],
-            mario.x,
-            mario.y + MagicCape.h[mario.frame] - MagicCape.h[0],
-            MagicCape.w[mario.frame] * mario.size,
-            MagicCape.h[mario.frame] * mario.size,
-        )
 
 
 class PalmStrike:
@@ -349,19 +205,6 @@ class PalmStrike:
     def do(mario):
         mario.frame = (mario.frame + 1) % PalmStrike.nFrame
 
-    @staticmethod
-    def draw(mario):
-        mario.img.clip_draw(
-            PalmStrike.l[mario.frame],
-            mario.img.h - PalmStrike.t[mario.frame],
-            PalmStrike.w[mario.frame],
-            PalmStrike.h[mario.frame],
-            mario.x,
-            mario.y + PalmStrike.h[mario.frame] - PalmStrike.h[0],
-            PalmStrike.w[mario.frame] * mario.size,
-            PalmStrike.h[mario.frame] * mario.size,
-        )
-
 
 class StateMachine:
     def __init__(self, mario):
@@ -375,10 +218,32 @@ class StateMachine:
                             mario.control_method.jump_down: Jump
                             },
                       Jump: {mario.control_method.move_r_down: Jump, mario.control_method.move_l_down: Jump,
-                            mario.control_method.move_r_up: Jump, mario.control_method.move_l_up: Jump}}
+                             mario.control_method.move_r_up: Jump, mario.control_method.move_l_up: Jump}}
 
     def draw(self):
-        self.state.draw(self.mario)
+        if self.mario.face_dir == "r":
+            self.mario.img.clip_draw(
+                self.state.l[self.mario.frame],
+                self.mario.img.h - self.state.t[self.mario.frame],
+                self.state.w[self.mario.frame],
+                self.state.h[self.mario.frame],
+                self.mario.x,
+                self.mario.y + self.state.h[self.mario.frame] * self.mario.size // 2,
+                self.state.w[self.mario.frame] * self.mario.size,
+                self.state.h[self.mario.frame] * self.mario.size,
+            )
+        elif self.mario.face_dir == "l":
+            self.mario.img.clip_composite_draw(
+                self.state.l[self.mario.frame],
+                self.mario.img.h - self.state.t[self.mario.frame],
+                self.state.w[self.mario.frame],
+                self.state.h[self.mario.frame],
+                0, 'h',
+                self.mario.x,
+                self.mario.y + self.state.h[self.mario.frame] * self.mario.size // 2,
+                self.state.w[self.mario.frame] * self.mario.size,
+                self.state.h[self.mario.frame] * self.mario.size,
+            )
 
     def update(self):
         self.state.do(self.mario)
@@ -393,7 +258,7 @@ class StateMachine:
 class Mario:
     img = None
 
-    def __init__(self, control_method): 
+    def __init__(self, control_method):
         self.x, self.y = control_method.x, game_world.ground
         self.frame = 0
         self.size = 2
