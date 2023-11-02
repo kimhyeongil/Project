@@ -45,8 +45,6 @@ class Attack2:
 
 
 class Run:
-    RUN_SPEED = 3
-    FRAME_PER_SEC = 8
     l = [12, 44, 82, 116, 146, 181, 220, 254]
     t = [148, 148, 149, 151, 149, 150, 149, 151]
     w = [28, 30, 29, 24, 28, 30, 28, 24]
@@ -54,6 +52,9 @@ class Run:
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
+
+    RUN_SPEED = 3
+    FRAME_PER_SEC = 8
 
     @staticmethod
     def enter(mario, e):
@@ -81,8 +82,6 @@ class Run:
 
 
 class Jump:
-    JUMP_POWER = 15
-    FRAME_PER_SEC = 8
     l = [15, 45, 78, 111, 141, 171]
     t = [84, 84, 84, 92, 93, 92]
     w = [24, 27, 29, 26, 26, 26]
@@ -90,6 +89,9 @@ class Jump:
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
+
+    JUMP_POWER = 15
+    FRAME_PER_SEC = 8
 
     @staticmethod
     def enter(mario, e):

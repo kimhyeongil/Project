@@ -1,5 +1,6 @@
 from pico2d import load_image
 
+import game_framework
 import game_world
 import megamen_projectile
 
@@ -12,6 +13,7 @@ class Idle:
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
+    FRAME_PER_SEC = 4
 
     @staticmethod
     def enter(megamen, e):
@@ -20,8 +22,8 @@ class Idle:
         megamen.dir = 0
 
     @staticmethod
-    def do(megemen):
-        megemen.frame = (megemen.frame + 1) % Idle.nFrame
+    def do(megamen):
+        megamen.frame = (megamen.frame + Idle.FRAME_PER_SEC * game_framework.frame_time) % Idle.nFrame
 
 
 class RunShot:
@@ -53,28 +55,31 @@ class Run:
     for i in range(len(t)):
         t[i] += h[i]
 
+    RUN_SPEED = 2.5
+    FRAME_PER_SEC = 8
+
     @staticmethod
     def enter(megamen, e):
         if megamen.control_method.move_r_down(e) or megamen.control_method.move_l_up(e):
             megamen.face_dir = "r"
-            megamen.speed[0] = 100
+            megamen.speed[0] = Run.RUN_SPEED
             megamen.dir += 1
         elif megamen.control_method.move_l_down(e) or megamen.control_method.move_r_up(e):
             megamen.face_dir = "l"
-            megamen.speed[0] = -100
+            megamen.speed[0] = -Run.RUN_SPEED
             megamen.dir -= 1
         elif e[0] == "LAND":
             if e[1] == 1:
                 megamen.face_dir = "r"
-                megamen.speed[0] = 100
+                megamen.speed[0] = Run.RUN_SPEED
             else:
                 megamen.face_dir = "l"
-                megamen.speed[0] = -100
+                megamen.speed[0] = -Run.RUN_SPEED
         megamen.frame = 0
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + 1) % Run.nFrame
+        megamen.frame = (megamen.frame + Run.FRAME_PER_SEC * game_framework.frame_time) % Run.nFrame
         megamen.move()
 
 
@@ -87,6 +92,9 @@ class Jump:
     for i in range(len(t)):
         t[i] += h[i]
 
+    JUMP_POWER = 15
+    FRAME_PER_SEC = 8
+
     @staticmethod
     def enter(megamen, e):
         if megamen.control_method.move_r_down(e) or megamen.control_method.move_l_up(e):
@@ -95,26 +103,24 @@ class Jump:
             megamen.dir -= 1
         elif megamen.control_method.jump_down(e):
             megamen.frame = 0
-            megamen.speed[1] = 300
+            megamen.speed[1] = Jump.JUMP_POWER
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + 1) % Jump.nFrame
+        megamen.frame = (megamen.frame + Jump.FRAME_PER_SEC * game_framework.frame_time) % Jump.nFrame
         megamen.move()
         if megamen.y > game_world.ground:
-            megamen.speed[1] -= game_world.g * game_world.time_slice
-            if megamen.frame > 3:
+            if int(megamen.frame) > 3:
                 megamen.frame = 3
+                print(megamen.frame)
         else:
-            megamen.y = game_world.ground
-            megamen.speed[1] = 0
-            if megamen.frame == 0:
+            if int(megamen.frame) == 0:
+                print(megamen.y)
                 if megamen.dir == 0:
                     megamen.state_machine.state = Idle
-                    megamen.state_machine.state.enter(megamen, ("LAND", 0))
                 else:
                     megamen.state_machine.state = Run
-                    megamen.state_machine.state.enter(megamen, ("LAND", megamen.dir))
+                megamen.state_machine.state.enter(megamen, ("LAND", megamen.dir))
 
 
 class SmallShot:
@@ -245,28 +251,29 @@ class StateMachine:
         self.state.enter(self.megamen, ("START", 0))
 
     def draw(self):
+        frame = int(self.megamen.frame)
         if self.megamen.face_dir == "r":
             self.megamen.img.clip_draw(
-                self.state.l[self.megamen.frame],
-                self.megamen.img.h - self.state.t[self.megamen.frame],
-                self.state.w[self.megamen.frame],
-                self.state.h[self.megamen.frame],
+                self.state.l[frame],
+                self.megamen.img.h - self.state.t[frame],
+                self.state.w[frame],
+                self.state.h[frame],
                 self.megamen.x,
-                self.megamen.y + self.state.h[self.megamen.frame] * self.megamen.size // 2,
-                self.state.w[self.megamen.frame] * self.megamen.size,
-                self.state.h[self.megamen.frame] * self.megamen.size,
+                self.megamen.y + self.megamen.size * self.state.h[frame] // 2,
+                self.state.w[frame] * self.megamen.size,
+                self.state.h[frame] * self.megamen.size
             )
         elif self.megamen.face_dir == "l":
             self.megamen.img.clip_composite_draw(
-                self.state.l[self.megamen.frame],
-                self.megamen.img.h - self.state.t[self.megamen.frame],
-                self.state.w[self.megamen.frame],
-                self.state.h[self.megamen.frame],
+                self.state.l[frame],
+                self.megamen.img.h - self.state.t[frame],
+                self.state.w[frame],
+                self.state.h[frame],
                 0, 'h',
                 self.megamen.x,
-                self.megamen.y + self.state.h[self.megamen.frame] * self.megamen.size // 2,
-                self.state.w[self.megamen.frame] * self.megamen.size,
-                self.state.h[self.megamen.frame] * self.megamen.size,
+                self.megamen.y + self.megamen.size * self.state.h[frame] // 2,
+                self.state.w[frame] * self.megamen.size,
+                self.state.h[frame] * self.megamen.size
             )
 
     def update(self):
@@ -301,5 +308,10 @@ class MegaMen:
         self.state_machine.update()
 
     def move(self):
-        self.x += self.speed[0] * game_world.time_slice
-        self.y += self.speed[1] * game_world.time_slice
+        self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
+        self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
+        if self.y > game_world.ground:
+            self.speed[1] -= game_world.g * game_framework.frame_time
+        else:
+            self.y = game_world.ground
+            self.speed[1] = 0
