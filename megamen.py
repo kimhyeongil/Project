@@ -228,7 +228,7 @@ class JumpShot:
 
 class StateMachine:
     def __init__(self, megamen):
-        self.state = Tornado
+        self.state = Idle
         self.megamen = megamen
         self.table = {Idle: {megamen.control_method.move_r_down: Run, megamen.control_method.move_l_down: Run,
                              megamen.control_method.move_r_up: Run, megamen.control_method.move_l_up: Run,
