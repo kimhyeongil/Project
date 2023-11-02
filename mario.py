@@ -45,7 +45,7 @@ class Attack2:
 
 
 class Run:
-    RUN_SPEED = 5
+    RUN_SPEED = 3
     FRAME_PER_SEC = 8
     l = [12, 44, 82, 116, 146, 181, 220, 254]
     t = [148, 148, 149, 151, 149, 150, 149, 151]
@@ -81,11 +81,12 @@ class Run:
 
 
 class Jump:
-    JUMP_POWER = 7
-    l = [15, 45, 45, 45, 78, 111, 141, 171]
-    t = [84, 84, 84, 84, 84, 92, 93, 92]
-    w = [24, 27, 27, 27, 29, 26, 26, 26]
-    h = [40, 39, 39, 39, 42, 34, 33, 34]
+    JUMP_POWER = 15
+    FRAME_PER_SEC = 8
+    l = [15, 45, 78, 111, 141, 171]
+    t = [84, 84, 84, 92, 93, 92]
+    w = [24, 27, 29, 26, 26, 26]
+    h = [40, 39, 42, 34, 33, 34]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
@@ -102,22 +103,20 @@ class Jump:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Jump.nFrame
+        mario.frame = (mario.frame + Jump.FRAME_PER_SEC * game_framework.frame_time) % Jump.nFrame
         mario.move()
         if mario.y > game_world.ground:
-            mario.speed[1] -= game_world.g * game_framework.frame_time
-            if mario.frame > 4:
-                mario.frame = 4
+            if int(mario.frame) > 2:
+                mario.frame = 2
+                print(mario.frame)
         else:
-            mario.y = game_world.ground
-            mario.speed[1] = 0
-            if mario.frame == 0:
+            if int(mario.frame) == 0:
+                print(mario.y)
                 if mario.dir == 0:
                     mario.state_machine.state = Idle
-                    mario.state_machine.state.enter(mario, ("LAND", 0))
                 else:
                     mario.state_machine.state = Run
-                    mario.state_machine.state.enter(mario, ("LAND", mario.dir))
+                mario.state_machine.state.enter(mario, ("LAND", mario.dir))
 
 
 class Attack1:
@@ -238,9 +237,9 @@ class StateMachine:
                 self.state.w[frame],
                 self.state.h[frame],
                 self.mario.x,
-                self.mario.y + self.mario.size * game_world.PIXEL_PER_METER // 2,
-                self.state.w[frame] / self.state.h[frame] * self.mario.size * game_world.PIXEL_PER_METER,
-                self.mario.size * game_world.PIXEL_PER_METER,
+                self.mario.y + self.mario.size * self.state.h[frame] // 2,
+                self.state.w[frame] * self.mario.size,
+                self.state.h[frame] * self.mario.size
             )
         elif self.mario.face_dir == "l":
             self.mario.img.clip_composite_draw(
@@ -250,9 +249,9 @@ class StateMachine:
                 self.state.h[frame],
                 0, 'h',
                 self.mario.x,
-                self.mario.y + self.mario.size * game_world.PIXEL_PER_METER // 2,
-                self.state.w[frame] / self.state.h[frame] * self.mario.size * game_world.PIXEL_PER_METER,
-                self.mario.size * game_world.PIXEL_PER_METER,
+                self.mario.y + self.mario.size * self.state.h[frame] // 2,
+                self.state.w[frame] * self.mario.size,
+                self.state.h[frame] * self.mario.size
             )
 
     def update(self):
@@ -271,7 +270,7 @@ class Mario:
     def __init__(self, control_method):
         self.x, self.y = control_method.x, game_world.ground
         self.frame = 0
-        self.size = 1.7
+        self.size = 2
         self.control_method = control_method
         self.face_dir = control_method.start_face
         self.dir = 0
@@ -289,8 +288,8 @@ class Mario:
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
-        # print(self.x)
-        # print(self.speed[0])
-        # print(game_framework.frame_time)
         if self.y > game_world.ground:
             self.speed[1] -= game_world.g * game_framework.frame_time
+        else:
+            self.y = game_world.ground
+            self.speed[1] = 0
