@@ -233,9 +233,9 @@ class StateMachine:
                 self.state.w[self.mario.frame],
                 self.state.h[self.mario.frame],
                 self.mario.x,
-                self.mario.y + self.state.h[self.mario.frame] * self.mario.size // 2,
-                self.state.w[self.mario.frame] * self.mario.size,
-                self.state.h[self.mario.frame] * self.mario.size,
+                self.mario.y + self.mario.size * game_world.PIXEL_PER_METER // 2,
+                self.state.w[self.mario.frame] / self.state.h[self.mario.frame] * self.mario.size * game_world.PIXEL_PER_METER,
+                self.mario.size * game_world.PIXEL_PER_METER,
             )
         elif self.mario.face_dir == "l":
             self.mario.img.clip_composite_draw(
@@ -245,9 +245,9 @@ class StateMachine:
                 self.state.h[self.mario.frame],
                 0, 'h',
                 self.mario.x,
-                self.mario.y + self.state.h[self.mario.frame] * self.mario.size // 2,
-                self.state.w[self.mario.frame] * self.mario.size,
-                self.state.h[self.mario.frame] * self.mario.size,
+                self.mario.y + self.mario.size * game_world.PIXEL_PER_METER // 2,
+                self.state.w[self.mario.frame] / self.state.h[self.mario.frame] * self.mario.size * game_world.PIXEL_PER_METER,
+                self.mario.size * game_world.PIXEL_PER_METER,
             )
 
     def update(self):
@@ -266,7 +266,7 @@ class Mario:
     def __init__(self, control_method):
         self.x, self.y = control_method.x, game_world.ground
         self.frame = 0
-        self.size = 2
+        self.size = 1.7
         self.control_method = control_method
         self.face_dir = control_method.start_face
         self.dir = 0
