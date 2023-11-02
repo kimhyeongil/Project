@@ -12,6 +12,9 @@ class Idle:
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
+
+    FRAME_PER_SEC = 10
+
     @staticmethod
     def enter(mario, e):
         mario.frame = 0
@@ -20,7 +23,7 @@ class Idle:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Idle.nFrame
+        mario.frame = (mario.frame + Idle.FRAME_PER_SEC * game_framework.frame_time) % Idle.nFrame
 
 
 class Attack2:
