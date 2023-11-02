@@ -1,6 +1,6 @@
 world = [[] for _ in range(10)]
 
-PIXEL_PER_METER = 100 / 1  # 100픽셀 당 10미터
+PIXEL_PER_METER = 100 / 2.5  # 100픽셀 당 1미터
 
 g = 10
 time_slice = 0.01
