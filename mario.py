@@ -1,5 +1,6 @@
 from pico2d import *
 
+import game_framework
 import game_world
 
 
@@ -42,6 +43,7 @@ class Attack2:
 
 
 class Run:
+    RUN_SPEED = 3
     l = [12, 44, 82, 116, 146, 181, 220, 254]
     t = [148, 148, 149, 151, 149, 150, 149, 151]
     w = [28, 30, 29, 24, 28, 30, 28, 24]
@@ -54,19 +56,19 @@ class Run:
     def enter(mario, e):
         if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
             mario.face_dir = "r"
-            mario.speed[0] = 100
+            mario.speed[0] = Run.RUN_SPEED
             mario.dir += 1
         elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
             mario.face_dir = "l"
-            mario.speed[0] = -100
+            mario.speed[0] = -Run.RUN_SPEED
             mario.dir -= 1
         elif e[0] == "LAND":
             if e[1] == 1:
                 mario.face_dir = "r"
-                mario.speed[0] = 100
+                mario.speed[0] = Run.RUN_SPEED
             else:
                 mario.face_dir = "l"
-                mario.speed[0] = -100
+                mario.speed[0] = -Run.RUN_SPEED
         mario.frame = 0
 
     @staticmethod
@@ -99,7 +101,7 @@ class Jump:
         mario.frame = (mario.frame + 1) % Jump.nFrame
         mario.move()
         if mario.y > game_world.ground:
-            mario.speed[1] -= game_world.g * game_world.time_slice
+            mario.speed[1] -= game_world.g * game_framework.frame_time
             if mario.frame > 4:
                 mario.frame = 4
         else:
@@ -280,5 +282,10 @@ class Mario:
         self.state_machine.update()
 
     def move(self):
-        self.x += self.speed[0] * game_world.time_slice
-        self.y += self.speed[1] * game_world.time_slice
+        self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
+        self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
+        # print(self.x)
+        # print(self.speed[0])
+        # print(game_framework.frame_time)
+        if self.y > game_world.ground:
+            self.speed[1] -= game_world.g * game_framework.frame_time
