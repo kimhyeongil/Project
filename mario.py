@@ -12,7 +12,6 @@ class Idle:
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
-
     @staticmethod
     def enter(mario, e):
         mario.frame = 0
@@ -44,6 +43,7 @@ class Attack2:
 
 class Run:
     RUN_SPEED = 5
+    FRAME_PER_SEC = 8
     l = [12, 44, 82, 116, 146, 181, 220, 254]
     t = [148, 148, 149, 151, 149, 150, 149, 151]
     w = [28, 30, 29, 24, 28, 30, 28, 24]
@@ -73,7 +73,7 @@ class Run:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Run.nFrame
+        mario.frame = (mario.frame + Run.FRAME_PER_SEC * game_framework.frame_time) % Run.nFrame
         mario.move()
 
 
@@ -227,27 +227,28 @@ class StateMachine:
         self.state.enter(self.mario, ("START", 0))
 
     def draw(self):
+        frame = int(self.mario.frame)
         if self.mario.face_dir == "r":
             self.mario.img.clip_draw(
-                self.state.l[self.mario.frame],
-                self.mario.img.h - self.state.t[self.mario.frame],
-                self.state.w[self.mario.frame],
-                self.state.h[self.mario.frame],
+                self.state.l[frame],
+                self.mario.img.h - self.state.t[frame],
+                self.state.w[frame],
+                self.state.h[frame],
                 self.mario.x,
                 self.mario.y + self.mario.size * game_world.PIXEL_PER_METER // 2,
-                self.state.w[self.mario.frame] / self.state.h[self.mario.frame] * self.mario.size * game_world.PIXEL_PER_METER,
+                self.state.w[frame] / self.state.h[frame] * self.mario.size * game_world.PIXEL_PER_METER,
                 self.mario.size * game_world.PIXEL_PER_METER,
             )
         elif self.mario.face_dir == "l":
             self.mario.img.clip_composite_draw(
-                self.state.l[self.mario.frame],
-                self.mario.img.h - self.state.t[self.mario.frame],
-                self.state.w[self.mario.frame],
-                self.state.h[self.mario.frame],
+                self.state.l[frame],
+                self.mario.img.h - self.state.t[frame],
+                self.state.w[frame],
+                self.state.h[frame],
                 0, 'h',
                 self.mario.x,
                 self.mario.y + self.mario.size * game_world.PIXEL_PER_METER // 2,
-                self.state.w[self.mario.frame] / self.state.h[self.mario.frame] * self.mario.size * game_world.PIXEL_PER_METER,
+                self.state.w[frame] / self.state.h[frame] * self.mario.size * game_world.PIXEL_PER_METER,
                 self.mario.size * game_world.PIXEL_PER_METER,
             )
 
