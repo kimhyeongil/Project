@@ -43,7 +43,7 @@ class Attack2:
 
 
 class Run:
-    RUN_SPEED = 3
+    RUN_SPEED = 5
     l = [12, 44, 82, 116, 146, 181, 220, 254]
     t = [148, 148, 149, 151, 149, 150, 149, 151]
     w = [28, 30, 29, 24, 28, 30, 28, 24]
@@ -78,6 +78,7 @@ class Run:
 
 
 class Jump:
+    JUMP_POWER = 7
     l = [15, 45, 45, 45, 78, 111, 141, 171]
     t = [84, 84, 84, 84, 84, 92, 93, 92]
     w = [24, 27, 27, 27, 29, 26, 26, 26]
@@ -94,7 +95,7 @@ class Jump:
             mario.dir -= 1
         elif mario.control_method.jump_down(e):
             mario.frame = 0
-            mario.speed[1] = 300
+            mario.speed[1] = Jump.JUMP_POWER
 
     @staticmethod
     def do(mario):
