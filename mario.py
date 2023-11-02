@@ -220,6 +220,9 @@ class StateMachine:
                       Jump: {mario.control_method.move_r_down: Jump, mario.control_method.move_l_down: Jump,
                              mario.control_method.move_r_up: Jump, mario.control_method.move_l_up: Jump}}
 
+    def start(self):
+        self.state.enter(self.mario, ("START", 0))
+
     def draw(self):
         if self.mario.face_dir == "r":
             self.mario.img.clip_draw(
