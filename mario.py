@@ -26,7 +26,7 @@ class Idle:
         mario.frame = (mario.frame + Idle.FRAME_PER_SEC * game_framework.frame_time) % Idle.nFrame
 
 
-class Attack2:
+class ATK2:
     l = [14, 14, 46, 46, 97, 142, 184, 224, 262, 301, 340, 340, 340]
     t = [999, 999, 1003, 1003, 1004, 1002, 1000, 1001, 1003, 1004, 1001, 1001, 1001]
     w = [26, 26, 45, 45, 39, 36, 34, 32, 33, 33, 25, 25, 25]
@@ -35,13 +35,27 @@ class Attack2:
     for i in range(len(t)):
         t[i] += h[i]
 
+    FRAME_PER_SEC = 25
+
     @staticmethod
     def enter(mario, e):
-        mario.frame = 0
+        if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
+            mario.dir += 1
+        elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
+            mario.dir -= 1
+        elif mario.control_method.atk2_down(e):
+            mario.frame = 0
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Attack2.nFrame
+        isRepeat = False if int(mario.frame) == 0 else True
+        mario.frame = (mario.frame + ATK2.FRAME_PER_SEC * game_framework.frame_time) % ATK2.nFrame
+        if int(mario.frame) == 0 and isRepeat:
+            if mario.dir == 0:
+                mario.state_machine.state = Idle
+            else:
+                mario.state_machine.state = Run
+            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
 
 
 class Run:
@@ -66,13 +80,12 @@ class Run:
             mario.face_dir = "l"
             mario.speed[0] = -Run.RUN_SPEED
             mario.dir -= 1
-        elif e[0] == "LAND":
-            if e[1] == 1:
-                mario.face_dir = "r"
-                mario.speed[0] = Run.RUN_SPEED
-            else:
-                mario.face_dir = "l"
-                mario.speed[0] = -Run.RUN_SPEED
+        if mario.dir == 1:
+            mario.face_dir = "r"
+            mario.speed[0] = Run.RUN_SPEED
+        else:
+            mario.face_dir = "l"
+            mario.speed[0] = -Run.RUN_SPEED
         mario.frame = 0
 
     @staticmethod
@@ -121,7 +134,7 @@ class Jump:
                 mario.state_machine.state.enter(mario, ("LAND", mario.dir))
 
 
-class Attack1:
+class ATK1:
     l = [12, 12, 54, 105, 152, 193, 233, 270, 307, 356, 356, 400, 400, 13, 13, 46, 46, 73, 73, 125, 125, 169, 169, 205,
          205, 232, 232]
     t = [261, 261, 263, 263, 263, 263, 261, 261, 263, 263, 263, 263, 263, 313, 310, 310, 310, 303, 303, 308, 308, 308,
@@ -132,13 +145,27 @@ class Attack1:
     for i in range(len(t)):
         t[i] += h[i]
 
+    FRAME_PER_SEC = 30
+
     @staticmethod
     def enter(mario, e):
-        mario.frame = 0
+        if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
+            mario.dir += 1
+        elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
+            mario.dir -= 1
+        elif mario.control_method.atk1_down(e):
+            mario.frame = 0
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Attack1.nFrame
+        isRepeat = False if int(mario.frame) == 0 else True
+        mario.frame = (mario.frame + ATK1.FRAME_PER_SEC * game_framework.frame_time) % ATK1.nFrame
+        if int(mario.frame) == 0 and isRepeat:
+            if mario.dir == 0:
+                mario.state_machine.state = Idle
+            else:
+                mario.state_machine.state = Run
+            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
 
 
 class Upper:
@@ -159,7 +186,7 @@ class Upper:
         mario.frame = (mario.frame + 1) % Upper.nFrame
 
 
-class SomersaultKick:
+class UP_ATK2:
     l = [141, 141, 14, 57, 113, 156, 200, 244, 287, 316]
     t = [93, 93, 652, 644, 612, 632, 638, 645, 646, 647]
     w = [26, 26, 37, 50, 37, 38, 38, 37, 23, 29]
@@ -168,13 +195,27 @@ class SomersaultKick:
     for i in range(len(t)):
         t[i] += h[i]
 
+    FRAME_PER_SEC = 25
+
     @staticmethod
     def enter(mario, e):
-        mario.frame = 0
+        if mario.control_method.move_r_down(e) or mario.control_method.move_l_up(e):
+            mario.dir += 1
+        elif mario.control_method.move_l_down(e) or mario.control_method.move_r_up(e):
+            mario.dir -= 1
+        elif mario.control_method.atk2_down(e):
+            mario.frame = 0
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % SomersaultKick.nFrame
+        isRepeat = False if int(mario.frame) == 0 else True
+        mario.frame = (mario.frame + UP_ATK2.FRAME_PER_SEC * game_framework.frame_time) % UP_ATK2.nFrame
+        if int(mario.frame) == 0 and isRepeat:
+            if mario.dir == 0:
+                mario.state_machine.state = Idle
+            else:
+                mario.state_machine.state = Run
+            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
 
 
 class MagicCape:
@@ -219,13 +260,25 @@ class StateMachine:
         self.mario = mario
         self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run,
                              mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run,
-                             mario.control_method.jump_down: Jump},
+                             mario.control_method.jump_down: Jump,
+                             mario.control_method.atk1_down: ATK1,
+                             mario.control_method.atk2_down: ATK2
+                             },
                       Run: {mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
                             mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
-                            mario.control_method.jump_down: Jump
+                            mario.control_method.jump_down: Jump,
+                            mario.control_method.atk1_down: ATK1,
+                            mario.control_method.atk2_down: ATK2
                             },
                       Jump: {mario.control_method.move_r_down: Jump, mario.control_method.move_l_down: Jump,
-                             mario.control_method.move_r_up: Jump, mario.control_method.move_l_up: Jump}}
+                             mario.control_method.move_r_up: Jump, mario.control_method.move_l_up: Jump},
+                      ATK1: {mario.control_method.move_r_down: ATK1, mario.control_method.move_l_down: ATK1,
+                             mario.control_method.move_r_up: ATK1, mario.control_method.move_l_up: ATK1},
+                      ATK2: {mario.control_method.move_r_down: ATK2, mario.control_method.move_l_down: ATK2,
+                             mario.control_method.move_r_up: ATK2, mario.control_method.move_l_up: ATK2},
+                      UP_ATK2: {mario.control_method.move_r_down: UP_ATK2, mario.control_method.move_l_down: UP_ATK2,
+                             mario.control_method.move_r_up: UP_ATK2, mario.control_method.move_l_up: UP_ATK2}
+                      }
 
     def start(self):
         self.state.enter(self.mario, ("START", 0))

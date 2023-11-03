@@ -1,4 +1,4 @@
-from sdl2 import SDL_KEYDOWN, SDLK_d, SDLK_a, SDL_KEYUP, SDLK_h
+from sdl2 import SDL_KEYDOWN, SDLK_d, SDLK_a, SDL_KEYUP, SDLK_h, SDLK_f
 
 x = 200
 start_face = "r"
@@ -22,3 +22,7 @@ def move_l_up(e):
 
 def jump_down(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_h
+
+
+def atk1_down(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_f
