@@ -104,7 +104,6 @@ class Jump:
         if mario.y > game_world.ground:
             if int(mario.frame) > 2:
                 mario.frame = 2
-                print(mario.frame)
         else:
             if int(mario.frame) == 0:
                 print(mario.y)
@@ -145,22 +144,35 @@ class ATK1:
             mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
 
 
-class Upper:
-    l = [14, 14, 54, 54, 96, 54]
-    t = [557, 557, 550, 550, 535, 550]
-    w = [35, 35, 34, 34, 22, 34]
-    h = [30, 30, 38, 38, 53, 38]
+class UP_ATK1:
+    l = [14, 14, 54, 96, 54]
+    t = [557, 557, 550, 535, 550]
+    w = [35, 35, 34, 22, 34]
+    h = [30, 30, 38, 53, 38]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
+    FRAME_PER_SEC = 10
+    JUMP_POWER = 5
+
     @staticmethod
     def enter(mario, e):
         mario.frame = 0
+        mario.speed[0] = 0
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % Upper.nFrame
+        isRepeat = False if int(mario.frame) == 0 else True
+        mario.frame = (mario.frame + UP_ATK1.FRAME_PER_SEC * game_framework.frame_time) % UP_ATK1.nFrame
+        if int(mario.frame) == 0 and isRepeat:
+            if mario.dir == 0:
+                mario.state_machine.state = Idle
+            else:
+                mario.state_machine.state = Run
+            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
+        elif int(mario.frame) == 1:
+            mario.speed[1] = UP_ATK1.JUMP_POWER
 
 
 class UP_ATK2:
@@ -173,7 +185,7 @@ class UP_ATK2:
         t[i] += h[i]
 
     FRAME_PER_SEC = 15
-    JUMP_POWER = 5
+    JUMP_POWER = 10
 
     @staticmethod
     def enter(mario, e):
@@ -184,7 +196,10 @@ class UP_ATK2:
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
         mario.frame = (mario.frame + UP_ATK2.FRAME_PER_SEC * game_framework.frame_time) % UP_ATK2.nFrame
-        if int(mario.frame) == 0 and isRepeat:
+        if mario.y > game_world.ground:
+            if int(mario.frame) >= 9:
+                mario.frame = 9
+        elif int(mario.frame) == 0 and isRepeat:
             if mario.dir == 0:
                 mario.state_machine.state = Idle
             else:
@@ -249,7 +264,8 @@ class StateMachine:
                       Jump: {},
                       ATK1: {},
                       ATK2: {},
-                      UP_ATK2: {}
+                      UP_ATK2: {},
+                      UP_ATK1: {}
                       }
 
     def start(self):
@@ -296,8 +312,11 @@ class StateMachine:
             self.mario.dir -= 1
         for check, next_state in self.table[self.state].items():
             if check(("INPUT", e)):
-                if next_state == ATK2 and self.mario.up:
-                    next_state = UP_ATK2
+                if self.mario.up:
+                    if next_state == ATK1:
+                        next_state = UP_ATK1
+                    elif next_state == ATK2:
+                        next_state = UP_ATK2
                 self.state = next_state
                 self.state.enter(self.mario, ("INPUT", e))
 
