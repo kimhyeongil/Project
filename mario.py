@@ -16,7 +16,7 @@ class Idle:
     FRAME_PER_SEC = 10
 
     @staticmethod
-    def enter(mario, e):
+    def enter(mario):
         mario.frame = 0
         mario.speed = [0, 0]
         mario.dir = 0
@@ -38,7 +38,7 @@ class ATK2:
     FRAME_PER_SEC = 25
 
     @staticmethod
-    def enter(mario, e):
+    def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
 
@@ -51,7 +51,7 @@ class ATK2:
                 mario.state_machine.state = Idle
             else:
                 mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
+            mario.state_machine.state.enter(mario)
 
 
 class Run:
@@ -67,7 +67,7 @@ class Run:
     FRAME_PER_SEC = 8
 
     @staticmethod
-    def enter(mario, e):
+    def enter(mario):
         mario.frame = 0
         if mario.dir == 1:
             mario.speed[0] = Run.RUN_SPEED
@@ -94,7 +94,7 @@ class Jump:
     FRAME_PER_SEC = 8
 
     @staticmethod
-    def enter(mario, e):
+    def enter(mario):
         mario.frame = 0
         mario.speed[1] = Jump.JUMP_POWER
 
@@ -111,7 +111,7 @@ class Jump:
                     mario.state_machine.state = Idle
                 else:
                     mario.state_machine.state = Run
-                mario.state_machine.state.enter(mario, ("LAND", mario.dir))
+                mario.state_machine.state.enter(mario)
 
 
 class ATK1:
@@ -128,7 +128,7 @@ class ATK1:
     FRAME_PER_SEC = 30
 
     @staticmethod
-    def enter(mario, e):
+    def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
 
@@ -141,7 +141,7 @@ class ATK1:
                 mario.state_machine.state = Idle
             else:
                 mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
+            mario.state_machine.state.enter(mario)
 
 
 class UP_ATK1:
@@ -157,7 +157,7 @@ class UP_ATK1:
     JUMP_POWER = 13
 
     @staticmethod
-    def enter(mario, e):
+    def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
 
@@ -173,7 +173,7 @@ class UP_ATK1:
                 mario.state_machine.state = Idle
             else:
                 mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
+            mario.state_machine.state.enter(mario)
         elif int(mario.frame) == 1:
             mario.speed[1] = UP_ATK1.JUMP_POWER
 
@@ -191,7 +191,7 @@ class UP_ATK2:
     JUMP_POWER = 12
 
     @staticmethod
-    def enter(mario, e):
+    def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
 
@@ -207,7 +207,7 @@ class UP_ATK2:
                 mario.state_machine.state = Idle
             else:
                 mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario, ("END_ATK", mario.dir))
+            mario.state_machine.state.enter(mario)
         elif int(mario.frame) == 3:
             mario.speed[1] = UP_ATK2.JUMP_POWER
 
@@ -321,7 +321,7 @@ class StateMachine:
                     elif next_state == ATK2:
                         next_state = UP_ATK2
                 self.state = next_state
-                self.state.enter(self.mario, ("INPUT", e))
+                self.state.enter(self.mario)
 
 
 class Mario:
