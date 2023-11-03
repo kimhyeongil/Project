@@ -153,8 +153,8 @@ class UP_ATK1:
     for i in range(len(t)):
         t[i] += h[i]
 
-    FRAME_PER_SEC = 10
-    JUMP_POWER = 5
+    FRAME_PER_SEC = 13
+    JUMP_POWER = 13
 
     @staticmethod
     def enter(mario, e):
@@ -165,7 +165,10 @@ class UP_ATK1:
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
         mario.frame = (mario.frame + UP_ATK1.FRAME_PER_SEC * game_framework.frame_time) % UP_ATK1.nFrame
-        if int(mario.frame) == 0 and isRepeat:
+        if mario.y > game_world.ground:
+            if int(mario.frame) >= 3:
+                mario.frame = 3
+        elif int(mario.frame) == 0 and isRepeat:
             if mario.dir == 0:
                 mario.state_machine.state = Idle
             else:
@@ -185,7 +188,7 @@ class UP_ATK2:
         t[i] += h[i]
 
     FRAME_PER_SEC = 15
-    JUMP_POWER = 10
+    JUMP_POWER = 12
 
     @staticmethod
     def enter(mario, e):
