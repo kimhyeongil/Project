@@ -57,3 +57,31 @@ class MegaTornado:
         self.x += self.speed * game_world.time_slice
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
+
+
+class ChargeShot:
+    l = [415, 444, 693]
+    t = [283, 274, 273]
+    w = [23, 35, 94]
+    h = [23, 42, 40]
+
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    def __init__(self, x, y):
+        self.img = projectile
+        self.x, self.y = x, y
+        self.speed = 10
+        self.frame = 2
+        self.size = 1
+
+    def draw(self):
+        self.img.clip_draw(ChargeShot.l[self.frame], self.img.h - ChargeShot.t[self.frame],
+                           ChargeShot.w[self.frame], ChargeShot.h[self.frame],
+                           self.x + ChargeShot.w[self.frame] * self.size // 2, self.y + 5,
+                           ChargeShot.w[self.frame] * self.size, ChargeShot.h[self.frame] * self.size)
+
+    def update(self):
+        self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
+        if self.x > 800 - 50 or self.x < 0 + 50:
+            game_world.erase_obj(self)

@@ -32,6 +32,10 @@ def atk2_down(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_g
 
 
+def atk2_up(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_g
+
+
 def up_down(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_w
 
