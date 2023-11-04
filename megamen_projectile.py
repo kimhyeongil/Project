@@ -14,10 +14,10 @@ class MegaBuster:
     for i in range(len(t)):
         t[i] += h[i]
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, dir):
         self.img = projectile
         self.x, self.y = x, y
-        self.speed = 10
+        self.speed = 10 * dir
         self.frame = 0
 
     def draw(self):

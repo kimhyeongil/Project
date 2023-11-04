@@ -141,9 +141,16 @@ class ATK1:
         isShot = False if int(megamen.frame) % 2 == 0 else True
         megamen.frame = (megamen.frame + ATK1.FRAME_PER_SEC * game_framework.frame_time) % ATK1.nFrame
         if int(megamen.frame) % 2 == 0 and isShot and int(megamen.frame) != 0:
-            game_world.add_obj(
-                megamen_projectile.MegaBuster(megamen.x + ATK1.w[int(megamen.frame)] * megamen.dir,
-                                              megamen.y + ATK1.h[int(megamen.frame)] * megamen.size // 2), 1)
+            if megamen.face_dir == "r":
+                game_world.add_obj(
+                    megamen_projectile.MegaBuster(
+                        megamen.x + ATK1.w[int(megamen.frame)],
+                        megamen.y + ATK1.h[int(megamen.frame)] * megamen.size // 2, 1), 1)
+            else:
+                game_world.add_obj(
+                    megamen_projectile.MegaBuster(
+                        megamen.x - ATK1.w[int(megamen.frame)],
+                        megamen.y + ATK1.h[int(megamen.frame)] * megamen.size // 2, -1), 1)
         if int(megamen.frame) == 0 and isRepeat:
             if megamen.dir == 0:
                 megamen.state_machine.state = Idle
