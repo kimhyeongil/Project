@@ -82,16 +82,16 @@ class Run:
 
 
 class Jump:
-    l = [15, 45, 78, 111, 141, 171]
-    t = [84, 84, 84, 92, 93, 92]
-    w = [24, 27, 29, 26, 26, 26]
-    h = [40, 39, 42, 34, 33, 34]
+    l = [15, 45, 78, 111, 141]
+    t = [84, 84, 84, 92, 93]
+    w = [24, 27, 29, 26, 26]
+    h = [40, 39, 42, 34, 33]
     nFrame = len(l)
     for i in range(len(t)):
         t[i] += h[i]
 
     JUMP_POWER = 15
-    FRAME_PER_SEC = 8
+    FRAME_PER_SEC = 10
 
     @staticmethod
     def enter(mario):
@@ -106,7 +106,6 @@ class Jump:
                 mario.frame = 2
         else:
             if int(mario.frame) == 0:
-                print(mario.y)
                 if mario.dir == 0:
                     mario.state_machine.state = Idle
                 else:
