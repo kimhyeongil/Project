@@ -1,4 +1,4 @@
-from sdl2 import SDL_KEYDOWN, SDLK_d, SDLK_a, SDL_KEYUP, SDLK_h, SDLK_f, SDLK_g, SDLK_s
+from sdl2 import SDL_KEYDOWN, SDLK_d, SDLK_a, SDL_KEYUP, SDLK_h, SDLK_f, SDLK_g, SDLK_s, SDLK_w
 
 x = 200
 start_face = "r"
@@ -33,8 +33,8 @@ def atk2_down(e):
 
 
 def up_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_w
 
 
 def up_up(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
+    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_w
