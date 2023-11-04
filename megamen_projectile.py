@@ -18,12 +18,21 @@ class MegaBuster:
         self.img = projectile
         self.x, self.y = x, y
         self.speed = 10 * dir
+        self.dir = dir
         self.frame = 0
-
+        self.size = 2
     def draw(self):
-        self.img.clip_draw(MegaBuster.l[self.frame], self.img.h - MegaBuster.t[self.frame],
-                           MegaBuster.w[self.frame], MegaBuster.h[self.frame],
-                           self.x, self.y, MegaBuster.w[self.frame] * 2, MegaBuster.h[self.frame] * 2)
+        if self.dir == 1:
+            self.img.clip_draw(MegaBuster.l[self.frame], self.img.h - MegaBuster.t[self.frame],
+                               MegaBuster.w[self.frame], MegaBuster.h[self.frame],
+                               self.x + MegaBuster.w[self.frame] * self.size // 2, self.y + 5,
+                               MegaBuster.w[self.frame] * self.size, MegaBuster.h[self.frame] * self.size)
+        else:
+            self.img.clip_composite_draw(MegaBuster.l[self.frame], self.img.h - MegaBuster.t[self.frame],
+                                         MegaBuster.w[self.frame], MegaBuster.h[self.frame],
+                                         0, 'h',
+                                         self.x - MegaBuster.w[self.frame] * self.size // 2, self.y + 5,
+                                         MegaBuster.w[self.frame] * self.size, MegaBuster.h[self.frame] * self.size)
 
     def update(self):
         self.frame = (self.frame + 1) % len(MegaBuster.l)
@@ -68,18 +77,26 @@ class ChargeShot:
     for i in range(len(t)):
         t[i] += h[i]
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, dir):
         self.img = projectile
         self.x, self.y = x, y
-        self.speed = 10
+        self.speed = 10 * dir
+        self.dir = dir
         self.frame = 2
         self.size = 1
 
     def draw(self):
-        self.img.clip_draw(ChargeShot.l[self.frame], self.img.h - ChargeShot.t[self.frame],
-                           ChargeShot.w[self.frame], ChargeShot.h[self.frame],
-                           self.x + ChargeShot.w[self.frame] * self.size // 2, self.y + 5,
-                           ChargeShot.w[self.frame] * self.size, ChargeShot.h[self.frame] * self.size)
+        if self.dir == 1:
+            self.img.clip_draw(ChargeShot.l[self.frame], self.img.h - ChargeShot.t[self.frame],
+                               ChargeShot.w[self.frame], ChargeShot.h[self.frame],
+                               self.x + ChargeShot.w[self.frame] * self.size // 2, self.y + 5,
+                               ChargeShot.w[self.frame] * self.size, ChargeShot.h[self.frame] * self.size)
+        else:
+            self.img.clip_composite_draw(ChargeShot.l[self.frame], self.img.h - ChargeShot.t[self.frame],
+                                         ChargeShot.w[self.frame], ChargeShot.h[self.frame],
+                                         0, 'h',
+                                         self.x - ChargeShot.w[self.frame] * self.size // 2, self.y + 5,
+                                         ChargeShot.w[self.frame] * self.size, ChargeShot.h[self.frame] * self.size)
 
     def update(self):
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time

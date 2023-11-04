@@ -237,10 +237,10 @@ class ATK2:
         ATK2.start_time = game_framework.time.time()
         if megamen.face_dir == 'r':
             ATK2.projectile = megamen_projectile.ChargeShot(megamen.x + ATK2.w[0] * megamen.size // 2,
-                                                            megamen.y + megamen.size * ATK2.h[0] // 2)
+                                                            megamen.y + megamen.size * ATK2.h[0] // 2, 1)
         else:
             ATK2.projectile = megamen_projectile.ChargeShot(megamen.x - ATK2.w[0] * megamen.size // 2,
-                                                            megamen.y + megamen.size * ATK2.h[0] // 2)
+                                                            megamen.y + megamen.size * ATK2.h[0] // 2, -1)
         ATK2.projectile.frame = 0
         ATK2.projectile.speed = 0
         game_world.add_obj(ATK2.projectile, 1)
@@ -255,11 +255,10 @@ class ATK2:
         game_world.erase_obj(ATK2.projectile)
         if megamen.face_dir == 'r':
             projectile = megamen_projectile.ChargeShot(megamen.x + ATK2.w[0] * megamen.size // 2,
-                                                       megamen.y + megamen.size * ATK2.h[0] // 2)
+                                                       megamen.y + megamen.size * ATK2.h[0] // 2, 1)
         else:
             projectile = megamen_projectile.ChargeShot(megamen.x - ATK2.w[0] * megamen.size // 2,
-                                                       megamen.y + megamen.size * ATK2.h[0] // 2)
-            projectile.speed *= -1
+                                                       megamen.y + megamen.size * ATK2.h[0] // 2, -1)
         projectile.size = min(game_framework.time.time() - ATK2.start_time, 2)
         game_world.add_obj(projectile, 1)
 
