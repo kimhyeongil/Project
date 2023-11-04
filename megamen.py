@@ -16,7 +16,7 @@ class Idle:
     FRAME_PER_SEC = 4
 
     @staticmethod
-    def enter(megamen, e):
+    def enter(megamen):
         megamen.frame = 0
         megamen.speed = [0, 0]
         megamen.dir = 0
@@ -26,7 +26,7 @@ class Idle:
         megamen.frame = (megamen.frame + Idle.FRAME_PER_SEC * game_framework.frame_time) % Idle.nFrame
 
 
-class RunShot:
+class RUN_ATK1:
     l = [62, 110, 218, 170, 239, 287, 334, 314, 394, 464]
     t = [457, 456, 334, 458, 458, 457, 456, 328, 457, 458]
     w = [42, 39, 44, 46, 45, 42, 40, 44, 46, 45]
@@ -36,14 +36,14 @@ class RunShot:
         t[i] += h[i]
 
     @staticmethod
-    def enter(megamen, e):
+    def enter(megamen):
         megamen.frame = 0
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + 1) % RunShot.nFrame
+        megamen.frame = (megamen.frame + 1) % RUN_ATK1.nFrame
         if megamen.frame == 3 or megamen.frame == 8:
-            game_world.add_obj(megabuster.MegaBuster(megamen.x + RunShot.w[megamen.frame], megamen.y), 1)
+            game_world.add_obj(megabuster.MegaBuster(megamen.x + RUN_ATK1.w[megamen.frame], megamen.y), 1)
 
 
 class Run:
@@ -59,28 +59,18 @@ class Run:
     FRAME_PER_SEC = 8
 
     @staticmethod
-    def enter(megamen, e):
-        if megamen.control_method.move_r_down(e) or megamen.control_method.move_l_up(e):
-            megamen.face_dir = "r"
-            megamen.speed[0] = Run.RUN_SPEED
-            megamen.dir += 1
-        elif megamen.control_method.move_l_down(e) or megamen.control_method.move_r_up(e):
-            megamen.face_dir = "l"
-            megamen.speed[0] = -Run.RUN_SPEED
-            megamen.dir -= 1
-        elif e[0] == "LAND":
-            if e[1] == 1:
-                megamen.face_dir = "r"
-                megamen.speed[0] = Run.RUN_SPEED
-            else:
-                megamen.face_dir = "l"
-                megamen.speed[0] = -Run.RUN_SPEED
+    def enter(megamen):
         megamen.frame = 0
+        if megamen.dir == 1:
+            megamen.speed[0] = Run.RUN_SPEED
+            megamen.face_dir = "r"
+        else:
+            megamen.speed[0] = -Run.RUN_SPEED
+            megamen.face_dir = "l"
 
     @staticmethod
     def do(megamen):
         megamen.frame = (megamen.frame + Run.FRAME_PER_SEC * game_framework.frame_time) % Run.nFrame
-        megamen.move()
 
 
 class Jump:
@@ -96,34 +86,26 @@ class Jump:
     FRAME_PER_SEC = 8
 
     @staticmethod
-    def enter(megamen, e):
-        if megamen.control_method.move_r_down(e) or megamen.control_method.move_l_up(e):
-            megamen.dir += 1
-        elif megamen.control_method.move_l_down(e) or megamen.control_method.move_r_up(e):
-            megamen.dir -= 1
-        elif megamen.control_method.jump_down(e):
-            megamen.frame = 0
-            megamen.speed[1] = Jump.JUMP_POWER
+    def enter(mario):
+        mario.frame = 0
+        mario.speed[1] = Jump.JUMP_POWER
 
     @staticmethod
-    def do(megamen):
-        megamen.frame = (megamen.frame + Jump.FRAME_PER_SEC * game_framework.frame_time) % Jump.nFrame
-        megamen.move()
-        if megamen.y > game_world.ground:
-            if int(megamen.frame) > 3:
-                megamen.frame = 3
-                print(megamen.frame)
+    def do(mario):
+        mario.frame = (mario.frame + Jump.FRAME_PER_SEC * game_framework.frame_time) % Jump.nFrame
+        if mario.y > game_world.ground:
+            if int(mario.frame) > 2:
+                mario.frame = 2
         else:
-            if int(megamen.frame) == 0:
-                print(megamen.y)
-                if megamen.dir == 0:
-                    megamen.state_machine.state = Idle
+            if int(mario.frame) == 0:
+                if mario.dir == 0:
+                    mario.state_machine.state = Idle
                 else:
-                    megamen.state_machine.state = Run
-                megamen.state_machine.state.enter(megamen, ("LAND", megamen.dir))
+                    mario.state_machine.state = Run
+                mario.state_machine.state.enter(mario)
 
 
-class SmallShot:
+class ATK1:
     l = [13, 62, 113, 163, 214, 265]
     t = [399, 399, 399, 399, 399, 399]
     w = [44, 46, 44, 45, 46, 44]
@@ -132,15 +114,27 @@ class SmallShot:
     for i in range(len(t)):
         t[i] += h[i]
 
+    FRAME_PER_SEC = 12
+
     @staticmethod
-    def enter(megamen, e):
-        megamen.frame = 0
+    def enter(mario):
+        mario.frame = 0
+        mario.speed[0] = 0
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + 1) % SmallShot.nFrame
-        if megamen.frame == 3:
-            game_world.add_obj(megabuster.MegaBuster(megamen.x + SmallShot.w[megamen.frame], megamen.y), 1)
+        isRepeat = False if int(megamen.frame) == 0 else True
+        isShot = False if int(megamen.frame) == 2 else True
+        megamen.frame = (megamen.frame + ATK1.FRAME_PER_SEC * game_framework.frame_time) % ATK1.nFrame
+        if int(megamen.frame) == 2 and isShot:
+            game_world.add_obj(
+                megamen_projectile.MegaBuster(megamen.x + ATK1.w[3], megamen.y + ATK1.h[3] * megamen.size // 2), 1)
+        if int(megamen.frame) == 0 and isRepeat:
+            if megamen.dir == 0:
+                megamen.state_machine.state = Idle
+            else:
+                megamen.state_machine.state = Run
+            megamen.state_machine.state.enter(megamen)
 
 
 class Upper:
@@ -243,12 +237,11 @@ class StateMachine:
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                             megamen.control_method.jump_down: Jump
                             },
-                      Jump: {megamen.control_method.move_r_down: Jump, megamen.control_method.move_l_down: Jump,
-                             megamen.control_method.move_r_up: Jump, megamen.control_method.move_l_up: Jump},
+                      Jump: {},
                       Tornado: {}}
 
     def start(self):
-        self.state.enter(self.megamen, ("START", 0))
+        self.state.enter(self.megamen)
 
     def draw(self):
         frame = int(self.megamen.frame)
@@ -277,13 +270,29 @@ class StateMachine:
             )
 
     def update(self):
+        self.megamen.move()
         self.state.do(self.megamen)
 
     def handle_events(self, e):
+        if self.megamen.control_method.up_down(("INPUT", e)):
+            self.megamen.up = True
+        elif self.megamen.control_method.up_up(("INPUT", e)):
+            self.megamen.up = False
+        elif self.megamen.control_method.move_r_down(("INPUT", e)) or self.megamen.control_method.move_l_up(
+                ("INPUT", e)):
+            self.megamen.dir += 1
+        elif self.megamen.control_method.move_l_down(("INPUT", e)) or self.megamen.control_method.move_r_up(
+                ("INPUT", e)):
+            self.megamen.dir -= 1
         for check, next_state in self.table[self.state].items():
             if check(("INPUT", e)):
+                if self.megamen.up:
+                    if next_state == ATK1:
+                        next_state = UP_ATK1
+                    elif next_state == ATK2:
+                        next_state = UP_ATK2
                 self.state = next_state
-                self.state.enter(self.megamen, ("INPUT", e))
+                self.state.enter(self.megamen)
 
 
 class MegaMen:
@@ -298,6 +307,7 @@ class MegaMen:
         self.face_dir = control_method.start_face
         self.control_method = control_method
         self.state_machine = StateMachine(self)
+        self.up = False
         if MegaMen.img == None:
             MegaMen.img = load_image('megamen.png')
 
