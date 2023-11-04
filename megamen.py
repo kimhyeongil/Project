@@ -35,15 +35,29 @@ class RUN_ATK1:
     for i in range(len(t)):
         t[i] += h[i]
 
+    FRAME_PER_SEC = 12
+    RUN_SPEED = 2.5
+
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
+        megamen.speed[0] = RUN_ATK1.RUN_SPEED * megamen.dir
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + 1) % RUN_ATK1.nFrame
-        if megamen.frame == 3 or megamen.frame == 8:
-            game_world.add_obj(megabuster.MegaBuster(megamen.x + RUN_ATK1.w[megamen.frame], megamen.y), 1)
+        isRepeat = False if int(megamen.frame) == 0 else True
+        isShot = False if int(megamen.frame) % 4 == 0 else True
+        megamen.frame = (megamen.frame + RUN_ATK1.FRAME_PER_SEC * game_framework.frame_time) % RUN_ATK1.nFrame
+        if int(megamen.frame) % 4 == 0 and isShot and int(megamen.frame) != 0:
+            game_world.add_obj(
+                megamen_projectile.MegaBuster(megamen.x + RUN_ATK1.w[int(megamen.frame)] * megamen.dir,
+                                              megamen.y + RUN_ATK1.h[int(megamen.frame)] * megamen.size // 2), 1)
+        if int(megamen.frame) == 0 and isRepeat:
+            if megamen.dir == 0:
+                megamen.state_machine.state = Idle
+            else:
+                megamen.state_machine.state = Run
+            megamen.state_machine.state.enter(megamen)
 
 
 class Run:
@@ -117,9 +131,9 @@ class ATK1:
     FRAME_PER_SEC = 6
 
     @staticmethod
-    def enter(mario):
-        mario.frame = 0
-        mario.speed[0] = 0
+    def enter(megamen):
+        megamen.frame = 0
+        megamen.speed[0] = 0
 
     @staticmethod
     def do(megamen):
@@ -128,7 +142,8 @@ class ATK1:
         megamen.frame = (megamen.frame + ATK1.FRAME_PER_SEC * game_framework.frame_time) % ATK1.nFrame
         if int(megamen.frame) % 2 == 0 and isShot and int(megamen.frame) != 0:
             game_world.add_obj(
-                megamen_projectile.MegaBuster(megamen.x + ATK1.w[3], megamen.y + ATK1.h[3] * megamen.size // 2), 1)
+                megamen_projectile.MegaBuster(megamen.x + ATK1.w[int(megamen.frame)] * megamen.dir,
+                                              megamen.y + ATK1.h[int(megamen.frame)] * megamen.size // 2), 1)
         if int(megamen.frame) == 0 and isRepeat:
             if megamen.dir == 0:
                 megamen.state_machine.state = Idle
@@ -236,10 +251,13 @@ class StateMachine:
                              megamen.control_method.atk1_down: ATK1},
                       Run: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
-                            megamen.control_method.jump_down: Jump
+                            megamen.control_method.jump_down: Jump,
+                            megamen.control_method.atk1_down: RUN_ATK1
                             },
                       Jump: {},
                       ATK1: {},
+                      RUN_ATK1: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
+                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle},
                       Tornado: {}}
 
     def start(self):
@@ -286,15 +304,16 @@ class StateMachine:
         elif self.megamen.control_method.move_l_down(("INPUT", e)) or self.megamen.control_method.move_r_up(
                 ("INPUT", e)):
             self.megamen.dir -= 1
-        for check, next_state in self.table[self.state].items():
-            if check(("INPUT", e)):
-                if self.megamen.up:
-                    if next_state == ATK1:
-                        next_state = UP_ATK1
-                    elif next_state == ATK2:
-                        next_state = UP_ATK2
-                self.state = next_state
-                self.state.enter(self.megamen)
+        if self.table.get(self.state) != None:
+            for check, next_state in self.table[self.state].items():
+                if check(("INPUT", e)):
+                    if self.megamen.up:
+                        if next_state == ATK1:
+                            next_state = UP_ATK1
+                        elif next_state == ATK2:
+                            next_state = UP_ATK2
+                    self.state = next_state
+                    self.state.enter(self.megamen)
 
 
 class MegaMen:
