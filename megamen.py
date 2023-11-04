@@ -253,14 +253,16 @@ class ATK2:
     @staticmethod
     def exit(megamen):
         game_world.erase_obj(ATK2.projectile)
-        if megamen.face_dir == 'r':
-            projectile = megamen_projectile.ChargeShot(megamen.x + ATK2.w[0] * megamen.size // 2,
-                                                       megamen.y + megamen.size * ATK2.h[0] // 2, 1)
-        else:
-            projectile = megamen_projectile.ChargeShot(megamen.x - ATK2.w[0] * megamen.size // 2,
-                                                       megamen.y + megamen.size * ATK2.h[0] // 2, -1)
-        projectile.size = min(game_framework.time.time() - ATK2.start_time, 2)
-        game_world.add_obj(projectile, 1)
+        charged_time = game_framework.time.time() - ATK2.start_time
+        if charged_time > 0.5:
+            if megamen.face_dir == 'r':
+                projectile = megamen_projectile.ChargeShot(megamen.x + ATK2.w[0] * megamen.size // 2,
+                                                           megamen.y + megamen.size * ATK2.h[0] // 2, 1)
+            else:
+                projectile = megamen_projectile.ChargeShot(megamen.x - ATK2.w[0] * megamen.size // 2,
+                                                           megamen.y + megamen.size * ATK2.h[0] // 2, -1)
+            projectile.size = min(game_framework.time.time() - ATK2.start_time, 2)
+            game_world.add_obj(projectile, 1)
 
 
 # game_world.add_obj(megamen, 1)
