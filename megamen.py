@@ -114,7 +114,7 @@ class ATK1:
     for i in range(len(t)):
         t[i] += h[i]
 
-    FRAME_PER_SEC = 12
+    FRAME_PER_SEC = 6
 
     @staticmethod
     def enter(mario):
@@ -124,9 +124,9 @@ class ATK1:
     @staticmethod
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
-        isShot = False if int(megamen.frame) == 2 else True
+        isShot = False if int(megamen.frame) % 2 == 0 else True
         megamen.frame = (megamen.frame + ATK1.FRAME_PER_SEC * game_framework.frame_time) % ATK1.nFrame
-        if int(megamen.frame) == 2 and isShot:
+        if int(megamen.frame) % 2 == 0 and isShot and int(megamen.frame) != 0:
             game_world.add_obj(
                 megamen_projectile.MegaBuster(megamen.x + ATK1.w[3], megamen.y + ATK1.h[3] * megamen.size // 2), 1)
         if int(megamen.frame) == 0 and isRepeat:
@@ -232,12 +232,14 @@ class StateMachine:
         self.megamen = megamen
         self.table = {Idle: {megamen.control_method.move_r_down: Run, megamen.control_method.move_l_down: Run,
                              megamen.control_method.move_r_up: Run, megamen.control_method.move_l_up: Run,
-                             megamen.control_method.jump_down: Jump},
+                             megamen.control_method.jump_down: Jump,
+                             megamen.control_method.atk1_down: ATK1},
                       Run: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                             megamen.control_method.jump_down: Jump
                             },
                       Jump: {},
+                      ATK1: {},
                       Tornado: {}}
 
     def start(self):

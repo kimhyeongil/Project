@@ -1,5 +1,6 @@
 from pico2d import *
 
+import game_framework
 import game_world
 
 projectile = None
@@ -26,7 +27,7 @@ class MegaBuster:
 
     def update(self):
         self.frame = (self.frame + 1) % len(MegaBuster.l)
-        self.x += self.speed
+        self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
 
@@ -50,11 +51,9 @@ class MegaTornado:
         self.img.clip_draw(MegaTornado.l[self.frame], self.img.h - MegaTornado.t[self.frame],
                            MegaTornado.w[self.frame], MegaTornado.h[self.frame],
                            self.x, self.y, MegaTornado.w[self.frame] * 2, MegaTornado.h[self.frame] * 2)
-        print("tornado")
 
     def update(self):
         self.frame = (self.frame + 1) % len(MegaTornado.l)
         self.x += self.speed * game_world.time_slice
-        print("tornado update")
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
