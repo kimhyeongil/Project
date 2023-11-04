@@ -247,8 +247,11 @@ class ATK2:
 
     @staticmethod
     def do(megamen):
-        if game_framework.time.time() - ATK2.start_time >= 1:
+        charged_time = game_framework.time.time() - ATK2.start_time
+        if charged_time >= 0.5:
             ATK2.projectile.frame = 1
+        if game_framework.time.time() - ATK2.start_time >= 2:
+            ATK2.projectile.frame = 2
 
     @staticmethod
     def exit(megamen):

@@ -21,6 +21,7 @@ class MegaBuster:
         self.dir = dir
         self.frame = 0
         self.size = 2
+
     def draw(self):
         if self.dir == 1:
             self.img.clip_draw(MegaBuster.l[self.frame], self.img.h - MegaBuster.t[self.frame],
@@ -69,10 +70,10 @@ class MegaTornado:
 
 
 class ChargeShot:
-    l = [415, 444, 693]
-    t = [283, 274, 273]
-    w = [23, 35, 94]
-    h = [23, 42, 40]
+    l = [415, 444, 484, 693]
+    t = [283, 274, 271, 273]
+    w = [23, 35, 45, 94]
+    h = [23, 42, 48, 40]
 
     for i in range(len(t)):
         t[i] += h[i]
@@ -82,7 +83,7 @@ class ChargeShot:
         self.x, self.y = x, y
         self.speed = 10 * dir
         self.dir = dir
-        self.frame = 2
+        self.frame = len(ChargeShot.t) - 1
         self.size = 1
 
     def draw(self):
