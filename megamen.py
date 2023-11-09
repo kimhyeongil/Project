@@ -1,5 +1,4 @@
 from pico2d import load_image
-
 import game_framework
 import game_world
 import megamen_projectile
@@ -50,7 +49,7 @@ class Land:
     @staticmethod
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
-        megamen.frame = (megamen.frame + Land.FRAME_PER_SEC * game_framework.frame_time) % Land.nFrame
+        megamen.next_frame()
         if int(megamen.frame) == 0 and isRepeat:
             megamen.state_machine.handle_event(("EOA", 0))
 
@@ -80,7 +79,7 @@ class Idle:
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + Idle.FRAME_PER_SEC * game_framework.frame_time) % Idle.nFrame
+        megamen.next_frame()
 
     @staticmethod
     def exit(megamen):
@@ -101,7 +100,7 @@ class UpIdle:
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + UpIdle.FRAME_PER_SEC * game_framework.frame_time) % UpIdle.nFrame
+        megamen.next_frame()
 
     @staticmethod
     def exit(megamen):
@@ -141,7 +140,7 @@ class RunShot:
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
         isShot = False if int(megamen.frame) % 4 == 0 else True
-        megamen.frame = (megamen.frame + RunShot.FRAME_PER_SEC * game_framework.frame_time) % RunShot.nFrame
+        megamen.next_frame()
         if int(megamen.frame) % 4 == 0 and isShot and int(megamen.frame) != 0:
             game_world.add_obj(
                 megamen_projectile.MegaBuster(megamen.x + RunShot.frame[int(megamen.frame)][2] * megamen.dir,
@@ -182,7 +181,7 @@ class Run:
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + Run.FRAME_PER_SEC * game_framework.frame_time) % Run.nFrame
+        megamen.next_frame()
 
 
 class UpRun:
@@ -216,7 +215,7 @@ class UpRun:
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + UpRun.FRAME_PER_SEC * game_framework.frame_time) % UpRun.nFrame
+        megamen.next_frame()
 
 
 class Jump:
@@ -241,7 +240,7 @@ class Jump:
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + Jump.FRAME_PER_SEC * game_framework.frame_time) % Jump.nFrame
+        megamen.next_frame()
         if megamen.y > game_world.ground:
             megamen.frame = min(megamen.frame, 2)
         elif int(megamen.frame) == 0:
@@ -272,7 +271,7 @@ class SmallShot:
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
         isShot = False if int(megamen.frame) % 2 == 0 else True
-        megamen.frame = (megamen.frame + SmallShot.FRAME_PER_SEC * game_framework.frame_time) % SmallShot.nFrame
+        megamen.next_frame()
         if int(megamen.frame) % 2 == 0 and isShot and int(megamen.frame) != 0:
             megamen.fire_megabuster(SmallShot.frame[int(megamen.frame)][2],
                                     SmallShot.frame[int(megamen.frame)][3] * megamen.size // 2)
@@ -291,6 +290,20 @@ class Uppercut:
     JUMP_POWER = 13
 
     @staticmethod
+    def get_bb(megamen):
+        frame = int(megamen.frame)
+        head = (megamen.x - Uppercut.frame[frame][2] * megamen.size // 3,
+                megamen.y + Uppercut.frame[frame][3] * megamen.size // 2,
+                megamen.x + Uppercut.frame[frame][2] * megamen.size // 3,
+                megamen.y + Uppercut.frame[frame][3] * megamen.size)
+        body = (megamen.x - Uppercut.frame[frame][2] * megamen.size // 2,
+                megamen.y,
+                megamen.x + Uppercut.frame[frame][2] * megamen.size // 2,
+                megamen.y + Uppercut.frame[frame][3] * megamen.size // 2)
+        hitbox = [head, body]
+        return hitbox
+
+    @staticmethod
     def exit(megamen):
         pass
 
@@ -302,7 +315,7 @@ class Uppercut:
     @staticmethod
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
-        megamen.frame = (megamen.frame + Uppercut.FRAME_PER_SEC * game_framework.frame_time) % Uppercut.nFrame
+        megamen.next_frame()
         if megamen.y > game_world.ground:
             if int(megamen.frame) >= 3:
                 megamen.frame = 3
@@ -383,7 +396,7 @@ class FireSword:
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + 1) % FireSword.nFrame
+        megamen.next_frame()
 
 
 class Tornado:
@@ -408,7 +421,7 @@ class Tornado:
 
     @staticmethod
     def do(megamen):
-        megamen.frame = (megamen.frame + 1) % Tornado.nFrame
+        megamen.next_frame()
 
 
 class JumpShot:
@@ -416,7 +429,7 @@ class JumpShot:
              (95, 1369, 39, 50),
              (139, 1369, 38, 46), ]
     nFrame = 3
-    FRAME_PER_SEC = 1
+    FRAME_PER_SEC = 6
 
     @staticmethod
     def enter(megamen):
@@ -424,13 +437,12 @@ class JumpShot:
 
     @staticmethod
     def do(megamen):
-        isRepeat = False if int(megamen.frame) == 0 else True
         isShot = False if int(megamen.frame) == 1 else True
-        megamen.frame = (megamen.frame + JumpShot.FRAME_PER_SEC * game_framework.frame_time) % JumpShot.nFrame
+        megamen.next_frame()
         if int(megamen.frame) == 1 and isShot:
             megamen.fire_megabuster(JumpShot.frame[int(megamen.frame)][2],
                                     JumpShot.frame[int(megamen.frame)][3] * megamen.size // 2)
-        if int(megamen.frame) == 0 and isRepeat:
+        if megamen.y <= game_world.ground:
             megamen.state_machine.handle_event(("LAND", 0))
 
     @staticmethod
@@ -470,7 +482,7 @@ class StateMachine:
                               },
                       AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
                       Land: {end_of_animation: AnimationEnd},
-                      Jump: {land: Land},
+                      Jump: {land: Land, megamen.control_method.atk1_down: JumpShot},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                                 end_of_animation: AnimationEnd},
@@ -482,7 +494,7 @@ class StateMachine:
                       Uppercut: {land: Land},
                       Tornado: {megamen.control_method.atk2_up: AnimationEnd},
                       FireSword: {megamen.control_method.atk2_up: AnimationEnd},
-                      JumpShot: {land: Land}}
+                      JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot}}
 
     def draw(self):
         frame = int(self.megamen.frame)
@@ -563,3 +575,10 @@ class MegaMen:
 
     def handle_event(self, e):
         self.state_machine.handle_event(("INPUT", e))
+
+    def get_hitbox(self):
+        pass
+
+    def next_frame(self):
+        state = self.state_machine.state
+        self.frame = (self.frame + state.FRAME_PER_SEC * game_framework.frame_time) % state.nFrame
