@@ -591,6 +591,6 @@ class MegaMen:
 
     def handle_collision(self, group, other):
         if group == "character:ground" and self.isFall:
-            self.y = other.y
+            self.y = other.y + 1
             self.speed[1] = 0
             self.isFall = False
