@@ -44,7 +44,7 @@ class Land:
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
-        mario.frame = (mario.frame + Land.FRAME_PER_SEC * game_framework.frame_time) % Land.nFrame
+        mario.next_frame()
         if int(mario.frame) == 0 and isRepeat:
             mario.state_machine.handle_event(("EOA", 0))
 
@@ -77,7 +77,7 @@ class Idle:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + Idle.FRAME_PER_SEC * game_framework.frame_time) % Idle.nFrame
+        mario.next_frame()
 
 
 class UpIdle:
@@ -101,7 +101,7 @@ class UpIdle:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + UpIdle.FRAME_PER_SEC * game_framework.frame_time) % UpIdle.nFrame
+        mario.next_frame()
 
 
 class TurnKick:
@@ -125,7 +125,7 @@ class TurnKick:
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
-        mario.frame = (mario.frame + TurnKick.FRAME_PER_SEC * game_framework.frame_time) % TurnKick.nFrame
+        mario.next_frame()
         if int(mario.frame) == 0 and isRepeat:
             mario.state_machine.handle_event(("EOA", 0))
 
@@ -153,7 +153,7 @@ class Run:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + Run.FRAME_PER_SEC * game_framework.frame_time) % Run.nFrame
+        mario.next_frame()
 
 
 class UpRun:
@@ -180,7 +180,7 @@ class UpRun:
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + UpRun.FRAME_PER_SEC * game_framework.frame_time) % UpRun.nFrame
+        mario.next_frame()
 
 
 class Jump:
@@ -194,17 +194,18 @@ class Jump:
     @staticmethod
     def enter(mario):
         mario.frame = 0
+        mario.isFall = True
         mario.speed[1] = Jump.JUMP_POWER
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + Jump.FRAME_PER_SEC * game_framework.frame_time) % Jump.nFrame
-        if mario.y > game_world.ground:
+        mario.next_frame()
+        if mario.isFall:
             if (mario.speed[1] < 10):
                 mario.frame = min(mario.frame, 2)
             else:
                 mario.frame = min(mario.frame, 0)
-        elif int(mario.frame) == 0:
+        else:
             mario.state_machine.handle_event(("LAND", 0))
 
 
@@ -237,8 +238,7 @@ class OneJabTwoPunchThreeKick:
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
-        mario.frame = (
-                              mario.frame + OneJabTwoPunchThreeKick.FRAME_PER_SEC * game_framework.frame_time) % OneJabTwoPunchThreeKick.nFrame
+        mario.next_frame()
         if int(mario.frame) == 0 and isRepeat:
             mario.state_machine.handle_event(("EOA", 0))
 
@@ -260,7 +260,7 @@ class Uppercut:
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
-        mario.frame = (mario.frame + Uppercut.FRAME_PER_SEC * game_framework.frame_time) % Uppercut.nFrame
+        mario.next_frame()
         if mario.y > game_world.ground:
             mario.frame = min(mario.frame, 2)
         elif int(mario.frame) == 0 and isRepeat:
@@ -291,7 +291,7 @@ class SomersaultKick:
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
-        mario.frame = (mario.frame + SomersaultKick.FRAME_PER_SEC * game_framework.frame_time) % SomersaultKick.nFrame
+        mario.next_frame()
         if mario.y > game_world.ground:
             mario.frame = min(mario.frame, 8)
         elif int(mario.frame) == 0 and isRepeat:
@@ -321,7 +321,7 @@ class MagicCape:
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
-        mario.frame = (mario.frame + MagicCape.FRAME_PER_SEC * game_framework.frame_time) % MagicCape.nFrame
+        mario.next_frame()
         if int(mario.frame) == 0 and isRepeat:
             mario.state_machine.handle_event(("EOA", 0))
 
@@ -345,7 +345,7 @@ class PalmStrike:
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
-        mario.frame = (mario.frame + PalmStrike.FRAME_PER_SEC * game_framework.frame_time) % PalmStrike.nFrame
+        mario.next_frame()
         if int(mario.frame) == 0 and isRepeat:
             mario.state_machine.handle_event(("EOA", 0))
 
@@ -412,7 +412,7 @@ class StateMachine:
                 self.state.frame[frame][2] * self.mario.size,
                 self.state.frame[frame][3] * self.mario.size
             )
-
+        draw_rectangle(*self.mario.get_bb())
     def update(self):
         self.mario.move()
         self.state.do(self.mario)
@@ -436,6 +436,7 @@ class Mario:
     img = None
 
     def __init__(self, control_method):
+        self.isFall = True
         self.x, self.y = control_method.x, game_world.ground
         self.frame = 0
         self.size = 2
@@ -457,11 +458,27 @@ class Mario:
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
-        if self.y > game_world.ground:
+        if self.isFall:
             self.speed[1] -= game_world.g * game_framework.frame_time
-        else:
-            self.y = game_world.ground
-            self.speed[1] = 0
 
     def handle_event(self, e):
         self.state_machine.handle_event(("INPUT", e))
+
+    def get_hitbox(self):
+        pass
+
+    def next_frame(self):
+        state = self.state_machine.state
+        self.frame = (self.frame + state.FRAME_PER_SEC * game_framework.frame_time) % state.nFrame
+
+    def get_bb(self):
+        frame = int(self.frame)
+        state = self.state_machine.state
+        return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
+            2] * self.size // 2, self.y + state.frame[frame][3] * self.size
+
+    def handle_collision(self, group, other):
+        if group == "character:ground" and self.isFall:
+            self.y = other.y + 1
+            self.speed[1] = 0
+            self.isFall = False
