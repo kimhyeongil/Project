@@ -1,4 +1,4 @@
-from pico2d import load_image
+from pico2d import load_image, draw_rectangle
 import game_framework
 import game_world
 import megamen_projectile
@@ -515,6 +515,7 @@ class StateMachine:
                 self.state.frame[frame][2] * self.megamen.size,
                 self.state.frame[frame][3] * self.megamen.size
             )
+        draw_rectangle(*self.megamen.get_bb())
 
     def update(self):
         self.megamen.move()
@@ -582,3 +583,9 @@ class MegaMen:
     def next_frame(self):
         state = self.state_machine.state
         self.frame = (self.frame + state.FRAME_PER_SEC * game_framework.frame_time) % state.nFrame
+
+    def get_bb(self):
+        frame = int(self.frame)
+        state = self.state_machine.state
+        return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
+            2] * self.size // 2, self.y + state.frame[frame][3] * self.size
