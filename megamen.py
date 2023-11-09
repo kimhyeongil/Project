@@ -236,14 +236,15 @@ class Jump:
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
+        megamen.isFall = True
         megamen.speed[1] = Jump.JUMP_POWER
 
     @staticmethod
     def do(megamen):
         megamen.next_frame()
-        if megamen.y > game_world.ground:
+        if megamen.isFall:
             megamen.frame = min(megamen.frame, 2)
-        elif int(megamen.frame) == 0:
+        else:
             megamen.state_machine.handle_event(("LAND", 0))
 
 
@@ -541,6 +542,7 @@ class MegaMen:
     img = None
 
     def __init__(self, control_method):
+        self.isFall = True
         self.x, self.y = control_method.x, game_world.ground
         self.frame = 0
         self.size = 2
@@ -568,11 +570,8 @@ class MegaMen:
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
-        if self.y > game_world.ground:
+        if self.isFall:
             self.speed[1] -= game_world.g * game_framework.frame_time
-        else:
-            self.y = game_world.ground
-            self.speed[1] = 0
 
     def handle_event(self, e):
         self.state_machine.handle_event(("INPUT", e))
@@ -589,3 +588,9 @@ class MegaMen:
         state = self.state_machine.state
         return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
             2] * self.size // 2, self.y + state.frame[frame][3] * self.size
+
+    def handle_collision(self, group, other):
+        if group == "character:ground" and self.isFall:
+            self.y = other.y
+            self.speed[1] = 0
+            self.isFall = False
