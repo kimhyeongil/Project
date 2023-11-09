@@ -1,4 +1,4 @@
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_SLASH, SDLK_COMMA, SDLK_PERIOD, SDLK_UP
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_SLASH, SDLK_COMMA, SDLK_PERIOD, SDLK_UP, SDLK_k
 
 x = 600
 start_face = "l"
@@ -38,3 +38,7 @@ def up_down(e):
 
 def up_up(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_UP
+
+
+def ultimate_down(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k
