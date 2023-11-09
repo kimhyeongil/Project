@@ -9,19 +9,19 @@ def end_of_animation(e):
 
 
 def check_up_run(e):
-    return e[0] == "CHECK_STATE" and e[1][0] != 0 and e[1][1]
+    return e[0] == "CHECK_STATE" and e[1] != 0 and e[2]
 
 
 def check_run(e):
-    return e[0] == "CHECK_STATE" and e[1][0] != 0 and not e[1][1]
+    return e[0] == "CHECK_STATE" and e[1] != 0 and not e[2]
 
 
 def check_idle(e):
-    return e[0] == "CHECK_STATE" and e[1][0] == 0 and not e[1][1]
+    return e[0] == "CHECK_STATE" and e[1] == 0 and not e[2]
 
 
 def check_up_idle(e):
-    return e[0] == "CHECK_STATE" and e[1][0] == 0 and e[1][1]
+    return e[0] == "CHECK_STATE" and e[1] == 0 and e[2]
 
 
 def land(e):
@@ -51,7 +51,7 @@ class AnimationEnd:
     @staticmethod
     def enter(mario):
         mario.frame = 0
-        mario.state_machine.handle_event(("CHECK_STATE", (mario.dir, mario.up)))
+        mario.state_machine.handle_event(("CHECK_STATE", mario.dir, mario.up))
 
 
 class Idle:
@@ -145,11 +145,10 @@ class Run:
 
     @staticmethod
     def enter(mario):
+        mario.speed[0] = Run.RUN_SPEED * mario.dir
         if mario.dir == 1:
-            mario.speed[0] = Run.RUN_SPEED
             mario.face_dir = "r"
         else:
-            mario.speed[0] = -Run.RUN_SPEED
             mario.face_dir = "l"
 
     @staticmethod
@@ -327,13 +326,17 @@ class MagicCape:
              (384, 1153, 27, 34),
              (418, 1153, 25, 34), ]
 
+    FRAME_PER_SEC = 12
     @staticmethod
     def enter(mario):
         mario.frame = 0
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % len(MagicCape.frame)
+        isRepeat = False if int(mario.frame) == 0 else True
+        mario.frame = (mario.frame + MagicCape.FRAME_PER_SEC * game_framework.frame_time) % len(MagicCape.frame)
+        if int(mario.frame) == 0 and isRepeat:
+            mario.state_machine.handle_event(("EOA", 0))
 
 
 class PalmStrike:
