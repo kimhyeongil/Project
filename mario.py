@@ -4,6 +4,36 @@ import game_framework
 import game_world
 
 
+def end_of_animation(e):
+    return e[0] == "EOA"
+
+
+def check_up_run(e):
+    return e[0] == "CHECK_STATE" and e[1][0] != 0 and e[1][1]
+
+
+def check_run(e):
+    return e[0] == "CHECK_STATE" and e[1][0] != 0 and not e[1][1]
+
+
+def check_idle(e):
+    return e[0] == "CHECK_STATE" and e[1][0] == 0 and not e[1][1]
+
+
+def check_up_idle(e):
+    return e[0] == "CHECK_STATE" and e[1][0] == 0 and e[1][1]
+
+
+def land(e):
+    return e[0] == "LAND"
+
+
+class Temp:
+    @staticmethod
+    def enter(mario):
+        mario.state_machine.handle_event(("CHECK_STATE", (mario.dir, mario.up)))
+
+
 class Idle:
     l = [18, 45, 72, 99, 126, 153, 126, 99, 72, 45]
     t = [25, 24, 23, 23, 24, 25, 24, 23, 23, 24]
@@ -18,6 +48,27 @@ class Idle:
     @staticmethod
     def enter(mario):
         mario.frame = 0
+        mario.speed = [0, 0]
+        mario.dir = 0
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + Idle.FRAME_PER_SEC * game_framework.frame_time) % Idle.nFrame
+
+
+class Up_Idle:
+    l = [18, 45, 72, 99, 126, 153, 126, 99, 72, 45]
+    t = [25, 24, 23, 23, 24, 25, 24, 23, 23, 24]
+    w = [23, 23, 23, 24, 25, 25, 25, 24, 23, 23]
+    h = [36, 37, 38, 38, 37, 36, 37, 38, 38, 37]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    FRAME_PER_SEC = 10
+
+    @staticmethod
+    def enter(mario):
         mario.speed = [0, 0]
         mario.dir = 0
 
@@ -47,11 +98,7 @@ class ATK2:
         isRepeat = False if int(mario.frame) == 0 else True
         mario.frame = (mario.frame + ATK2.FRAME_PER_SEC * game_framework.frame_time) % ATK2.nFrame
         if int(mario.frame) == 0 and isRepeat:
-            if mario.dir == 0:
-                mario.state_machine.state = Idle
-            else:
-                mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario)
+            mario.state_machine.handle_event(("EOA", 0))
 
 
 class Run:
@@ -69,6 +116,32 @@ class Run:
     @staticmethod
     def enter(mario):
         mario.frame = 0
+        if mario.dir == 1:
+            mario.speed[0] = Run.RUN_SPEED
+            mario.face_dir = "r"
+        else:
+            mario.speed[0] = -Run.RUN_SPEED
+            mario.face_dir = "l"
+
+    @staticmethod
+    def do(mario):
+        mario.frame = (mario.frame + Run.FRAME_PER_SEC * game_framework.frame_time) % Run.nFrame
+
+
+class Up_Run:
+    l = [12, 44, 82, 116, 146, 181, 220, 254]
+    t = [148, 148, 149, 151, 149, 150, 149, 151]
+    w = [28, 30, 29, 24, 28, 30, 28, 24]
+    h = [36, 34, 36, 36, 36, 34, 36, 36]
+    nFrame = len(l)
+    for i in range(len(t)):
+        t[i] += h[i]
+
+    RUN_SPEED = 3
+    FRAME_PER_SEC = 8
+
+    @staticmethod
+    def enter(mario):
         if mario.dir == 1:
             mario.speed[0] = Run.RUN_SPEED
             mario.face_dir = "r"
@@ -102,15 +175,12 @@ class Jump:
     def do(mario):
         mario.frame = (mario.frame + Jump.FRAME_PER_SEC * game_framework.frame_time) % Jump.nFrame
         if mario.y > game_world.ground:
-            if int(mario.frame) > 2:
-                mario.frame = 2
-        else:
-            if int(mario.frame) == 0:
-                if mario.dir == 0:
-                    mario.state_machine.state = Idle
-                else:
-                    mario.state_machine.state = Run
-                mario.state_machine.state.enter(mario)
+            if (mario.speed[1] < 10):
+                mario.frame = min(mario.frame, 2)
+            else:
+                mario.frame = min(mario.frame, 0)
+        elif int(mario.frame) == 0:
+            mario.state_machine.handle_event(("LAND", 0))
 
 
 class ATK1:
@@ -136,11 +206,7 @@ class ATK1:
         isRepeat = False if int(mario.frame) == 0 else True
         mario.frame = (mario.frame + ATK1.FRAME_PER_SEC * game_framework.frame_time) % ATK1.nFrame
         if int(mario.frame) == 0 and isRepeat:
-            if mario.dir == 0:
-                mario.state_machine.state = Idle
-            else:
-                mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario)
+            mario.state_machine.handle_event(("EOA", 0))
 
 
 class UP_ATK1:
@@ -168,11 +234,7 @@ class UP_ATK1:
             if int(mario.frame) >= 3:
                 mario.frame = 3
         elif int(mario.frame) == 0 and isRepeat:
-            if mario.dir == 0:
-                mario.state_machine.state = Idle
-            else:
-                mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario)
+            mario.state_machine.handle_event(("EOA", 0))
         elif int(mario.frame) == 1:
             mario.speed[1] = UP_ATK1.JUMP_POWER
 
@@ -202,11 +264,7 @@ class UP_ATK2:
             if int(mario.frame) >= 9:
                 mario.frame = 9
         elif int(mario.frame) == 0 and isRepeat:
-            if mario.dir == 0:
-                mario.state_machine.state = Idle
-            else:
-                mario.state_machine.state = Run
-            mario.state_machine.state.enter(mario)
+            mario.state_machine.handle_event(("EOA", 0))
         elif int(mario.frame) == 3:
             mario.speed[1] = UP_ATK2.JUMP_POWER
 
@@ -253,21 +311,35 @@ class StateMachine:
         self.mario = mario
         self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run,
                              mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run,
+                             mario.control_method.up_down: Up_Idle,
                              mario.control_method.jump_down: Jump,
                              mario.control_method.atk1_down: ATK1,
                              mario.control_method.atk2_down: ATK2
                              },
+                      Up_Idle: {mario.control_method.move_r_down: Up_Run, mario.control_method.move_l_down: Up_Run,
+                                mario.control_method.move_r_up: Up_Run, mario.control_method.move_l_up: Up_Run,
+                                mario.control_method.up_down: Idle,
+                                mario.control_method.jump_down: Jump,
+                                mario.control_method.atk1_down: UP_ATK1,
+                                mario.control_method.atk2_down: UP_ATK2},
                       Run: {mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
                             mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
                             mario.control_method.jump_down: Jump,
+                            mario.control_method.up_down: Up_Run,
                             mario.control_method.atk1_down: ATK1,
                             mario.control_method.atk2_down: ATK2
                             },
-                      Jump: {},
-                      ATK1: {},
-                      ATK2: {},
-                      UP_ATK2: {},
-                      UP_ATK1: {}
+                      Up_Run: {mario.control_method.move_r_up: Up_Idle, mario.control_method.move_l_up: Up_Idle,
+                               mario.control_method.move_r_down: Up_Idle, mario.control_method.move_l_down: Up_Idle,
+                               mario.control_method.jump_down: Jump,
+                               mario.control_method.atk1_down: UP_ATK1,
+                               mario.control_method.atk2_down: UP_ATK2},
+                      Temp: {check_run: Run, check_idle: Idle, check_up_run: Up_Run, check_up_idle: Up_Idle},
+                      Jump: {land: Temp},
+                      ATK1: {end_of_animation: Temp},
+                      ATK2: {end_of_animation: Temp},
+                      UP_ATK2: {end_of_animation: Temp},
+                      UP_ATK1: {end_of_animation: Temp}
                       }
 
     def start(self):
@@ -303,22 +375,17 @@ class StateMachine:
         self.mario.move()
         self.state.do(self.mario)
 
-    def handle_events(self, e):
-        if self.mario.control_method.up_down(("INPUT", e)):
+    def handle_event(self, e):
+        if self.mario.control_method.up_down(e):
             self.mario.up = True
-        elif self.mario.control_method.up_up(("INPUT", e)):
+        elif self.mario.control_method.up_up(e):
             self.mario.up = False
-        elif self.mario.control_method.move_r_down(("INPUT", e)) or self.mario.control_method.move_l_up(("INPUT", e)):
+        elif self.mario.control_method.move_r_down(e) or self.mario.control_method.move_l_up(e):
             self.mario.dir += 1
-        elif self.mario.control_method.move_l_down(("INPUT", e)) or self.mario.control_method.move_r_up(("INPUT", e)):
+        elif self.mario.control_method.move_l_down(e) or self.mario.control_method.move_r_up(e):
             self.mario.dir -= 1
         for check, next_state in self.table[self.state].items():
-            if check(("INPUT", e)):
-                if self.mario.up:
-                    if next_state == ATK1:
-                        next_state = UP_ATK1
-                    elif next_state == ATK2:
-                        next_state = UP_ATK2
+            if check(e):
                 self.state = next_state
                 self.state.enter(self.mario)
 
@@ -353,3 +420,6 @@ class Mario:
         else:
             self.y = game_world.ground
             self.speed[1] = 0
+
+    def handle_event(self, e):
+        self.state_machine.handle_event(("INPUT", e))
