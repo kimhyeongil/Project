@@ -231,8 +231,7 @@ class UP_ATK1:
         isRepeat = False if int(mario.frame) == 0 else True
         mario.frame = (mario.frame + UP_ATK1.FRAME_PER_SEC * game_framework.frame_time) % UP_ATK1.nFrame
         if mario.y > game_world.ground:
-            if int(mario.frame) >= 3:
-                mario.frame = 3
+            mario.frame = min(mario.frame, 3)
         elif int(mario.frame) == 0 and isRepeat:
             mario.state_machine.handle_event(("EOA", 0))
         elif int(mario.frame) == 1:
@@ -261,8 +260,7 @@ class UP_ATK2:
         isRepeat = False if int(mario.frame) == 0 else True
         mario.frame = (mario.frame + UP_ATK2.FRAME_PER_SEC * game_framework.frame_time) % UP_ATK2.nFrame
         if mario.y > game_world.ground:
-            if int(mario.frame) >= 9:
-                mario.frame = 9
+            mario.frame = min(mario.frame, 9)
         elif int(mario.frame) == 0 and isRepeat:
             mario.state_machine.handle_event(("EOA", 0))
         elif int(mario.frame) == 3:
