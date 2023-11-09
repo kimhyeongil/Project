@@ -4,10 +4,11 @@ from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 import player1_control
 import player2_control
 import game_framework
-import mario
+from mario import Mario
 import game_world
-import megamen
+from megamen import MegaMen
 import megamen_projectile
+from ground import Ground
 
 
 def handle_events():
@@ -18,22 +19,26 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         else:
-            player1.state_machine.handle_events(event)
-            player2.state_machine.handle_events(event)
+            player1.handle_event(event)
+            player2.handle_event(event)
 
 
 def init():
     global player1, player2
     megamen_projectile.projectile = load_image('megamen.png')
-    player1 = megamen.MegaMen(player1_control)
-    player2 = mario.Mario(player2_control)
-    player1.state_machine.start()
+    player1 = MegaMen(player1_control)
+    player2 = Mario(player2_control)
+    ground = Ground(299)
     game_world.add_obj(player1, 1)
     game_world.add_obj(player2, 1)
+    game_world.add_collision_pair("character:ground", player1, ground)
+    game_world.add_collision_pair("character:ground", player2, ground)
     # game_world.add_obj(megamen.MegaMen(), 1)
+
 
 def finish():
     pass
+
 
 def draw():
     clear_canvas()
@@ -43,4 +48,4 @@ def draw():
 
 def update():
     game_world.update()
-
+    game_world.handle_collisons()
