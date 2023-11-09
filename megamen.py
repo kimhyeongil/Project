@@ -390,14 +390,23 @@ class FireSword:
              (248, 470, 54, 45),
              (309, 472, 54, 46), ]
     nFrame = 6
+    FRAME_PER_SEC = 12
 
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
+        megamen.speed[0] = 0
 
     @staticmethod
     def do(megamen):
+        isRepeat = False if int(megamen.frame) == 0 else True
         megamen.next_frame()
+        if isRepeat and int(megamen.frame) == 0:
+            megamen.state_machine.handle_event(("EOA", 0))
+
+    @staticmethod
+    def exit(megamen):
+        pass
 
 
 class Tornado:
@@ -413,16 +422,28 @@ class Tornado:
              (380, 145, 38, 39),
              (424, 145, 34, 44), ]
     nFrame = 11
+    FRAME_PER_SEC = 22
+    RUSH_SPEED = 5
 
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
-        game_world.add_obj(megamen_projectile.MegaTornado(megamen.x, megamen.y + Tornado.frame[megamen.frame][3], 100),
-                           1)
+        if megamen.face_dir == "r":
+            megamen.speed[0] = Tornado.RUSH_SPEED
+        else:
+            megamen.speed[0] = -Tornado.RUSH_SPEED
+        megamen.fire_tornado(0, Tornado.frame[megamen.frame][3])
 
     @staticmethod
     def do(megamen):
+        isRepeat = False if int(megamen.frame) == 0 else True
         megamen.next_frame()
+        if isRepeat and int(megamen.frame) == 0:
+            megamen.state_machine.handle_event(("EOA", 0))
+
+    @staticmethod
+    def exit(self):
+        pass
 
 
 class JumpShot:
@@ -460,26 +481,30 @@ class StateMachine:
                              megamen.control_method.up_down: UpIdle,
                              megamen.control_method.jump_down: Jump,
                              megamen.control_method.atk1_down: SmallShot,
-                             megamen.control_method.atk2_down: ChargingShot},
+                             megamen.control_method.atk2_down: ChargingShot,
+                             megamen.control_method.ultimate_down: FireSword},
                       UpIdle: {megamen.control_method.move_r_down: UpRun, megamen.control_method.move_l_down: UpRun,
                                megamen.control_method.move_r_up: UpRun, megamen.control_method.move_l_up: UpRun,
                                megamen.control_method.up_up: Idle,
                                megamen.control_method.jump_down: Jump,
                                megamen.control_method.atk1_down: Uppercut,
-                               megamen.control_method.atk2_down: ChargingShot},
+                               megamen.control_method.atk2_down: ChargingShot,
+                               megamen.control_method.ultimate_down: Tornado},
                       Run: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                             megamen.control_method.up_down: UpRun,
                             megamen.control_method.jump_down: Jump,
                             megamen.control_method.atk1_down: RunShot,
-                            megamen.control_method.atk2_down: ChargingShot
+                            megamen.control_method.atk2_down: ChargingShot,
+                            megamen.control_method.ultimate_down: FireSword
                             },
                       UpRun: {megamen.control_method.move_r_down: UpIdle, megamen.control_method.move_l_down: UpIdle,
                               megamen.control_method.move_r_up: UpIdle, megamen.control_method.move_l_up: UpIdle,
                               megamen.control_method.up_up: Run,
                               megamen.control_method.jump_down: Jump,
                               megamen.control_method.atk1_down: Uppercut,
-                              megamen.control_method.atk2_down: ChargingShot
+                              megamen.control_method.atk2_down: ChargingShot,
+                              megamen.control_method.ultimate_down: Tornado
                               },
                       AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
                       Land: {end_of_animation: AnimationEnd},
@@ -493,8 +518,8 @@ class StateMachine:
                                   end_of_animation: AnimationEnd},
                       ChargingShot: {megamen.control_method.atk2_up: AnimationEnd},
                       Uppercut: {land: Land},
-                      Tornado: {megamen.control_method.atk2_up: AnimationEnd},
-                      FireSword: {megamen.control_method.atk2_up: AnimationEnd},
+                      Tornado: {end_of_animation: AnimationEnd},
+                      FireSword: {end_of_animation: AnimationEnd},
                       JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot}}
 
     def draw(self):
@@ -560,6 +585,12 @@ class MegaMen:
             game_world.add_obj(megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1), 1)
         else:
             game_world.add_obj(megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1), 1)
+
+    def fire_tornado(self, fire_x, fire_y):
+        if self.face_dir == "r":
+            game_world.add_obj(megamen_projectile.MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]), 0)
+        else:
+            game_world.add_obj(megamen_projectile.MegaTornado(self.x - fire_x, self.y + fire_y, self.speed[0]), 0)
 
     def draw(self):
         self.state_machine.draw()
