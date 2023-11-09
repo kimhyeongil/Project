@@ -246,8 +246,9 @@ class OneJabTwoPunchThreeKick:
 class Uppercut:
     frame = [(14, 1940, 35, 30),
              (54, 1939, 34, 38),
-             (96, 1939, 22, 53), ]
-    nFrame = 3
+             (96, 1939, 22, 53),
+             (54, 1939, 34, 38),]
+    nFrame = 4
     FRAME_PER_SEC = 12
     JUMP_POWER = 13
 
