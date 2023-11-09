@@ -246,9 +246,8 @@ class OneJabTwoPunchThreeKick:
 class Uppercut:
     frame = [(14, 1940, 35, 30),
              (54, 1939, 34, 38),
-             (96, 1939, 22, 53),
-             (54, 1939, 34, 38), ]
-    nFrame = 4
+             (96, 1939, 22, 53), ]
+    nFrame = 3
     FRAME_PER_SEC = 12
     JUMP_POWER = 13
 
@@ -261,12 +260,14 @@ class Uppercut:
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
         mario.next_frame()
-        if mario.y > game_world.ground:
+        if mario.isFall:
             mario.frame = min(mario.frame, 2)
-        elif int(mario.frame) == 0 and isRepeat:
-            mario.state_machine.handle_event(("EOA", 0))
-        elif int(mario.frame) == 1:
-            mario.speed[1] = Uppercut.JUMP_POWER
+        else:
+            if isRepeat and int(mario.frame) == 0:
+                mario.state_machine.handle_event(("EOA", 0))
+            if int(mario.frame) == 1:
+                mario.isFall = True
+                mario.speed[1] = Uppercut.JUMP_POWER
 
 
 class SomersaultKick:
@@ -292,12 +293,14 @@ class SomersaultKick:
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
         mario.next_frame()
-        if mario.y > game_world.ground:
+        if mario.isFall:
             mario.frame = min(mario.frame, 8)
-        elif int(mario.frame) == 0 and isRepeat:
-            mario.state_machine.handle_event(("EOA", 0))
-        elif int(mario.frame) == 2:
-            mario.speed[1] = SomersaultKick.JUMP_POWER
+        else:
+            if int(mario.frame) == 0 and isRepeat:
+                mario.state_machine.handle_event(("EOA", 0))
+            if int(mario.frame) == 2:
+                mario.isFall = True
+                mario.speed[1] = SomersaultKick.JUMP_POWER
 
 
 class MagicCape:
@@ -413,6 +416,7 @@ class StateMachine:
                 self.state.frame[frame][3] * self.mario.size
             )
         draw_rectangle(*self.mario.get_bb())
+
     def update(self):
         self.mario.move()
         self.state.do(self.mario)
@@ -478,7 +482,7 @@ class Mario:
             2] * self.size // 2, self.y + state.frame[frame][3] * self.size
 
     def handle_collision(self, group, other):
-        if group == "character:ground" and self.isFall:
+        if group == "character:ground":
             self.y = other.y + 1
             self.speed[1] = 0
             self.isFall = False
