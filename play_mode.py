@@ -1,14 +1,26 @@
-from pico2d import open_canvas, delay, close_canvas, get_events, clear_canvas, update_canvas, load_image
+from pico2d import get_events, clear_canvas, update_canvas, load_image
 from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
 import player1_control
 import player2_control
 import game_framework
+import play_sever
 from mario import Mario
 import game_world
 from megamen import MegaMen
 import megamen_projectile
 from ground import Ground
+
+
+def init():
+    megamen_projectile.projectile = load_image('megamen.png')
+    play_sever.player1 = MegaMen(player1_control)
+    play_sever.player2 = Mario(player2_control)
+    play_sever.ground = Ground(299)
+    game_world.add_obj(play_sever.player1, 1)
+    game_world.add_obj(play_sever.player2, 1)
+    game_world.add_collision_pair("character:ground", play_sever.player1, play_sever.ground)
+    game_world.add_collision_pair("character:ground", play_sever.player2, play_sever.ground)
 
 
 def handle_events():
@@ -19,21 +31,8 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         else:
-            player1.handle_event(event)
-            player2.handle_event(event)
-
-
-def init():
-    global player1, player2
-    megamen_projectile.projectile = load_image('megamen.png')
-    player1 = MegaMen(player1_control)
-    player2 = Mario(player2_control)
-    ground = Ground(299)
-    game_world.add_obj(player1, 1)
-    game_world.add_obj(player2, 1)
-    game_world.add_collision_pair("character:ground", player1, ground)
-    game_world.add_collision_pair("character:ground", player2, ground)
-    # game_world.add_obj(megamen.MegaMen(), 1)
+            play_sever.player1.handle_event(event)
+            play_sever.player2.handle_event(event)
 
 
 def finish():
