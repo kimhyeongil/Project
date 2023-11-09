@@ -355,7 +355,7 @@ class StateMachine:
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                             megamen.control_method.jump_down: Jump,
                             megamen.control_method.atk1_down: RUN_ATK1,
-                            megamen.control_method.atk2_down: RUN_ATK1
+                            megamen.control_method.atk2_down: ATK2
                             },
                       Jump: {},
                       RUN_ATK1: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
@@ -415,6 +415,9 @@ class StateMachine:
                             next_state = UP_ATK1
                         elif next_state == ATK2:
                             next_state = UP_ATK2
+                    if self.state == ATK2:
+                        if self.megamen.dir != 0:
+                            next_state = Run
                     self.state.exit(self.megamen)
                     self.state = next_state
                     self.state.enter(self.megamen)
