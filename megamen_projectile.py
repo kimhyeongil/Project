@@ -64,7 +64,7 @@ class MegaTornado:
 
     def update(self):
         self.frame = (self.frame + 1) % len(MegaTornado.l)
-        self.x += self.speed * game_world.time_slice
+        self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
 
