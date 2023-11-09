@@ -28,7 +28,26 @@ def land(e):
     return e[0] == "LAND"
 
 
-class Temp:
+class Land:
+    frame = [
+        (111, 2401, 26, 34),
+        (141, 2401, 26, 33), ]
+
+    FRAME_PER_SEC = 15
+    @staticmethod
+    def enter(mario):
+        mario.frame = 0
+        mario.speed[0] = 0
+
+    @staticmethod
+    def do(mario):
+        isRepeat = False if int(mario.frame) == 0 else True
+        mario.frame = (mario.frame + Land.FRAME_PER_SEC * game_framework.frame_time) % len(Land.frame)
+        if int(mario.frame) == 0 and isRepeat:
+            mario.state_machine.handle_event(("EOA", 0))
+
+
+class AnimationEnd:
     @staticmethod
     def enter(mario):
         mario.frame = 0
@@ -168,9 +187,8 @@ class UpRun:
 class Jump:
     frame = [(15, 2403, 24, 40),
              (45, 2404, 27, 39),
-             (78, 2401, 29, 42),
-             (111, 2401, 26, 34),
-             (141, 2401, 26, 33), ]
+             (78, 2401, 29, 42)
+             ]
 
     JUMP_POWER = 15
     FRAME_PER_SEC = 10
@@ -328,13 +346,18 @@ class PalmStrike:
              (189, 1561, 37, 37),
              (232, 1561, 25, 34), ]
 
+    FRAME_PER_SEC = 12
+
     @staticmethod
     def enter(mario):
         mario.frame = 0
 
     @staticmethod
     def do(mario):
-        mario.frame = (mario.frame + 1) % len(PalmStrike.frame)
+        isRepeat = False if int(mario.frame) == 0 else True
+        mario.frame = (mario.frame + PalmStrike.FRAME_PER_SEC * game_framework.frame_time) % len(PalmStrike.frame)
+        if int(mario.frame) == 0 and isRepeat:
+            mario.state_machine.handle_event(("EOA", 0))
 
 
 class StateMachine:
@@ -366,14 +389,15 @@ class StateMachine:
                               mario.control_method.jump_down: Jump,
                               mario.control_method.atk1_down: Uppercut,
                               mario.control_method.atk2_down: SomersaultKick},
-                      Temp: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
-                      Jump: {land: Temp},
-                      OneJabTwoStraightThreeKick: {end_of_animation: Temp},
-                      TurnKick: {end_of_animation: Temp},
-                      SomersaultKick: {end_of_animation: Temp},
-                      Uppercut: {end_of_animation: Temp},
-                      MagicCape: {end_of_animation: Temp},
-                      PalmStrike: {end_of_animation: Temp}
+                      AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
+                      Land: {end_of_animation: AnimationEnd},
+                      Jump: {land: Land},
+                      OneJabTwoStraightThreeKick: {end_of_animation: AnimationEnd},
+                      TurnKick: {end_of_animation: AnimationEnd},
+                      SomersaultKick: {end_of_animation: Land},
+                      Uppercut: {end_of_animation: Land},
+                      MagicCape: {end_of_animation: AnimationEnd},
+                      PalmStrike: {end_of_animation: AnimationEnd}
                       }
 
     def start(self):
