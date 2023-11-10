@@ -8,20 +8,12 @@ def end_of_animation(e):
     return e[0] == "EOA"
 
 
-def check_up_run(e):
-    return e[0] == "CHECK_STATE" and e[1] != 0 and e[2]
-
-
 def check_run(e):
-    return e[0] == "CHECK_STATE" and e[1] != 0 and not e[2]
+    return e[0] == "CHECK_STATE" and e[1] != 0
 
 
 def check_idle(e):
-    return e[0] == "CHECK_STATE" and e[1] == 0 and not e[2]
-
-
-def check_up_idle(e):
-    return e[0] == "CHECK_STATE" and e[1] == 0 and e[2]
+    return e[0] == "CHECK_STATE" and e[1] == 0
 
 
 def land(e):
@@ -66,27 +58,6 @@ class AnimationEnd:
 
 
 class Idle:
-    frame = [(16, 1774, 31, 45),
-             (52, 1774, 31, 45),
-             (16, 1774, 31, 45), ]
-    nFrame = 3
-    FRAME_PER_SEC = 2
-
-    @staticmethod
-    def enter(megamen):
-        megamen.speed = [0, 0]
-        megamen.dir = 0
-
-    @staticmethod
-    def do(megamen):
-        megamen.next_frame()
-
-    @staticmethod
-    def exit(megamen):
-        pass
-
-
-class UpIdle:
     frame = [(16, 1774, 31, 45),
              (52, 1774, 31, 45),
              (16, 1774, 31, 45), ]
@@ -177,40 +148,6 @@ class Run:
             megamen.face_dir = "r"
         else:
             megamen.speed[0] = -Run.RUN_SPEED
-            megamen.face_dir = "l"
-
-    @staticmethod
-    def do(megamen):
-        megamen.next_frame()
-
-
-class UpRun:
-    frame = [(101, 1706, 30, 43),
-             (149, 1706, 27, 44),
-             (189, 1705, 37, 44),
-             (232, 1705, 42, 43),
-             (278, 1705, 37, 43),
-             (326, 1705, 30, 44),
-             (373, 1705, 28, 45),
-             (414, 1705, 33, 44),
-             (457, 1706, 40, 42),
-             (503, 1706, 38, 42), ]
-    nFrame = 10
-
-    RUN_SPEED = 2.5
-    FRAME_PER_SEC = 12
-
-    @staticmethod
-    def exit(megamen):
-        pass
-
-    @staticmethod
-    def enter(megamen):
-        if megamen.dir == 1:
-            megamen.speed[0] = UpRun.RUN_SPEED
-            megamen.face_dir = "r"
-        else:
-            megamen.speed[0] = -UpRun.RUN_SPEED
             megamen.face_dir = "l"
 
     @staticmethod
@@ -524,7 +461,7 @@ class StateMachine:
                             megamen.control_method.ultimate_down: FireSword,
                             megamen.control_method.up_ultimate_down: Tornado
                             },
-                      AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
+                      AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {land: Land, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.up_ultimate_down: JumpHurricane},
