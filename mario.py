@@ -8,10 +8,6 @@ def end_of_animation(e):
     return e[0] == "EOA"
 
 
-def check_up_run(e):
-    return e[0] == "CHECK_STATE" and e[1] != 0 and e[2]
-
-
 def check_run(e):
     return e[0] == "CHECK_STATE" and e[1] != 0 and not e[2]
 
@@ -20,20 +16,16 @@ def check_idle(e):
     return e[0] == "CHECK_STATE" and e[1] == 0 and not e[2]
 
 
-def check_up_idle(e):
-    return e[0] == "CHECK_STATE" and e[1] == 0 and e[2]
-
-
 def land(e):
     return e[0] == "LAND"
 
 
 class Land:
-    frame = [
-        (111, 2401, 26, 34),
-        (141, 2401, 26, 33), ]
+    frame = [(111, 2401, 26, 34,),
+             (141, 2401, 26, 33,),
+             (171, 2401, 26, 34,), ]
 
-    nFrame = 2
+    nFrame = 3
     FRAME_PER_SEC = 15
 
     @staticmethod
@@ -57,30 +49,6 @@ class AnimationEnd:
 
 
 class Idle:
-    frame = [(18, 2466, 23, 36),
-             (45, 2466, 23, 37),
-             (72, 2466, 23, 38),
-             (99, 2466, 24, 38),
-             (126, 2466, 25, 37),
-             (153, 2466, 25, 36),
-             (126, 2466, 25, 37),
-             (99, 2466, 24, 38),
-             (72, 2466, 23, 38),
-             (45, 2466, 23, 37)]
-    nFrame = 10
-    FRAME_PER_SEC = 10
-
-    @staticmethod
-    def enter(mario):
-        mario.speed = [0, 0]
-        mario.dir = 0
-
-    @staticmethod
-    def do(mario):
-        mario.next_frame()
-
-
-class UpIdle:
     frame = [(18, 2466, 23, 36),
              (45, 2466, 23, 37),
              (72, 2466, 23, 38),
@@ -156,33 +124,6 @@ class Run:
         mario.next_frame()
 
 
-class UpRun:
-    frame = [(12, 2343, 28, 36),
-             (44, 2345, 30, 34),
-             (82, 2342, 29, 36),
-             (116, 2340, 24, 36),
-             (146, 2342, 28, 36),
-             (181, 2343, 30, 34),
-             (220, 2342, 28, 36),
-             (254, 2340, 24, 36), ]
-    nFrame = 8
-    RUN_SPEED = 3
-    FRAME_PER_SEC = 8
-
-    @staticmethod
-    def enter(mario):
-        if mario.dir == 1:
-            mario.speed[0] = Run.RUN_SPEED
-            mario.face_dir = "r"
-        else:
-            mario.speed[0] = -Run.RUN_SPEED
-            mario.face_dir = "l"
-
-    @staticmethod
-    def do(mario):
-        mario.next_frame()
-
-
 class Jump:
     frame = [(15, 2403, 24, 40),
              (45, 2404, 27, 39),
@@ -205,6 +146,62 @@ class Jump:
                 mario.frame = min(mario.frame, 2)
             else:
                 mario.frame = min(mario.frame, 0)
+        else:
+            mario.state_machine.handle_event(("LAND", 0))
+
+
+class JumpKick:
+    frame = [(11, 2101, 31, 40,),
+             (48, 2110, 36, 30,),
+             (48, 2110, 36, 30,),
+             (90, 2101, 30, 40,),
+             (126, 2099, 29, 42,), ]
+
+    nFrame = 5
+    FRAME_PER_SEC = 12
+
+    @staticmethod
+    def enter(mario):
+        mario.frame = 0
+
+    @staticmethod
+    def do(mario):
+        mario.next_frame()
+        if mario.isFall:
+            mario.frame = min(mario.frame, 4)
+        else:
+            mario.state_machine.handle_event(("LAND", 0))
+
+
+class JumpSpinKick:
+    frame = [(14, 1316, 31, 40,),
+             (51, 1322, 39, 26,),
+             (96, 1324, 39, 20,),
+             (141, 1316, 39, 36,),
+             (186, 1323, 39, 27,),
+             (231, 1326, 39, 20,),
+             (276, 1327, 39, 22,),
+             (321, 1318, 39, 36,),
+             (367, 1316, 30, 40,),
+             (403, 1314, 29, 42,), ]
+
+    nFrame = 10
+    FRAME_PER_SEC = 25
+    SPEED = 2
+
+    @staticmethod
+    def enter(mario):
+        mario.frame = 0
+        if mario.face_dir == "r":
+            mario.speed[0] += JumpSpinKick.SPEED
+        else:
+            mario.speed[0] -= JumpSpinKick.SPEED
+
+    @staticmethod
+    def do(mario):
+        mario.next_frame()
+        if mario.isFall:
+            mario.frame = min(mario.frame, JumpSpinKick.nFrame - 1)
         else:
             mario.state_machine.handle_event(("LAND", 0))
 
@@ -378,15 +375,18 @@ class StateMachine:
                             mario.control_method.ultimate_down: PalmStrike,
                             mario.control_method.up_ultimate_down: MagicCape
                             },
-                      AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
+                      AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
-                      Jump: {land: Land},
+                      Jump: {land: Land, mario.control_method.atk1_down: JumpKick,
+                             mario.control_method.atk2_down: JumpSpinKick},
                       OneJabTwoPunchThreeKick: {end_of_animation: AnimationEnd},
                       TurnKick: {end_of_animation: AnimationEnd},
                       SomersaultKick: {end_of_animation: Land},
                       Uppercut: {end_of_animation: Land},
                       MagicCape: {end_of_animation: AnimationEnd},
-                      PalmStrike: {end_of_animation: AnimationEnd}
+                      PalmStrike: {end_of_animation: AnimationEnd},
+                      JumpKick: {land: Land},
+                      JumpSpinKick: {land: Land}
                       }
 
     def start(self):
