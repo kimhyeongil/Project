@@ -362,7 +362,7 @@ class ChargingShot:
         charged_time = game_framework.time.time() - ChargingShot.start_time
         if charged_time >= 0.5:
             ChargingShot.projectile.frame = 1
-        if game_framework.time.time() - ChargingShot.start_time >= 2:
+        if charged_time >= 2:
             ChargingShot.projectile.frame = 2
 
     @staticmethod
@@ -376,11 +376,8 @@ class ChargingShot:
             else:
                 projectile = megamen_projectile.ChargeShot(megamen.x - ChargingShot.w[0] * megamen.size // 2,
                                                            megamen.y + megamen.size * ChargingShot.h[0] // 2, -1)
-            projectile.size = min(game_framework.time.time() - ChargingShot.start_time, 2)
+            projectile.size = min(charged_time, 2)
             game_world.add_obj(projectile, 1)
-
-
-# game_world.add_obj(megamen, 1)
 
 
 class FireSword:
