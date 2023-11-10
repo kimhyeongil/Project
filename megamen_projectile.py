@@ -126,3 +126,25 @@ class MegaHurricane:
         megamen = self.megamen
         self.x = megamen.x
         self.y = megamen.y + megamen.state_machine.state.frame[int(megamen.frame)][3] * megamen.size
+
+
+class MegaKnuckle:
+    frame = [(340, 326, 10, 15,), ]
+
+    def __init__(self, x, y, size):
+        self.img = projectile
+        self.x, self.y = x, y
+        self.dir = 0
+        self.frame = 0
+        self.size = size
+        self.speed = -10
+
+    def draw(self):
+        frame = self.frame
+        self.img.clip_draw(*MegaKnuckle.frame[0],
+                           self.x, self.y,
+                           MegaKnuckle.frame[0][2] * self.size, MegaKnuckle.frame[0][3] * self.size)
+
+    def update(self):
+        self.y += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
+        self.speed -= game_framework.frame_time * game_world.g

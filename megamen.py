@@ -2,7 +2,12 @@ from pico2d import load_image, draw_rectangle
 import game_framework
 import game_world
 import megamen_projectile
+import play_sever
 
+
+# for i in range(len(JumpKnuckle.l)):
+#     print(f"({JumpKnuckle.l[i]},{megamen.img.h - JumpKnuckle.t[i]},{JumpKnuckle.w[i]},{JumpKnuckle.h[i]},),")
+# print(len(JumpKnuckle.l))
 
 def end_of_animation(e):
     return e[0] == "EOA"
@@ -185,6 +190,38 @@ class Jump:
             megamen.state_machine.handle_event(("LAND", 0))
 
 
+class JumpKnuckle:
+    frame = [(24, 305, 34, 46,),
+             (66, 311, 40, 39,),
+             (115, 306, 39, 45,),
+             (166, 306, 34, 46,),
+             (210, 308, 35, 47,),
+             (255, 306, 37, 50,),
+             ]
+    nFrame = 6
+    FRAME_PER_SEC = 8
+
+    @staticmethod
+    def exit(megamen):
+        pass
+
+    @staticmethod
+    def enter(megamen):
+        megamen.frame = 0
+
+    @staticmethod
+    def do(megamen):
+        isShot = True if int(megamen.frame) == 2 else False
+        megamen.next_frame()
+        if not isShot and int(megamen.frame) == 2:
+            knuckle = megamen_projectile.MegaKnuckle(megamen.x, megamen.y, megamen.size)
+            game_world.add_obj(knuckle, 1)
+        if megamen.isFall:
+            megamen.frame = min(megamen.frame, JumpKnuckle.nFrame - 1)
+        else:
+            megamen.state_machine.handle_event(("LAND", 0))
+
+
 class SmallShot:
     frame = [(13, 1491, 44, 44),
              (62, 1491, 46, 44),
@@ -193,7 +230,6 @@ class SmallShot:
              (214, 1491, 46, 44),
              (265, 1491, 44, 44), ]
     nFrame = 6
-
     FRAME_PER_SEC = 6
 
     @staticmethod
@@ -464,7 +500,8 @@ class StateMachine:
                       AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {land: Land, megamen.control_method.atk1_down: JumpShot,
-                             megamen.control_method.up_ultimate_down: JumpHurricane},
+                             megamen.control_method.up_ultimate_down: JumpHurricane,
+                             megamen.control_method.atk2_down: JumpKnuckle},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                                 end_of_animation: AnimationEnd},
@@ -477,7 +514,8 @@ class StateMachine:
                       Tornado: {end_of_animation: AnimationEnd},
                       FireSword: {end_of_animation: AnimationEnd},
                       JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot},
-                      JumpHurricane: {land: Land}}
+                      JumpHurricane: {land: Land},
+                      JumpKnuckle: {land: Land}}
 
     def draw(self):
         frame = int(self.megamen.frame)
