@@ -470,6 +470,37 @@ class JumpShot:
         pass
 
 
+class JumpHurricane:
+    frame = [(25, 387, 36, 50,),
+             (68, 387, 36, 50,),
+             (110, 387, 33, 50,),
+             (151, 387, 31, 51,),
+             (188, 387, 34, 50,),
+             (230, 387, 37, 50,), ]
+    nFrame = 6
+    FRAME_PER_SEC = 12
+    PROJECTILE = None
+
+    @staticmethod
+    def enter(megamen):
+        megamen.frame = 0
+        JumpHurricane.PROJECTILE = megamen_projectile.MegaHurricane(megamen.x, megamen.y + JumpHurricane.frame[0][3] * megamen.size)
+        game_world.add_obj(JumpHurricane.PROJECTILE, 1)
+
+    @staticmethod
+    def do(megamen):
+        megamen.next_frame()
+        if megamen.isFall:
+            megamen.frame = min(megamen.frame, JumpHurricane.nFrame - 1)
+        else:
+            megamen.state_machine.handle_event(("LAND", 0))
+
+    @staticmethod
+    def exit(megamen):
+        game_world.erase_obj(JumpHurricane.PROJECTILE)
+        pass
+
+
 class StateMachine:
     def __init__(self, megamen):
         self.state = Idle
@@ -493,7 +524,8 @@ class StateMachine:
                             },
                       AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
                       Land: {end_of_animation: AnimationEnd},
-                      Jump: {land: Land, megamen.control_method.atk1_down: JumpShot},
+                      Jump: {land: Land, megamen.control_method.atk1_down: JumpShot,
+                             megamen.control_method.up_ultimate_down: JumpHurricane},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                                 end_of_animation: AnimationEnd},
@@ -505,7 +537,8 @@ class StateMachine:
                       Uppercut: {land: Land},
                       Tornado: {end_of_animation: AnimationEnd},
                       FireSword: {end_of_animation: AnimationEnd},
-                      JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot}}
+                      JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot},
+                      JumpHurricane: {land: Land}}
 
     def draw(self):
         frame = int(self.megamen.frame)
