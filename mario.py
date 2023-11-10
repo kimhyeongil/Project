@@ -247,7 +247,7 @@ class Uppercut:
     frame = [(14, 1940, 35, 30),
              (54, 1939, 34, 38),
              (96, 1939, 22, 53),
-             (54, 1939, 34, 38),]
+             (54, 1939, 34, 38), ]
     nFrame = 4
     FRAME_PER_SEC = 12
     JUMP_POWER = 13
@@ -360,33 +360,24 @@ class StateMachine:
         self.mario = mario
         self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run,
                              mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run,
-                             mario.control_method.up_down: UpIdle,
                              mario.control_method.jump_down: Jump,
                              mario.control_method.atk1_down: OneJabTwoPunchThreeKick,
                              mario.control_method.atk2_down: TurnKick,
-                             mario.control_method.ultimate_down: PalmStrike
+                             mario.control_method.up_atk1_down: Uppercut,
+                             mario.control_method.up_atk2_down: SomersaultKick,
+                             mario.control_method.ultimate_down: PalmStrike,
+                             mario.control_method.up_ultimate_down: MagicCape
                              },
-                      UpIdle: {mario.control_method.move_r_down: UpRun, mario.control_method.move_l_down: UpRun,
-                               mario.control_method.move_r_up: UpRun, mario.control_method.move_l_up: UpRun,
-                               mario.control_method.up_down: Idle,
-                               mario.control_method.jump_down: Jump,
-                               mario.control_method.atk1_down: Uppercut,
-                               mario.control_method.atk2_down: SomersaultKick,
-                               mario.control_method.ultimate_down: MagicCape},
                       Run: {mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
                             mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
                             mario.control_method.jump_down: Jump,
-                            mario.control_method.up_down: UpRun,
                             mario.control_method.atk1_down: OneJabTwoPunchThreeKick,
                             mario.control_method.atk2_down: TurnKick,
-                            mario.control_method.ultimate_down: PalmStrike
+                            mario.control_method.up_atk1_down: Uppercut,
+                            mario.control_method.up_atk2_down: SomersaultKick,
+                            mario.control_method.ultimate_down: PalmStrike,
+                            mario.control_method.up_ultimate_down: MagicCape
                             },
-                      UpRun: {mario.control_method.move_r_up: UpIdle, mario.control_method.move_l_up: UpIdle,
-                              mario.control_method.move_r_down: UpIdle, mario.control_method.move_l_down: UpIdle,
-                              mario.control_method.jump_down: Jump,
-                              mario.control_method.atk1_down: Uppercut,
-                              mario.control_method.atk2_down: SomersaultKick,
-                              mario.control_method.ultimate_down: MagicCape},
                       AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {land: Land},
@@ -471,7 +462,7 @@ class Mario:
             self.speed[1] -= game_world.g * game_framework.frame_time
 
     def handle_event(self, e):
-        self.state_machine.handle_event(("INPUT", e))
+        self.state_machine.handle_event(("INPUT", e, self.up))
 
     def get_hitbox(self):
         pass

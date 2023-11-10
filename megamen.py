@@ -317,13 +317,14 @@ class Uppercut:
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
         megamen.next_frame()
-        if megamen.y > game_world.ground:
-            if int(megamen.frame) >= 3:
-                megamen.frame = 3
-        elif int(megamen.frame) == 0 and isRepeat:
-            megamen.state_machine.handle_event(("LAND", 0))
-        elif int(megamen.frame) == 1:
-            megamen.speed[1] = Uppercut.JUMP_POWER
+        if megamen.isFall:
+            megamen.frame = min(megamen.frame, 3)
+        else:
+            if int(megamen.frame) == 0 and isRepeat:
+                megamen.state_machine.handle_event(("LAND", 0))
+            elif int(megamen.frame) == 1:
+                megamen.isFall = True
+                megamen.speed[1] = Uppercut.JUMP_POWER
 
 
 class ChargingShot:
@@ -478,34 +479,21 @@ class StateMachine:
         self.megamen = megamen
         self.table = {Idle: {megamen.control_method.move_r_down: Run, megamen.control_method.move_l_down: Run,
                              megamen.control_method.move_r_up: Run, megamen.control_method.move_l_up: Run,
-                             megamen.control_method.up_down: UpIdle,
                              megamen.control_method.jump_down: Jump,
                              megamen.control_method.atk1_down: SmallShot,
                              megamen.control_method.atk2_down: ChargingShot,
-                             megamen.control_method.ultimate_down: FireSword},
-                      UpIdle: {megamen.control_method.move_r_down: UpRun, megamen.control_method.move_l_down: UpRun,
-                               megamen.control_method.move_r_up: UpRun, megamen.control_method.move_l_up: UpRun,
-                               megamen.control_method.up_up: Idle,
-                               megamen.control_method.jump_down: Jump,
-                               megamen.control_method.atk1_down: Uppercut,
-                               megamen.control_method.atk2_down: ChargingShot,
-                               megamen.control_method.ultimate_down: Tornado},
+                             megamen.control_method.up_atk1_down: Uppercut,
+                             megamen.control_method.ultimate_down: FireSword,
+                             megamen.control_method.up_ultimate_down: Tornado},
                       Run: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
-                            megamen.control_method.up_down: UpRun,
                             megamen.control_method.jump_down: Jump,
                             megamen.control_method.atk1_down: RunShot,
                             megamen.control_method.atk2_down: ChargingShot,
-                            megamen.control_method.ultimate_down: FireSword
+                            megamen.control_method.up_atk1_down: Uppercut,
+                            megamen.control_method.ultimate_down: FireSword,
+                            megamen.control_method.up_ultimate_down: Tornado
                             },
-                      UpRun: {megamen.control_method.move_r_down: UpIdle, megamen.control_method.move_l_down: UpIdle,
-                              megamen.control_method.move_r_up: UpIdle, megamen.control_method.move_l_up: UpIdle,
-                              megamen.control_method.up_up: Run,
-                              megamen.control_method.jump_down: Jump,
-                              megamen.control_method.atk1_down: Uppercut,
-                              megamen.control_method.atk2_down: ChargingShot,
-                              megamen.control_method.ultimate_down: Tornado
-                              },
                       AnimationEnd: {check_run: Run, check_idle: Idle, check_up_run: UpRun, check_up_idle: UpIdle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {land: Land, megamen.control_method.atk1_down: JumpShot},
@@ -605,7 +593,7 @@ class MegaMen:
             self.speed[1] -= game_world.g * game_framework.frame_time
 
     def handle_event(self, e):
-        self.state_machine.handle_event(("INPUT", e))
+        self.state_machine.handle_event(("INPUT", e, self.up))
 
     def get_hitbox(self):
         pass

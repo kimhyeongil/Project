@@ -25,11 +25,23 @@ def jump_down(e):
 
 
 def atk1_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_COMMA
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_COMMA and not e[2]
+
+
+def up_atk1_down(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_COMMA and e[2]
 
 
 def atk2_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_PERIOD
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_PERIOD and not e[2]
+
+
+def up_atk2_down(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_PERIOD and e[2]
+
+
+def atk2_up(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_PERIOD
 
 
 def up_down(e):
@@ -41,4 +53,8 @@ def up_up(e):
 
 
 def ultimate_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k and not e[2]
+
+
+def up_ultimate_down(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k and e[2]
