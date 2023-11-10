@@ -490,6 +490,8 @@ class JumpHurricane:
     @staticmethod
     def do(megamen):
         megamen.next_frame()
+        if int(megamen.frame) == JumpHurricane.nFrame - 1:
+            game_world.erase_obj(JumpHurricane.PROJECTILE)
         if megamen.isFall:
             megamen.frame = min(megamen.frame, JumpHurricane.nFrame - 1)
         else:
