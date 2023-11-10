@@ -9,11 +9,11 @@ def end_of_animation(e):
 
 
 def check_run(e):
-    return e[0] == "CHECK_STATE" and e[1] != 0 and not e[2]
+    return e[0] == "CHECK_STATE" and e[1] != 0
 
 
 def check_idle(e):
-    return e[0] == "CHECK_STATE" and e[1] == 0 and not e[2]
+    return e[0] == "CHECK_STATE" and e[1] == 0
 
 
 def land(e):
@@ -45,7 +45,7 @@ class AnimationEnd:
     @staticmethod
     def enter(mario):
         mario.frame = 0
-        mario.state_machine.handle_event(("CHECK_STATE", mario.dir, mario.up))
+        mario.state_machine.handle_event(("CHECK_STATE", mario.dir))
 
 
 class Idle:
@@ -159,10 +159,14 @@ class JumpKick:
 
     nFrame = 5
     FRAME_PER_SEC = 12
-
+    SPEED = 1
     @staticmethod
     def enter(mario):
         mario.frame = 0
+        if mario.face_dir == "r":
+            mario.speed[0] += JumpKick.SPEED
+        else:
+            mario.speed[0] -= JumpKick.SPEED
 
     @staticmethod
     def do(mario):
