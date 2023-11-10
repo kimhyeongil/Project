@@ -7,12 +7,10 @@ projectile = None
 
 
 class MegaBuster:
-    l = [546, 559]
-    t = [488, 488]
-    w = [9, 10]
-    h = [7, 7]
-    for i in range(len(t)):
-        t[i] += h[i]
+    frame = [(546, 1439, 9, 7,),
+             (559, 1439, 10, 7,), ]
+    FRAME_PER_SEC = 5
+    nFrame = 2
 
     def __init__(self, x, y, dir):
         self.img = projectile
@@ -23,33 +21,30 @@ class MegaBuster:
         self.size = 2
 
     def draw(self):
+        frame = int(self.frame)
         if self.dir == 1:
-            self.img.clip_draw(MegaBuster.l[self.frame], self.img.h - MegaBuster.t[self.frame],
-                               MegaBuster.w[self.frame], MegaBuster.h[self.frame],
-                               self.x + MegaBuster.w[self.frame] * self.size // 2, self.y + 5,
-                               MegaBuster.w[self.frame] * self.size, MegaBuster.h[self.frame] * self.size)
+            self.img.clip_draw(*MegaBuster.frame[frame],
+                               self.x + MegaBuster.frame[frame][2] * self.size // 2, self.y + 5,
+                               MegaBuster.frame[frame][2] * self.size, MegaBuster.frame[frame][3] * self.size)
         else:
-            self.img.clip_composite_draw(MegaBuster.l[self.frame], self.img.h - MegaBuster.t[self.frame],
-                                         MegaBuster.w[self.frame], MegaBuster.h[self.frame],
+            self.img.clip_composite_draw(*MegaBuster.frame[frame],
                                          0, 'h',
-                                         self.x - MegaBuster.w[self.frame] * self.size // 2, self.y + 5,
-                                         MegaBuster.w[self.frame] * self.size, MegaBuster.h[self.frame] * self.size)
+                                         self.x - MegaBuster.frame[frame][2] * self.size // 2, self.y + 5,
+                                         MegaBuster.frame[frame][2] * self.size, MegaBuster.frame[frame][3] * self.size)
 
     def update(self):
-        self.frame = (self.frame + 1) % len(MegaBuster.l)
+        self.frame = (self.frame + game_framework.frame_time * MegaBuster.FRAME_PER_SEC) % MegaBuster.nFrame
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
 
 
 class MegaTornado:
-    l = [534, 613, 697]
-    t = [1735, 1732, 1732]
-    w = [71, 72, 66]
-    h = [58, 66, 59]
-
-    for i in range(len(t)):
-        t[i] += h[i]
+    frame = [(534, 141, 71, 58,),
+             (613, 136, 72, 66,),
+             (697, 143, 66, 59,), ]
+    nFrame = 3
+    FRAME_PER_SEC = 18
 
     def __init__(self, x, y, speed):
         self.img = projectile
@@ -58,48 +53,72 @@ class MegaTornado:
         self.frame = 0
 
     def draw(self):
-        self.img.clip_draw(MegaTornado.l[self.frame], self.img.h - MegaTornado.t[self.frame],
-                           MegaTornado.w[self.frame], MegaTornado.h[self.frame],
-                           self.x, self.y, MegaTornado.w[self.frame] * 2, MegaTornado.h[self.frame] * 2)
+        frame = int(self.frame)
+        self.img.clip_draw(*MegaTornado.frame[frame],
+                           self.x, self.y, MegaTornado.frame[frame][2] * 2, MegaTornado.frame[frame][3] * 2)
 
     def update(self):
-        self.frame = (self.frame + 1) % len(MegaTornado.l)
+        self.frame = (self.frame + game_framework.frame_time * MegaTornado.FRAME_PER_SEC) % MegaTornado.nFrame
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
 
 
 class ChargeShot:
-    l = [415, 444, 484, 693]
-    t = [283, 274, 271, 273]
-    w = [23, 35, 45, 94]
-    h = [23, 42, 48, 40]
-
-    for i in range(len(t)):
-        t[i] += h[i]
+    frame = [(415, 1628, 23, 23,),
+             (444, 1618, 35, 42,),
+             (484, 1615, 45, 48,),
+             (693, 1621, 94, 40,), ]
+    nFrame = 4
 
     def __init__(self, x, y, dir):
         self.img = projectile
         self.x, self.y = x, y
         self.speed = 10 * dir
         self.dir = dir
-        self.frame = len(ChargeShot.t) - 1
+        self.frame = ChargeShot.nFrame - 1
         self.size = 1
 
     def draw(self):
+        frame = self.frame
         if self.dir == 1:
-            self.img.clip_draw(ChargeShot.l[self.frame], self.img.h - ChargeShot.t[self.frame],
-                               ChargeShot.w[self.frame], ChargeShot.h[self.frame],
-                               self.x + ChargeShot.w[self.frame] * self.size // 2, self.y + 5,
-                               ChargeShot.w[self.frame] * self.size, ChargeShot.h[self.frame] * self.size)
+            self.img.clip_draw(*ChargeShot.frame[frame],
+                               self.x + ChargeShot.frame[frame][2] * self.size // 2, self.y + 5,
+                               ChargeShot.frame[frame][2] * self.size, ChargeShot.frame[frame][3] * self.size)
         else:
-            self.img.clip_composite_draw(ChargeShot.l[self.frame], self.img.h - ChargeShot.t[self.frame],
-                                         ChargeShot.w[self.frame], ChargeShot.h[self.frame],
+            self.img.clip_composite_draw(*ChargeShot.frame[frame],
                                          0, 'h',
-                                         self.x - ChargeShot.w[self.frame] * self.size // 2, self.y + 5,
-                                         ChargeShot.w[self.frame] * self.size, ChargeShot.h[self.frame] * self.size)
+                                         self.x - ChargeShot.frame[frame][2] * self.size // 2, self.y + 5,
+                                         ChargeShot.frame[frame][2] * self.size, ChargeShot.frame[frame][3] * self.size)
 
     def update(self):
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
+
+
+class MegaHurricane:
+    frame = [(292, 394, 38, 36,),
+             (336, 393, 35, 37,),
+             (379, 393, 35, 37,), ]
+    FRAME_PER_SEC = 6
+    nFrame = 3
+
+    def __init__(self, x, y):
+        self.img = projectile
+        self.x, self.y = x, y
+        self.size = 2
+        self.frame = 0
+
+    def draw(self):
+        frame = int(self.frame)
+        self.img.clip_draw(
+            *MegaHurricane.frame[frame],
+            self.x,
+            self.y + MegaHurricane.frame[frame][3] * self.size // 2,
+            MegaHurricane.frame[frame][2] * self.size,
+            MegaHurricane.frame[frame][3] * self.size
+        )
+
+    def update(self):
+        self.frame = (self.frame + game_framework.frame_time * MegaHurricane.FRAME_PER_SEC) % MegaBuster.nFrame
