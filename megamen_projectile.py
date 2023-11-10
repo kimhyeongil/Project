@@ -104,9 +104,10 @@ class MegaHurricane:
     FRAME_PER_SEC = 6
     nFrame = 3
 
-    def __init__(self, x, y):
+    def __init__(self, megamen):
         self.img = projectile
-        self.x, self.y = x, y
+        self.x, self.y = megamen.x, megamen.y + megamen.state_machine.state.frame[int(megamen.frame)][3] * megamen.size
+        self.megamen = megamen
         self.size = 2
         self.frame = 0
 
@@ -122,3 +123,6 @@ class MegaHurricane:
 
     def update(self):
         self.frame = (self.frame + game_framework.frame_time * MegaHurricane.FRAME_PER_SEC) % MegaBuster.nFrame
+        megamen = self.megamen
+        self.x = megamen.x
+        self.y = megamen.y + megamen.state_machine.state.frame[int(megamen.frame)][3] * megamen.size

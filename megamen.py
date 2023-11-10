@@ -484,7 +484,7 @@ class JumpHurricane:
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
-        JumpHurricane.PROJECTILE = megamen_projectile.MegaHurricane(megamen.x, megamen.y + JumpHurricane.frame[0][3] * megamen.size)
+        JumpHurricane.PROJECTILE = megamen_projectile.MegaHurricane(megamen)
         game_world.add_obj(JumpHurricane.PROJECTILE, 1)
 
     @staticmethod
