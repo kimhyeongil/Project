@@ -2,7 +2,7 @@ world = [[] for _ in range(10)]
 collision_pairs = {}
 PIXEL_PER_METER = 100 / 2.5  # 100픽셀 당 1미터
 
-g = 50
+g = 40
 time_slice = 0.01
 ground = 300
 
@@ -27,6 +27,8 @@ def erase_obj(o):
     for layer in world:
         if o in layer:
             layer.remove(o)
+            erase_collision_object(o)
+            del o
             return
 
 
