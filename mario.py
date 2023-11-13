@@ -4,6 +4,11 @@ import game_framework
 import game_world
 
 
+# state = JumpSuperPunch
+# for i in range(len(state.l)):
+#     print(f"({state.l[i]},{mario.img.h - state.t[i] - state.h[i]},{state.w[i]},{state.h[i]},),")
+# print(len(state.l))
+
 def end_of_animation(e):
     return e[0] == "EOA"
 
@@ -142,9 +147,7 @@ class Jump:
     def do(mario):
         mario.next_frame()
         if mario.isFall:
-            if (mario.speed[1] < 10):
-                mario.frame = min(mario.frame, 2)
-            else:
+            if (mario.speed[1] > 10):
                 mario.frame = min(mario.frame, 0)
         else:
             mario.state_machine.handle_event(("LAND", 0))
@@ -160,6 +163,7 @@ class JumpKick:
     nFrame = 5
     FRAME_PER_SEC = 12
     SPEED = 1
+
     @staticmethod
     def enter(mario):
         mario.frame = 0
@@ -171,9 +175,47 @@ class JumpKick:
     @staticmethod
     def do(mario):
         mario.next_frame()
-        if mario.isFall:
-            mario.frame = min(mario.frame, 4)
+        if not mario.isFall:
+            mario.state_machine.handle_event(("LAND", 0))
+
+
+class JumpSuperPunch:
+    frame = [(14, 1419, 32, 40,),
+             (52, 1419, 32, 40,),
+             (90, 1419, 32, 40,),
+             (129, 1419, 35, 40,),
+             (170, 1420, 29, 38,),
+             (205, 1421, 44, 38,),
+             (255, 1421, 42, 36,),
+             (303, 1419, 32, 38,),
+             (341, 1419, 30, 40,),
+             (377, 1426, 34, 32,),
+             (417, 1436, 36, 21,),
+             (16, 1378, 35, 29,),
+             (57, 1373, 35, 34,),
+             (98, 1374, 36, 34,),
+             (140, 1371, 36, 31,),
+             (181, 1374, 34, 34,), ]
+
+    nFrame = 16
+    FRAME_PER_SEC = 24
+    SPEED = 5
+
+    @staticmethod
+    def enter(mario):
+        mario.frame = 0
+        if mario.face_dir == "r":
+            mario.speed[0] += JumpSpinKick.SPEED
         else:
+            mario.speed[0] -= JumpSpinKick.SPEED
+        mario.speed[1] = 0
+
+    @staticmethod
+    def do(mario):
+        mario.next_frame()
+        if not int(mario.frame) == JumpSuperPunch.nFrame - 1:
+            mario.speed[1] = 0
+        if not mario.isFall:
             mario.state_machine.handle_event(("LAND", 0))
 
 
@@ -204,9 +246,7 @@ class JumpSpinKick:
     @staticmethod
     def do(mario):
         mario.next_frame()
-        if mario.isFall:
-            mario.frame = min(mario.frame, JumpSpinKick.nFrame - 1)
-        else:
+        if not mario.isFall:
             mario.state_machine.handle_event(("LAND", 0))
 
 
@@ -262,12 +302,10 @@ class Uppercut:
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
         mario.next_frame()
-        if mario.isFall:
-            mario.frame = min(mario.frame, 2)
-        else:
+        if not mario.isFall:
             if isRepeat and int(mario.frame) == 0:
                 mario.state_machine.handle_event(("EOA", 0))
-            if int(mario.frame) == 1:
+            elif int(mario.frame) == 1:
                 mario.isFall = True
                 mario.speed[1] = Uppercut.JUMP_POWER
 
@@ -295,12 +333,10 @@ class SomersaultKick:
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
         mario.next_frame()
-        if mario.isFall:
-            mario.frame = min(mario.frame, 8)
-        else:
+        if not mario.isFall:
             if int(mario.frame) == 0 and isRepeat:
                 mario.state_machine.handle_event(("EOA", 0))
-            if int(mario.frame) == 2:
+            elif int(mario.frame) == 2:
                 mario.isFall = True
                 mario.speed[1] = SomersaultKick.JUMP_POWER
 
@@ -382,7 +418,8 @@ class StateMachine:
                       AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {land: Land, mario.control_method.atk1_down: JumpKick,
-                             mario.control_method.atk2_down: JumpSpinKick},
+                             mario.control_method.atk2_down: JumpSpinKick,
+                             mario.control_method.ultimate_down: JumpSuperPunch},
                       OneJabTwoPunchThreeKick: {end_of_animation: AnimationEnd},
                       TurnKick: {end_of_animation: AnimationEnd},
                       SomersaultKick: {end_of_animation: Land},
@@ -390,7 +427,8 @@ class StateMachine:
                       MagicCape: {end_of_animation: AnimationEnd},
                       PalmStrike: {end_of_animation: AnimationEnd},
                       JumpKick: {land: Land},
-                      JumpSpinKick: {land: Land}
+                      JumpSpinKick: {land: Land},
+                      JumpSuperPunch: {land: Land}
                       }
 
     def start(self):
@@ -474,6 +512,8 @@ class Mario:
     def next_frame(self):
         state = self.state_machine.state
         self.frame = (self.frame + state.FRAME_PER_SEC * game_framework.frame_time) % state.nFrame
+        if self.isFall:
+            self.frame = min(self.frame, state.nFrame - 1)
 
     def get_bb(self):
         frame = int(self.frame)
