@@ -64,7 +64,7 @@ class MegaTornado:
             game_world.erase_obj(self)
 
 
-class ChargeShot:
+class MegaChargingShot:
     frame = [(415, 1628, 23, 23,),
              (444, 1618, 35, 42,),
              (484, 1615, 45, 48,),
@@ -76,20 +76,20 @@ class ChargeShot:
         self.x, self.y = x, y
         self.speed = 10 * dir
         self.dir = dir
-        self.frame = ChargeShot.nFrame - 1
+        self.frame = MegaChargingShot.nFrame - 1
         self.size = 1
 
     def draw(self):
         frame = self.frame
         if self.dir == 1:
-            self.img.clip_draw(*ChargeShot.frame[frame],
-                               self.x + ChargeShot.frame[frame][2] * self.size // 2, self.y + 5,
-                               ChargeShot.frame[frame][2] * self.size, ChargeShot.frame[frame][3] * self.size)
+            self.img.clip_draw(*MegaChargingShot.frame[frame],
+                               self.x + MegaChargingShot.frame[frame][2] * self.size // 2, self.y + 5,
+                               MegaChargingShot.frame[frame][2] * self.size, MegaChargingShot.frame[frame][3] * self.size)
         else:
-            self.img.clip_composite_draw(*ChargeShot.frame[frame],
+            self.img.clip_composite_draw(*MegaChargingShot.frame[frame],
                                          0, 'h',
-                                         self.x - ChargeShot.frame[frame][2] * self.size // 2, self.y + 5,
-                                         ChargeShot.frame[frame][2] * self.size, ChargeShot.frame[frame][3] * self.size)
+                                         self.x - MegaChargingShot.frame[frame][2] * self.size // 2, self.y + 5,
+                                         MegaChargingShot.frame[frame][2] * self.size, MegaChargingShot.frame[frame][3] * self.size)
 
     def update(self):
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
