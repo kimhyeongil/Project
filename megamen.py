@@ -5,12 +5,6 @@ import megamen_projectile
 import play_sever
 
 
-# state = CogwheelShot
-# for i in range(len(state.l)):
-#     print(f"({state.l[i]},{megamen.img.h - state.t[i] - state.h[i]},{state.w[i]},{state.h[i]},),")
-# print(len(state.l))
-
-
 def end_of_animation(e):
     return e[0] == "EOA"
 
@@ -377,11 +371,13 @@ class ChargingShot:
         charged_time = game_framework.time.time() - ChargingShot.start_time
         if charged_time > 0.5:
             if megamen.face_dir == 'r':
-                projectile = megamen_projectile.MegaChargingShot(megamen.x + ChargingShot.frame[0][2] * megamen.size // 2,
-                                                                 megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, 1)
+                projectile = megamen_projectile.MegaChargingShot(
+                    megamen.x + ChargingShot.frame[0][2] * megamen.size // 2,
+                    megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, 1)
             else:
-                projectile = megamen_projectile.MegaChargingShot(megamen.x - ChargingShot.frame[0][2] * megamen.size // 2,
-                                                                 megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, -1)
+                projectile = megamen_projectile.MegaChargingShot(
+                    megamen.x - ChargingShot.frame[0][2] * megamen.size // 2,
+                    megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, -1)
             projectile.size = min(charged_time, 2)
             game_world.add_obj(projectile, 1)
 
