@@ -5,9 +5,11 @@ import megamen_projectile
 import play_sever
 
 
-# for i in range(len(JumpKnuckle.l)):
-#     print(f"({JumpKnuckle.l[i]},{megamen.img.h - JumpKnuckle.t[i]},{JumpKnuckle.w[i]},{JumpKnuckle.h[i]},),")
-# print(len(JumpKnuckle.l))
+# state = CogwheelShot
+# for i in range(len(state.l)):
+#     print(f"({state.l[i]},{megamen.img.h - state.t[i] - state.h[i]},{state.w[i]},{state.h[i]},),")
+# print(len(state.l))
+
 
 def end_of_animation(e):
     return e[0] == "EOA"
@@ -301,6 +303,38 @@ class Uppercut:
                 megamen.speed[1] = Uppercut.JUMP_POWER
 
 
+class CogwheelShot:
+    frame = [(27, 556, 31, 45,),
+             (68, 556, 31, 45,),
+             (111, 556, 42, 44,),
+             (158, 556, 40, 41,),
+             (205, 556, 34, 44,),
+             (252, 556, 31, 45,), ]
+
+    nFrame = 6
+    FRAME_PER_SEC = 6
+
+    @staticmethod
+    def exit(megamen):
+        pass
+
+    @staticmethod
+    def enter(megamen):
+        megamen.frame = 0
+        megamen.speed[0] = 0
+
+    @staticmethod
+    def do(megamen):
+        isRepeat = False if int(megamen.frame) == 0 else True
+        isShot = True if int(megamen.frame) == 3 else False
+        megamen.next_frame()
+        if int(megamen.frame) == 3 and not isShot:
+            megamen.fire_cogwheel(CogwheelShot.frame[int(megamen.frame)][2],
+                                  CogwheelShot.frame[int(megamen.frame)][3] * megamen.size // 2)
+        if int(megamen.frame) == 0 and isRepeat:
+            megamen.state_machine.handle_event(("EOA", 0))
+\
+
 class ChargingShot:
     frame = [(355, 1491, 47, 42)]
     l = [355]
@@ -360,21 +394,21 @@ class FireSword:
              (123, 462, 57, 55),
              (185, 464, 56, 55),
              (248, 470, 54, 45),
-             (309, 472, 54, 46), ]
-    nFrame = 6
-    FRAME_PER_SEC = 12
+             (309, 472, 54, 46),
+             (364, 474, 35, 47,),
+             (409, 472, 37, 50,), ]
+    nFrame = 8
+    FRAME_PER_SEC = 16
 
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
-        megamen.speed[0] = 0
 
     @staticmethod
     def do(megamen):
-        isRepeat = False if int(megamen.frame) == 0 else True
         megamen.next_frame()
-        if isRepeat and int(megamen.frame) == 0:
-            megamen.state_machine.handle_event(("EOA", 0))
+        if not megamen.isFall:
+            megamen.state_machine.handle_event(("LAND", 0))
 
     @staticmethod
     def exit(megamen):
@@ -487,7 +521,7 @@ class StateMachine:
                              megamen.control_method.atk1_down: SmallShot,
                              megamen.control_method.atk2_down: ChargingShot,
                              megamen.control_method.up_atk1_down: Uppercut,
-                             megamen.control_method.ultimate_down: FireSword,
+                             megamen.control_method.ultimate_down: CogwheelShot,
                              megamen.control_method.up_ultimate_down: Tornado},
                       Run: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
@@ -495,14 +529,15 @@ class StateMachine:
                             megamen.control_method.atk1_down: RunShot,
                             megamen.control_method.atk2_down: ChargingShot,
                             megamen.control_method.up_atk1_down: Uppercut,
-                            megamen.control_method.ultimate_down: FireSword,
+                            megamen.control_method.ultimate_down: CogwheelShot,
                             megamen.control_method.up_ultimate_down: Tornado
                             },
                       AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {land: Land, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.up_ultimate_down: JumpHurricane,
-                             megamen.control_method.atk2_down: JumpKnuckle},
+                             megamen.control_method.atk2_down: JumpKnuckle,
+                             megamen.control_method.ultimate_down: FireSword},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                                 end_of_animation: AnimationEnd},
@@ -513,10 +548,11 @@ class StateMachine:
                       ChargingShot: {megamen.control_method.atk2_up: AnimationEnd},
                       Uppercut: {land: Land},
                       Tornado: {end_of_animation: AnimationEnd},
-                      FireSword: {end_of_animation: AnimationEnd},
+                      FireSword: {land: Land},
                       JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot},
                       JumpHurricane: {land: Land},
-                      JumpKnuckle: {land: Land}}
+                      JumpKnuckle: {land: Land},
+                      CogwheelShot: {end_of_animation: AnimationEnd}}
 
     def draw(self):
         frame = int(self.megamen.frame)
@@ -582,6 +618,12 @@ class MegaMen:
         else:
             game_world.add_obj(megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1), 1)
 
+    def fire_cogwheel(self, fire_x, fire_y):
+        if self.face_dir == "r":
+            game_world.add_obj(megamen_projectile.MegaCogwheel(self.x + fire_x, self.y + fire_y, 1), 1)
+        else:
+            game_world.add_obj(megamen_projectile.MegaCogwheel(self.x - fire_x, self.y + fire_y, -1), 1)
+
     def fire_tornado(self, fire_x, fire_y):
         if self.face_dir == "r":
             game_world.add_obj(megamen_projectile.MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]), 0)
@@ -609,6 +651,8 @@ class MegaMen:
     def next_frame(self):
         state = self.state_machine.state
         self.frame = (self.frame + state.FRAME_PER_SEC * game_framework.frame_time) % state.nFrame
+        if self.isFall:
+            self.frame = min(self.frame, state.nFrame - 1)
 
     def get_bb(self):
         frame = int(self.frame)

@@ -154,6 +154,40 @@ class MegaKnuckle:
             3] * self.size // 2, self.x + MegaKnuckle.frame[0][2] * self.size // 2, self.y + \
                MegaKnuckle.frame[0][3] * self.size // 2
 
-    def handle_collision(self,group,other):
+    def handle_collision(self, group, other):
         if group == "knuckle:ground":
+            game_world.erase_obj(self)
+
+
+class MegaCogwheel:
+    frame = [(307, 571, 20, 20,),
+             (332, 571, 20, 20,), ]
+    FRAME_PER_SEC = 12
+    nFrame = 2
+
+    def __init__(self, x, y, dir):
+        self.img = projectile
+        self.x, self.y = x, y
+        self.speed = 10 * dir
+        self.dir = dir
+        self.frame = 0
+        self.size = 2
+
+    def draw(self):
+        frame = int(self.frame)
+        if self.dir == 1:
+            self.img.clip_draw(*MegaCogwheel.frame[frame],
+                               self.x + MegaCogwheel.frame[frame][2] * self.size // 2, self.y + 5,
+                               MegaCogwheel.frame[frame][2] * self.size, MegaCogwheel.frame[frame][3] * self.size)
+        else:
+            self.img.clip_composite_draw(*MegaCogwheel.frame[frame],
+                                         0, 'h',
+                                         self.x - MegaCogwheel.frame[frame][2] * self.size // 2, self.y + 5,
+                                         MegaCogwheel.frame[frame][2] * self.size,
+                                         MegaCogwheel.frame[frame][3] * self.size)
+
+    def update(self):
+        self.frame = (self.frame + game_framework.frame_time * MegaCogwheel.FRAME_PER_SEC) % MegaCogwheel.nFrame
+        self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
+        if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
