@@ -302,10 +302,12 @@ class Uppercut:
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
         mario.next_frame()
-        if not mario.isFall:
-            if isRepeat and int(mario.frame) == 0:
+        if mario.isFall:
+            mario.frame = min(mario.frame, 2)
+        else:
+            if int(mario.frame) == 0 and isRepeat:
                 mario.state_machine.handle_event(("EOA", 0))
-            elif int(mario.frame) == 1:
+            if int(mario.frame) == 1:
                 mario.isFall = True
                 mario.speed[1] = Uppercut.JUMP_POWER
 
