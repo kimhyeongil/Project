@@ -402,9 +402,11 @@ class FireSword:
 
     @staticmethod
     def do(megamen):
+        isRepeat = False if int(megamen.frame) == 0 else True
         megamen.next_frame()
-        if not megamen.isFall:
-            megamen.state_machine.handle_event(("LAND", 0))
+        if ((not megamen.isFall and int(megamen.frame) == FireSword.nFrame - 1)
+                or (isRepeat and int(megamen.frame) == 0)):
+            megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
     def exit(megamen):
@@ -544,7 +546,7 @@ class StateMachine:
                       ChargingShot: {megamen.control_method.atk2_up: AnimationEnd},
                       Uppercut: {land: Land},
                       Tornado: {end_of_animation: AnimationEnd},
-                      FireSword: {land: Land},
+                      FireSword: {end_of_animation: Land},
                       JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot},
                       JumpHurricane: {land: Land},
                       JumpKnuckle: {land: Land},
