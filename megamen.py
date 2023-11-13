@@ -333,14 +333,10 @@ class CogwheelShot:
                                   CogwheelShot.frame[int(megamen.frame)][3] * megamen.size // 2)
         if int(megamen.frame) == 0 and isRepeat:
             megamen.state_machine.handle_event(("EOA", 0))
-\
+
 
 class ChargingShot:
     frame = [(355, 1491, 47, 42)]
-    l = [355]
-    t = [443]
-    w = [47]
-    h = [42]
 
     nFrame = 1
     FRAME_PER_SEC = 6
@@ -354,13 +350,15 @@ class ChargingShot:
         megamen.speed[0] = 0
         ChargingShot.start_time = game_framework.time.time()
         if megamen.face_dir == 'r':
-            ChargingShot.projectile = megamen_projectile.ChargeShot(megamen.x + ChargingShot.w[0] * megamen.size // 2,
-                                                                    megamen.y + megamen.size * ChargingShot.h[0] // 2,
-                                                                    1)
+            ChargingShot.projectile = megamen_projectile.MegaChargingShot(
+                megamen.x + ChargingShot.frame[0][2] * megamen.size // 2,
+                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2,
+                1)
         else:
-            ChargingShot.projectile = megamen_projectile.ChargeShot(megamen.x - ChargingShot.w[0] * megamen.size // 2,
-                                                                    megamen.y + megamen.size * ChargingShot.h[0] // 2,
-                                                                    -1)
+            ChargingShot.projectile = megamen_projectile.MegaChargingShot(
+                megamen.x - ChargingShot.frame[0][2] * megamen.size // 2,
+                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2,
+                -1)
         ChargingShot.projectile.frame = 0
         ChargingShot.projectile.speed = 0
         game_world.add_obj(ChargingShot.projectile, 1)
@@ -379,11 +377,11 @@ class ChargingShot:
         charged_time = game_framework.time.time() - ChargingShot.start_time
         if charged_time > 0.5:
             if megamen.face_dir == 'r':
-                projectile = megamen_projectile.ChargeShot(megamen.x + ChargingShot.w[0] * megamen.size // 2,
-                                                           megamen.y + megamen.size * ChargingShot.h[0] // 2, 1)
+                projectile = megamen_projectile.MegaChargingShot(megamen.x + ChargingShot.frame[0][2] * megamen.size // 2,
+                                                                 megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, 1)
             else:
-                projectile = megamen_projectile.ChargeShot(megamen.x - ChargingShot.w[0] * megamen.size // 2,
-                                                           megamen.y + megamen.size * ChargingShot.h[0] // 2, -1)
+                projectile = megamen_projectile.MegaChargingShot(megamen.x - ChargingShot.frame[0][2] * megamen.size // 2,
+                                                                 megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, -1)
             projectile.size = min(charged_time, 2)
             game_world.add_obj(projectile, 1)
 
