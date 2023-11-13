@@ -148,3 +148,12 @@ class MegaKnuckle:
     def update(self):
         self.y += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
         self.speed -= game_framework.frame_time * game_world.g
+
+    def get_bb(self):
+        return self.x - MegaKnuckle.frame[0][2] * self.size // 2, self.y - MegaKnuckle.frame[0][
+            3] * self.size // 2, self.x + MegaKnuckle.frame[0][2] * self.size // 2, self.y + \
+               MegaKnuckle.frame[0][3] * self.size // 2
+
+    def handle_collision(self,group,other):
+        if group == "knuckle:ground":
+            game_world.erase_obj(self)

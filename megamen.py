@@ -215,6 +215,7 @@ class JumpKnuckle:
         megamen.next_frame()
         if not isShot and int(megamen.frame) == 2:
             knuckle = megamen_projectile.MegaKnuckle(megamen.x, megamen.y, megamen.size)
+            game_world.add_collision_pair("knuckle:ground", knuckle, play_sever.ground)
             game_world.add_obj(knuckle, 1)
         if megamen.isFall:
             megamen.frame = min(megamen.frame, JumpKnuckle.nFrame - 1)
