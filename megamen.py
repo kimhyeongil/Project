@@ -196,6 +196,7 @@ class JumpKnuckle:
              ]
     nFrame = 6
     FRAME_PER_SEC = 8
+    SPEED = 10
 
     @staticmethod
     def exit(megamen):
@@ -211,6 +212,7 @@ class JumpKnuckle:
         megamen.next_frame()
         if not isShot and int(megamen.frame) == 2:
             knuckle = megamen_projectile.MegaKnuckle(megamen.x, megamen.y, megamen.size)
+            megamen.speed[1] += JumpKnuckle.SPEED
             game_world.add_collision_pair("knuckle:ground", knuckle, play_sever.ground)
             game_world.add_obj(knuckle, 1)
         if megamen.isFall:
