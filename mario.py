@@ -113,7 +113,7 @@ class Run:
              (220, 2342, 28, 36),
              (254, 2340, 24, 36), ]
     nFrame = 8
-    RUN_SPEED = 3
+    RUN_SPEED = 3.5
     FRAME_PER_SEC = 8
 
     @staticmethod
