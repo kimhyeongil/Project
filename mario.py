@@ -1,3 +1,5 @@
+import time
+
 from pico2d import *
 
 import game_framework
@@ -25,6 +27,33 @@ def land(e):
     return e[0] == "LAND"
 
 
+def time_out(e):
+    return e[0] == "TIMEOUT"
+
+
+def hit(e):
+    return e[0] == "HIT"
+
+
+class Hit:
+    frame = [(15, 973, 26, 34,), ]
+    nFrame = 1
+    FRAME_PER_SEC = 15
+    start_time = 0
+
+    @staticmethod
+    def enter(mario):
+        mario.frame = 0
+        mario.speed[0] = 0
+        Hit.start_time = time.time()
+
+    @staticmethod
+    def do(mario):
+        mario.next_frame()
+        if time.time() - Hit.start_time >= mario.rigid_time:
+            mario.state_machine.handle_event(("TIMEOUT", 0))
+
+
 class Land:
     frame = [(111, 2401, 26, 34,),
              (141, 2401, 26, 33,),
@@ -50,6 +79,7 @@ class AnimationEnd:
     @staticmethod
     def enter(mario):
         mario.frame = 0
+        mario.rigid_time = 0
         mario.state_machine.handle_event(("CHECK_STATE", mario.dir))
 
 
@@ -399,7 +429,7 @@ class StateMachine:
         self.mario = mario
         self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run,
                              mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run,
-                             mario.control_method.jump_down: Jump,
+                             mario.control_method.jump_down: Jump, hit: Hit,
                              mario.control_method.atk1_down: OneJabTwoPunchThreeKick,
                              mario.control_method.atk2_down: TurnKick,
                              mario.control_method.up_atk1_down: Uppercut,
@@ -409,7 +439,7 @@ class StateMachine:
                              },
                       Run: {mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
                             mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
-                            mario.control_method.jump_down: Jump,
+                            mario.control_method.jump_down: Jump, hit: Hit,
                             mario.control_method.atk1_down: OneJabTwoPunchThreeKick,
                             mario.control_method.atk2_down: TurnKick,
                             mario.control_method.up_atk1_down: Uppercut,
@@ -430,7 +460,8 @@ class StateMachine:
                       PalmStrike: {end_of_animation: AnimationEnd},
                       JumpKick: {land: Land},
                       JumpSpinKick: {land: Land},
-                      JumpSuperPunch: {land: Land}
+                      JumpSuperPunch: {land: Land},
+                      Hit: {time_out: AnimationEnd}
                       }
 
     def start(self):
@@ -455,9 +486,6 @@ class StateMachine:
                 self.state.frame[frame][2] * self.mario.size,
                 self.state.frame[frame][3] * self.mario.size
             )
-        for rect in self.mario.get_bb():
-            if rect:
-                draw_rectangle(*rect)
 
     def update(self):
         self.mario.move()
@@ -491,6 +519,9 @@ class Mario:
         self.dir = 0
         self.speed = [0, 0]
         self.atk_box = None
+        self.hp = 100
+        self.rigid_time = 0
+        self.font = load_font('ENCR10B.TTF', 40)
         self.state_machine = StateMachine(self)
         self.up = False
         if Mario.img == None:
@@ -498,6 +529,10 @@ class Mario:
 
     def draw(self):
         self.state_machine.draw()
+        frame = int(self.frame)
+        state = self.state_machine.state
+        draw_rectangle(*self.get_bb())
+        self.font.draw(self.x, self.y + state.frame[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
@@ -520,19 +555,16 @@ class Mario:
         if self.isFall:
             self.frame = min(self.frame, state.nFrame - 1)
 
-    def hit_box(self):
+    def get_bb(self):
         frame = int(self.frame)
         state = self.state_machine.state
         return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
             2] * self.size // 2, self.y + state.frame[frame][3] * self.size
-
-    def get_bb(self):
-        return [self.hit_box(), self.atk_box]
 
     def handle_collision(self, group, other):
         if group == "character:ground":
             self.y = other.y + 1
             self.speed[1] = 0
             self.isFall = False
-        if group == "Player1:Player2":
-            print(group)
+        if self.control_method.isHit(group):
+            self.state_machine.handle_event(("HIT", 0))
