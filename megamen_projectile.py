@@ -24,13 +24,15 @@ class MegaBuster:
         frame = int(self.frame)
         if self.dir == 1:
             self.img.clip_draw(*MegaBuster.frame[frame],
-                               self.x + MegaBuster.frame[frame][2] * self.size // 2, self.y + 5,
+                               self.x, self.y,
                                MegaBuster.frame[frame][2] * self.size, MegaBuster.frame[frame][3] * self.size)
         else:
             self.img.clip_composite_draw(*MegaBuster.frame[frame],
                                          0, 'h',
-                                         self.x - MegaBuster.frame[frame][2] * self.size // 2, self.y + 5,
+                                         self.x, self.y,
                                          MegaBuster.frame[frame][2] * self.size, MegaBuster.frame[frame][3] * self.size)
+        for rect in self.get_bb():
+            draw_rectangle(*rect)
 
     def update(self):
         self.frame = (self.frame + game_framework.frame_time * MegaBuster.FRAME_PER_SEC) % MegaBuster.nFrame
@@ -38,7 +40,16 @@ class MegaBuster:
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
 
-
+    def get_bb(self):
+        frame = int(self.frame)
+        return [
+            (self.x - MegaBuster.frame[frame][2] * self.size // 2,
+             self.y - MegaBuster.frame[frame][3] * self.size // 2,
+             self.x + MegaBuster.frame[frame][2] * self.size // 2,
+             self.y + MegaBuster.frame[frame][3] * self.size // 2)]
+    def handle_collision(self, group,other):
+        if group == "Player1:Player2":
+            game_world.erase_obj(self)
 class MegaTornado:
     frame = [(534, 141, 71, 58,),
              (613, 136, 72, 66,),
@@ -84,12 +95,14 @@ class MegaChargingShot:
         if self.dir == 1:
             self.img.clip_draw(*MegaChargingShot.frame[frame],
                                self.x + MegaChargingShot.frame[frame][2] * self.size // 2, self.y + 5,
-                               MegaChargingShot.frame[frame][2] * self.size, MegaChargingShot.frame[frame][3] * self.size)
+                               MegaChargingShot.frame[frame][2] * self.size,
+                               MegaChargingShot.frame[frame][3] * self.size)
         else:
             self.img.clip_composite_draw(*MegaChargingShot.frame[frame],
                                          0, 'h',
                                          self.x - MegaChargingShot.frame[frame][2] * self.size // 2, self.y + 5,
-                                         MegaChargingShot.frame[frame][2] * self.size, MegaChargingShot.frame[frame][3] * self.size)
+                                         MegaChargingShot.frame[frame][2] * self.size,
+                                         MegaChargingShot.frame[frame][3] * self.size)
 
     def update(self):
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time

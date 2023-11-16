@@ -21,6 +21,7 @@ def init():
     game_world.add_obj(play_sever.player2, 1)
     game_world.add_collision_pair("character:ground", play_sever.player1, play_sever.ground)
     game_world.add_collision_pair("character:ground", play_sever.player2, play_sever.ground)
+    game_world.add_collision_pair("Player1:Player2", play_sever.player1, play_sever.player2)
 
 
 def handle_events():

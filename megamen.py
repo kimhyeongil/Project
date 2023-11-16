@@ -594,10 +594,13 @@ class MegaMen:
             MegaMen.img = load_image('megamen.png')
 
     def fire_megabuster(self, fire_x, fire_y):
+        buster = None
         if self.face_dir == "r":
-            game_world.add_obj(megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1), 1)
+            buster = megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1)
         else:
-            game_world.add_obj(megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1), 1)
+            buster = megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1)
+        game_world.add_obj(buster, 1)
+        self.control_method.add_collision(buster)
 
     def fire_cogwheel(self, fire_x, fire_y):
         if self.face_dir == "r":
