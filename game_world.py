@@ -51,17 +51,15 @@ def add_collision_pair(group, a, b):
 
 
 def collide(a, b):
-    al, ab, ar, at = a.get_bb()
-    bl, bb, br, bt = b.get_bb()
-    if al > br:
-        return False
-    if ab > bt:
-        return False
-    if at < bb:
-        return False
-    if ar < bl:
-        return False
-    return True
+    aboxes = a.get_bb()
+    bboxes = b.get_bb()
+    for abox in aboxes:
+        for bbox in bboxes:
+            al, ab, ar, at = abox
+            bl, bb, br, bt = bbox
+            if al <= br and ab <= bt and at >= bb and ar >= bl:
+                return True
+    return False
 
 
 def handle_collisons():
