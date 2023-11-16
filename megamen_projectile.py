@@ -11,6 +11,7 @@ class MegaBuster:
              (559, 1439, 10, 7,), ]
     FRAME_PER_SEC = 5
     nFrame = 2
+    damage = 1
 
     def __init__(self, x, y, dir):
         self.img = projectile
@@ -47,9 +48,13 @@ class MegaBuster:
              self.y - MegaBuster.frame[frame][3] * self.size // 2,
              self.x + MegaBuster.frame[frame][2] * self.size // 2,
              self.y + MegaBuster.frame[frame][3] * self.size // 2)]
-    def handle_collision(self, group,other):
+
+    def handle_collision(self, group, other):
         if group == "Player1:Player2":
+            other.hp -= MegaBuster.damage
             game_world.erase_obj(self)
+
+
 class MegaTornado:
     frame = [(534, 141, 71, 58,),
              (613, 136, 72, 66,),
