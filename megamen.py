@@ -552,9 +552,6 @@ class StateMachine:
                 self.state.frame[frame][2] * self.megamen.size,
                 self.state.frame[frame][3] * self.megamen.size
             )
-        for rect in self.megamen.get_bb():
-            if rect:
-                draw_rectangle(*rect)
 
     def update(self):
         self.megamen.move()
@@ -601,7 +598,7 @@ class MegaMen:
         else:
             buster = megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1)
         game_world.add_obj(buster, 1)
-        self.control_method.add_collision(buster)
+        self.control_method.add_atk_collision(buster)
 
     def fire_cogwheel(self, fire_x, fire_y):
         if self.face_dir == "r":
@@ -617,6 +614,7 @@ class MegaMen:
 
     def draw(self):
         self.state_machine.draw()
+        draw_rectangle(*self.get_bb())
 
     def update(self):
         self.state_machine.update()
@@ -638,14 +636,11 @@ class MegaMen:
         if self.isFall:
             self.frame = min(self.frame, state.nFrame - 1)
 
-    def hit_box(self):
+    def get_bb(self):
         frame = int(self.frame)
         state = self.state_machine.state
         return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
             2] * self.size // 2, self.y + state.frame[frame][3] * self.size
-
-    def get_bb(self):
-        return [self.hit_box(), self.atk_box]
 
     def handle_collision(self, group, other):
         if group == "character:ground" and self.isFall:

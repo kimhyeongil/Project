@@ -62,5 +62,9 @@ def up_ultimate_down(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_r and e[2]
 
 
-def add_collision(o):
+def add_atk_collision(o):
     game_world.add_collision_pair("Player1:Player2", o, None)
+
+
+def isHit(group):
+    return group == "Player2:Player1"

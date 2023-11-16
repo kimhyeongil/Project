@@ -20,7 +20,7 @@ class MegaBuster:
         self.dir = dir
         self.frame = 0
         self.size = 2
-
+        self.rigid_coefficient = 0.2
     def draw(self):
         frame = int(self.frame)
         if self.dir == 1:
@@ -32,8 +32,7 @@ class MegaBuster:
                                          0, 'h',
                                          self.x, self.y,
                                          MegaBuster.frame[frame][2] * self.size, MegaBuster.frame[frame][3] * self.size)
-        for rect in self.get_bb():
-            draw_rectangle(*rect)
+        draw_rectangle(*self.get_bb())
 
     def update(self):
         self.frame = (self.frame + game_framework.frame_time * MegaBuster.FRAME_PER_SEC) % MegaBuster.nFrame
@@ -43,15 +42,14 @@ class MegaBuster:
 
     def get_bb(self):
         frame = int(self.frame)
-        return [
-            (self.x - MegaBuster.frame[frame][2] * self.size // 2,
-             self.y - MegaBuster.frame[frame][3] * self.size // 2,
-             self.x + MegaBuster.frame[frame][2] * self.size // 2,
-             self.y + MegaBuster.frame[frame][3] * self.size // 2)]
+        return self.x - MegaBuster.frame[frame][2] * self.size // 2, self.y - MegaBuster.frame[frame][
+            3] * self.size // 2, self.x + MegaBuster.frame[frame][2] * self.size // 2, self.y + MegaBuster.frame[frame][
+                   3] * self.size // 2
 
     def handle_collision(self, group, other):
         if group == "Player1:Player2":
             other.hp -= MegaBuster.damage
+            other.rigid_time += self.rigid_coefficient * (0.5 ** other.rigid_time)
             game_world.erase_obj(self)
 
 
