@@ -455,7 +455,8 @@ class StateMachine:
                 self.state.frame[frame][2] * self.mario.size,
                 self.state.frame[frame][3] * self.mario.size
             )
-        draw_rectangle(*self.mario.get_bb())
+        for rect in self.mario.get_bb():
+            draw_rectangle(*rect)
 
     def update(self):
         self.mario.move()
@@ -488,6 +489,7 @@ class Mario:
         self.face_dir = control_method.start_face
         self.dir = 0
         self.speed = [0, 0]
+        self.atk_box = (0, 0, 0, 0)
         self.state_machine = StateMachine(self)
         self.up = False
         if Mario.img == None:
@@ -517,11 +519,14 @@ class Mario:
         if self.isFall:
             self.frame = min(self.frame, state.nFrame - 1)
 
-    def get_bb(self):
+    def hit_box(self):
         frame = int(self.frame)
         state = self.state_machine.state
         return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
             2] * self.size // 2, self.y + state.frame[frame][3] * self.size
+
+    def get_bb(self):
+        return [self.hit_box(), self.atk_box]
 
     def handle_collision(self, group, other):
         if group == "character:ground":

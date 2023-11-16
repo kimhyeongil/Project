@@ -552,7 +552,8 @@ class StateMachine:
                 self.state.frame[frame][2] * self.megamen.size,
                 self.state.frame[frame][3] * self.megamen.size
             )
-        draw_rectangle(*self.megamen.get_bb())
+        for rect in self.megamen.get_bb():
+            draw_rectangle(*rect)
 
     def update(self):
         self.megamen.move()
@@ -584,6 +585,7 @@ class MegaMen:
         self.size = 2
         self.dir = 0
         self.speed = [0, 0]
+        self.atk_box = (0, 0, 0, 0)
         self.face_dir = control_method.start_face
         self.control_method = control_method
         self.state_machine = StateMachine(self)
@@ -626,20 +628,20 @@ class MegaMen:
     def handle_event(self, e):
         self.state_machine.handle_event(("INPUT", e, self.up))
 
-    def get_hitbox(self):
-        pass
-
     def next_frame(self):
         state = self.state_machine.state
         self.frame = (self.frame + state.FRAME_PER_SEC * game_framework.frame_time) % state.nFrame
         if self.isFall:
             self.frame = min(self.frame, state.nFrame - 1)
 
-    def get_bb(self):
+    def hit_box(self):
         frame = int(self.frame)
         state = self.state_machine.state
         return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
             2] * self.size // 2, self.y + state.frame[frame][3] * self.size
+
+    def get_bb(self):
+        return [self.hit_box(), self.atk_box]
 
     def handle_collision(self, group, other):
         if group == "character:ground" and self.isFall:
