@@ -456,7 +456,8 @@ class StateMachine:
                 self.state.frame[frame][3] * self.mario.size
             )
         for rect in self.mario.get_bb():
-            draw_rectangle(*rect)
+            if rect:
+                draw_rectangle(*rect)
 
     def update(self):
         self.mario.move()
@@ -489,7 +490,7 @@ class Mario:
         self.face_dir = control_method.start_face
         self.dir = 0
         self.speed = [0, 0]
-        self.atk_box = (0, 0, 0, 0)
+        self.atk_box = None
         self.state_machine = StateMachine(self)
         self.up = False
         if Mario.img == None:
@@ -533,3 +534,5 @@ class Mario:
             self.y = other.y + 1
             self.speed[1] = 0
             self.isFall = False
+        if group == "Player1:Player2":
+            print(group)

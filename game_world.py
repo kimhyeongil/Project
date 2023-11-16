@@ -55,10 +55,11 @@ def collide(a, b):
     bboxes = b.get_bb()
     for abox in aboxes:
         for bbox in bboxes:
-            al, ab, ar, at = abox
-            bl, bb, br, bt = bbox
-            if al <= br and ab <= bt and at >= bb and ar >= bl:
-                return True
+            if abox and bbox:
+                al, ab, ar, at = abox
+                bl, bb, br, bt = bbox
+                if al <= br and ab <= bt and at >= bb and ar >= bl:
+                    return True
     return False
 
 

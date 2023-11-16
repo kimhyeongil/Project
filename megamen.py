@@ -553,7 +553,8 @@ class StateMachine:
                 self.state.frame[frame][3] * self.megamen.size
             )
         for rect in self.megamen.get_bb():
-            draw_rectangle(*rect)
+            if rect:
+                draw_rectangle(*rect)
 
     def update(self):
         self.megamen.move()
@@ -585,7 +586,7 @@ class MegaMen:
         self.size = 2
         self.dir = 0
         self.speed = [0, 0]
-        self.atk_box = (0, 0, 0, 0)
+        self.atk_box = None
         self.face_dir = control_method.start_face
         self.control_method = control_method
         self.state_machine = StateMachine(self)
