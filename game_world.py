@@ -69,6 +69,3 @@ def handle_collisons():
                 if collide(a, b):
                     a.handle_collision(group, b)
                     b.handle_collision(group, a)
-                else:
-                    a.handle_collision("not" + group, b)
-                    b.handle_collision("not" + group, a)
