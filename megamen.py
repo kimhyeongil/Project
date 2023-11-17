@@ -317,6 +317,7 @@ class CogwheelShot:
     def enter(megamen):
         megamen.frame = 0
         megamen.speed[0] = 0
+        megamen.control_method.ultimate_gage -= 1
 
     @staticmethod
     def do(megamen):
@@ -405,6 +406,7 @@ class FireSword:
         megamen.frame = 0
         megamen.atk_box.damage = FireSword.damage
         megamen.atk_box.rigid_coefficient = FireSword.rigid_coefficient
+        megamen.control_method.ultimate_gage -= 1
 
     @staticmethod
     def do(megamen):
@@ -453,7 +455,7 @@ class RushTornado:
         else:
             megamen.speed[0] = -RushTornado.RUSH_SPEED
         megamen.fire_tornado(0, RushTornado.frame[0][3])
-
+        megamen.control_method.ultimate_gage -= 3
     @staticmethod
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
