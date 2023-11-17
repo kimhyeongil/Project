@@ -239,6 +239,7 @@ class JumpSuperPunch:
         else:
             mario.speed[0] -= JumpSpinKick.SPEED
         mario.speed[1] = 0
+        mario.control_method.ultimate_gage -= 1
 
     @staticmethod
     def do(mario):
@@ -390,6 +391,7 @@ class MagicCape:
     @staticmethod
     def enter(mario):
         mario.frame = 0
+        mario.control_method.ultimate_gage -= 3
 
     @staticmethod
     def do(mario):
@@ -414,7 +416,7 @@ class PalmStrike:
     @staticmethod
     def enter(mario):
         mario.frame = 0
-
+        mario.control_method.ultimate_gage -= 1
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
@@ -534,6 +536,7 @@ class Mario:
         state = self.state_machine.state
         draw_rectangle(*self.get_bb())
         self.font.draw(self.x, self.y + state.frame[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        self.font.draw(self.x, 300, f"{self.control_method.ultimate_gage}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
@@ -571,6 +574,6 @@ class Mario:
             self.state_machine.handle_event(("HIT", 0))
 
     def hit(self, damage, rigid):
-        self.control_method.ultimate_gage = max(self.control_method.ultimate_gage + damage / 2, 3)
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
         self.hp -= damage
