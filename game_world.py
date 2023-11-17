@@ -51,6 +51,8 @@ def add_collision_pair(group, a, b):
 
 
 def collide(a, b):
+    if not a.get_bb() or not b.get_bb():
+        return False
     al, ab, ar, at = a.get_bb()
     bl, bb, br, bt = b.get_bb()
     if al > br or ab > bt or at < bb or ar < bl:

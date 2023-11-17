@@ -50,7 +50,7 @@ class Hit:
     @staticmethod
     def do(mario):
         mario.next_frame()
-        if time.time() - Hit.start_time >= mario.rigid_time:
+        if time.time() - Hit.start_time >= mario.rigid_time and not mario.isFall:
             mario.state_machine.handle_event(("TIMEOUT", 0))
 
 
@@ -450,7 +450,7 @@ class StateMachine:
                       AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {land: Land, mario.control_method.atk1_down: JumpKick,
-                             mario.control_method.atk2_down: JumpSpinKick,
+                             mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
                              mario.control_method.ultimate_down: JumpSuperPunch},
                       OneJabTwoPunchThreeKick: {end_of_animation: AnimationEnd},
                       TurnKick: {end_of_animation: AnimationEnd},
@@ -521,6 +521,7 @@ class Mario:
         self.atk_box = None
         self.hp = 100
         self.rigid_time = 0
+        self.resist_coefficient = 0.25
         self.font = load_font('ENCR10B.TTF', 40)
         self.state_machine = StateMachine(self)
         self.up = False
@@ -568,3 +569,7 @@ class Mario:
             self.isFall = False
         if self.control_method.isHit(group):
             self.state_machine.handle_event(("HIT", 0))
+
+    def hit(self, damage, rigid):
+        self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
+        self.hp -= damage

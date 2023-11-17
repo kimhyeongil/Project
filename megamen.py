@@ -3,6 +3,8 @@ import game_framework
 import game_world
 import megamen_projectile
 import play_sever
+import player1_control
+import player2_control
 
 
 def end_of_animation(e):
@@ -55,6 +57,7 @@ class AnimationEnd:
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
+        megamen.atk_box.reset()
         megamen.state_machine.handle_event(("CHECK_STATE", megamen.dir, megamen.up))
 
 
@@ -210,10 +213,8 @@ class JumpKnuckle:
         isShot = True if int(megamen.frame) == 2 else False
         megamen.next_frame()
         if not isShot and int(megamen.frame) == 2:
-            knuckle = megamen_projectile.MegaKnuckle(megamen.x, megamen.y, megamen.size)
+            megamen.fire_knuckle()
             megamen.speed[1] += JumpKnuckle.SPEED
-            game_world.add_collision_pair("knuckle:ground", knuckle, play_sever.ground)
-            game_world.add_obj(knuckle, 1)
         if not megamen.isFall:
             megamen.state_machine.handle_event(("LAND", 0))
 
@@ -252,31 +253,49 @@ class SmallShot:
 class Uppercut:
     frame = [(20, 1031, 29, 42),
              (56, 1031, 35, 39),
-             (97, 1031, 24, 56),
-             (130, 1035, 21, 56), ]
-    nFrame = 4
+             (97, 1031, 24, 56), ]
+    nFrame = 3
 
     FRAME_PER_SEC = 13
     JUMP_POWER = 13
+    damage = 10
+    rigid_coefficient = 1
 
     @staticmethod
     def exit(megamen):
-        pass
+        megamen.atk_box.reset()
 
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
         megamen.speed[0] = 0
+        megamen.atk_box.damage = Uppercut.damage
+        megamen.atk_box.rigid_coefficient = Uppercut.rigid_coefficient
 
     @staticmethod
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
         megamen.next_frame()
+        int_frame = int(megamen.frame)
+        state = Uppercut
+        dx, dy, sx, sy = 2, 2, 0, 0
+        if int_frame == 0:
+            sx, sy = 10, 10
+        elif int_frame == 1:
+            sx, sy = 20, 30
+        elif int_frame == 2:
+            dy, sx, sy = 1.2, 20, 30
+        if megamen.face_dir == "l":
+            dx *= -1
+        megamen.set_atk_box(state.frame[int_frame][2] * megamen.size // dx,
+                            state.frame[int_frame][3] * megamen.size // dy, sx, sy)
         if not megamen.isFall:
-            if int(megamen.frame) == 0 and isRepeat:
+            if int_frame == 0 and isRepeat:
                 megamen.state_machine.handle_event(("EOA", 0))
-            if int(megamen.frame) == 1:
-                megamen.speed[1] = Uppercut.JUMP_POWER
+            if int_frame == 1:
+                megamen.speed[1] = state.JUMP_POWER
+        if megamen.speed[1] < 0:
+            megamen.atk_box.reset()
 
 
 class CogwheelShot:
@@ -327,17 +346,18 @@ class ChargingShot:
         ChargingShot.start_time = game_framework.time.time()
         if megamen.face_dir == 'r':
             ChargingShot.projectile = megamen_projectile.MegaChargingShot(
-                megamen.x + ChargingShot.frame[0][2] * megamen.size // 2,
-                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2,
+                megamen.x + ChargingShot.frame[0][2] * megamen.size // 2 + megamen_projectile.MegaChargingShot.frame[0][
+                    2] * 0.5,
+                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2 + 5,
                 1)
         else:
             ChargingShot.projectile = megamen_projectile.MegaChargingShot(
-                megamen.x - ChargingShot.frame[0][2] * megamen.size // 2,
-                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2,
+                megamen.x - ChargingShot.frame[0][2] * megamen.size // 2 - megamen_projectile.MegaChargingShot.frame[0][
+                    2] * 0.5,
+                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2 + 5,
                 -1)
         ChargingShot.projectile.frame = 0
         ChargingShot.projectile.speed = 0
-        game_world.add_obj(ChargingShot.projectile, 1)
 
     @staticmethod
     def do(megamen):
@@ -361,7 +381,9 @@ class ChargingShot:
                     megamen.x - ChargingShot.frame[0][2] * megamen.size // 2,
                     megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, -1)
             projectile.size = min(charged_time, 2)
-            game_world.add_obj(projectile, 1)
+            projectile.damage = int(7.5 * min(charged_time, 2))
+            projectile.rigid_coefficient = 0.5 * min(charged_time, 2)
+            megamen.control_method.add_atk_collision(projectile)
 
 
 class FireSword:
@@ -375,22 +397,36 @@ class FireSword:
              (409, 472, 37, 50,), ]
     nFrame = 8
     FRAME_PER_SEC = 16
+    damage = 10
+    rigid_coefficient = 1
 
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
+        megamen.atk_box.damage = FireSword.damage
+        megamen.atk_box.rigid_coefficient = FireSword.rigid_coefficient
 
     @staticmethod
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
         megamen.next_frame()
-        if ((not megamen.isFall and int(megamen.frame) == FireSword.nFrame - 1)
+        int_frame = int(megamen.frame)
+        state = FireSword
+        dx = 2
+        if megamen.face_dir == "l":
+            dx *= -1
+        megamen.set_atk_box(state.frame[int_frame][2] * megamen.size // dx,
+                            state.frame[int_frame][3] * megamen.size // 2, 20,
+                            state.frame[int_frame][3] * megamen.size // 2)
+        if int_frame == state.nFrame - 1:
+            megamen.atk_box.reset()
+        if ((not megamen.isFall and int(megamen.frame) == state.nFrame - 1)
                 or (isRepeat and int(megamen.frame) == 0)):
             megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
     def exit(megamen):
-        pass
+        megamen.atk_box.reset()
 
 
 class RushTornado:
@@ -416,7 +452,7 @@ class RushTornado:
             megamen.speed[0] = RushTornado.RUSH_SPEED
         else:
             megamen.speed[0] = -RushTornado.RUSH_SPEED
-        megamen.fire_tornado(0, RushTornado.frame[megamen.frame][3])
+        megamen.fire_tornado(0, RushTornado.frame[0][3])
 
     @staticmethod
     def do(megamen):
@@ -473,6 +509,7 @@ class UpTornado:
         megamen.frame = 0
         megamen.speed[1] = UpTornado.JUMP_POWER
         UpTornado.PROJECTILE = megamen_projectile.MegaHurricane(megamen)
+        megamen.control_method.add_atk_collision(UpTornado.PROJECTILE)
         game_world.add_obj(UpTornado.PROJECTILE, 1)
 
     @staticmethod
@@ -558,14 +595,6 @@ class StateMachine:
         self.state.do(self.megamen)
 
     def handle_event(self, e):
-        if self.megamen.control_method.up_down(e):
-            self.megamen.up = True
-        elif self.megamen.control_method.up_up(e):
-            self.megamen.up = False
-        elif self.megamen.control_method.move_r_down(e) or self.megamen.control_method.move_l_up(e):
-            self.megamen.dir += 1
-        elif self.megamen.control_method.move_l_down(e) or self.megamen.control_method.move_r_up(e):
-            self.megamen.dir -= 1
         for check, next_state in self.table[self.state].items():
             if check(e):
                 self.state.exit(self.megamen)
@@ -583,38 +612,46 @@ class MegaMen:
         self.size = 2
         self.dir = 0
         self.speed = [0, 0]
-        self.atk_box = None
+        self.atk_box = AtkBox()
         self.face_dir = control_method.start_face
         self.control_method = control_method
         self.state_machine = StateMachine(self)
+        self.resist_coefficient = 50
+        control_method.add_atk_collision(self.atk_box)
         self.up = False
         if MegaMen.img == None:
             MegaMen.img = load_image('megamen.png')
 
+    def set_atk_box(self, dx, dy, sx, sy):
+        atkX, atkY = self.x + dx, self.y + dy
+        self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+
     def fire_megabuster(self, fire_x, fire_y):
-        buster = None
         if self.face_dir == "r":
-            buster = megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1)
+            self.control_method.add_atk_collision(megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1))
         else:
-            buster = megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1)
-        game_world.add_obj(buster, 1)
-        self.control_method.add_atk_collision(buster)
+            self.control_method.add_atk_collision(megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1))
 
     def fire_cogwheel(self, fire_x, fire_y):
         if self.face_dir == "r":
-            game_world.add_obj(megamen_projectile.MegaCogwheel(self.x + fire_x, self.y + fire_y, 1), 1)
+            self.control_method.add_atk_collision(megamen_projectile.MegaCogwheel(self.x + fire_x, self.y + fire_y, 1))
         else:
-            game_world.add_obj(megamen_projectile.MegaCogwheel(self.x - fire_x, self.y + fire_y, -1), 1)
+            self.control_method.add_atk_collision(megamen_projectile.MegaCogwheel(self.x - fire_x, self.y + fire_y, -1))
+
+    def fire_knuckle(self):
+        self.control_method.add_atk_collision(megamen_projectile.MegaKnuckle(self.x, self.y, self.size))
 
     def fire_tornado(self, fire_x, fire_y):
         if self.face_dir == "r":
-            game_world.add_obj(megamen_projectile.MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]), 0)
+            self.control_method.add_atk_collision(megamen_projectile.MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]))
         else:
-            game_world.add_obj(megamen_projectile.MegaTornado(self.x - fire_x, self.y + fire_y, self.speed[0]), 0)
+            self.control_method.add_atk_collision(megamen_projectile.MegaTornado(self.x - fire_x, self.y + fire_y, self.speed[0]))
 
     def draw(self):
         self.state_machine.draw()
         draw_rectangle(*self.get_bb())
+        if self.atk_box.get_bb():
+            draw_rectangle(*self.atk_box.get_bb())
 
     def update(self):
         self.state_machine.update()
@@ -628,7 +665,16 @@ class MegaMen:
             self.speed[1] -= game_world.g * game_framework.frame_time
 
     def handle_event(self, e):
-        self.state_machine.handle_event(("INPUT", e, self.up))
+        input_e = ("INPUT", e, self.up)
+        if self.control_method.up_down(input_e):
+            self.up = True
+        elif self.control_method.up_up(input_e):
+            self.up = False
+        elif self.control_method.move_r_down(input_e) or self.control_method.move_l_up(input_e):
+            self.dir += 1
+        elif self.control_method.move_l_down(input_e) or self.control_method.move_r_up(input_e):
+            self.dir -= 1
+        self.state_machine.handle_event(input_e)
 
     def next_frame(self):
         state = self.state_machine.state
@@ -647,3 +693,24 @@ class MegaMen:
             self.y = other.y + 1
             self.speed[1] = 0
             self.isFall = False
+
+
+class AtkBox:
+    def __init__(self):
+        self.bb = None
+        self.damage = 0
+        self.rigid_coefficient = 0
+
+    def get_bb(self):
+        return self.bb
+
+    def handle_collision(self, group, other):
+        if other.control_method.isHit(group):
+            other.hit(self.damage, self.rigid_coefficient)
+            self.damage = 0
+            self.rigid_coefficient = 0
+
+    def reset(self):
+        self.bb = None
+        self.damage = 0
+        self.rigid_coefficient = 0
