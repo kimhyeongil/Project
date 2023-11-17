@@ -1,4 +1,4 @@
-from pico2d import load_image, draw_rectangle
+from pico2d import load_image, draw_rectangle, load_font
 import game_framework
 import game_world
 import megamen_projectile
@@ -611,12 +611,14 @@ class MegaMen:
         self.frame = 0
         self.size = 2
         self.dir = 0
+        self.hp = 125
         self.speed = [0, 0]
         self.atk_box = AtkBox()
         self.face_dir = control_method.start_face
         self.control_method = control_method
         self.state_machine = StateMachine(self)
-        self.resist_coefficient = 50
+        self.resist_coefficient = 0.5
+        self.font = load_font('ENCR10B.TTF', 40)
         control_method.add_atk_collision(self.atk_box)
         self.up = False
         if MegaMen.img == None:
@@ -643,18 +645,26 @@ class MegaMen:
 
     def fire_tornado(self, fire_x, fire_y):
         if self.face_dir == "r":
-            self.control_method.add_atk_collision(megamen_projectile.MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]))
+            self.control_method.add_atk_collision(
+                megamen_projectile.MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]))
         else:
-            self.control_method.add_atk_collision(megamen_projectile.MegaTornado(self.x - fire_x, self.y + fire_y, self.speed[0]))
+            self.control_method.add_atk_collision(
+                megamen_projectile.MegaTornado(self.x - fire_x, self.y + fire_y, self.speed[0]))
 
     def draw(self):
         self.state_machine.draw()
+        frame = int(self.frame)
+        state = self.state_machine.state
         draw_rectangle(*self.get_bb())
         if self.atk_box.get_bb():
             draw_rectangle(*self.atk_box.get_bb())
+        self.font.draw(self.x, self.y + state.frame[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        self.font.draw(self.x, 300, f"{round(self.control_method.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time, 3)
+
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
@@ -693,6 +703,11 @@ class MegaMen:
             self.y = other.y + 1
             self.speed[1] = 0
             self.isFall = False
+
+    def hit(self, damage, rigid):
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
+        self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
+        self.hp -= damage
 
 
 class AtkBox:

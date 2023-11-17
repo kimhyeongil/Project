@@ -417,6 +417,7 @@ class PalmStrike:
     def enter(mario):
         mario.frame = 0
         mario.control_method.ultimate_gage -= 1
+
     @staticmethod
     def do(mario):
         isRepeat = False if int(mario.frame) == 0 else True
@@ -536,10 +537,11 @@ class Mario:
         state = self.state_machine.state
         draw_rectangle(*self.get_bb())
         self.font.draw(self.x, self.y + state.frame[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
-        self.font.draw(self.x, 300, f"{self.control_method.ultimate_gage}", (0, 0, 0))
+        self.font.draw(self.x, 300, f"{round(self.control_method.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time, 3)
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
