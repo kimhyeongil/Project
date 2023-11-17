@@ -571,5 +571,6 @@ class Mario:
             self.state_machine.handle_event(("HIT", 0))
 
     def hit(self, damage, rigid):
+        self.control_method.ultimate_gage = max(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
         self.hp -= damage
