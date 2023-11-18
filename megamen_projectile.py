@@ -18,6 +18,7 @@ class MegaBuster:
     nFrame = 2
     damage = 1
     rigid_coefficient = 0.5
+    knock_back = 0.1
 
     def __init__(self, x, y, dir):
         self.img = projectile
@@ -55,7 +56,7 @@ class MegaBuster:
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            other.hit(self.damage, self.rigid_coefficient)
+            other.hit(self.damage, self.rigid_coefficient, knock_back=self.knock_back)
             game_world.erase_obj(self)
 
 
@@ -111,15 +112,21 @@ class MegaChargingShot:
              (693, 1621, 94, 40,), ]
     nFrame = 4
 
-    def __init__(self, x, y, dir):
+    def __init__(self, x, y, dir, charged_time=0):
         self.img = projectile
         self.x, self.y = x, y
-        self.speed = 10 * dir
+        if charged_time == 0:
+            self.frame = 0
+            self.speed = 0
+        else:
+            self.frame = MegaChargingShot.nFrame - 1
+            self.speed = 10 * dir
         self.dir = dir
-        self.frame = MegaChargingShot.nFrame - 1
-        self.size = 1
-        self.damage = 0
-        self.rigid_coefficient = 0
+        self.size = max(charged_time, 1)
+        self.damage = int(7.5 * charged_time)
+        self.rigid_coefficient = 0.5 * charged_time
+        self.knock_back = 3 * max(charged_time - 0.5, 0)
+        self.knock_up = 7 * max(charged_time - 0.7, 0)
         game_world.add_obj(self, 1)
 
     def draw(self):
@@ -151,7 +158,7 @@ class MegaChargingShot:
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            other.hit(self.damage, self.rigid_coefficient)
+            other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
             game_world.erase_obj(self)
 
 
@@ -210,6 +217,7 @@ class MegaKnuckle:
     frame = [(340, 326, 10, 15,), ]
     damage = 5
     rigid_coefficient = 2
+    knock_up = 10
 
     def __init__(self, x, y, size):
         self.img = projectile
@@ -242,7 +250,7 @@ class MegaKnuckle:
         if group == "knuckle:ground":
             game_world.erase_obj(self)
         elif other.control_method.isHit(group):
-            other.hit(self.damage, self.rigid_coefficient)
+            other.hit(self.damage, self.rigid_coefficient, knock_up=self.knock_up)
             game_world.erase_obj(self)
 
 
@@ -252,7 +260,8 @@ class MegaCogwheel:
     FRAME_PER_SEC = 12
     nFrame = 2
     damage = 15
-    rigid_coefficient = 4
+    rigid_coefficient = 2
+    knock_back = 4
 
     def __init__(self, x, y, dir):
         self.img = projectile
@@ -292,5 +301,5 @@ class MegaCogwheel:
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            other.hit(self.damage, self.rigid_coefficient)
+            other.hit(self.damage, self.rigid_coefficient, knock_back=self.knock_back)
             game_world.erase_obj(self)

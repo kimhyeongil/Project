@@ -282,6 +282,7 @@ class Uppercut:
     rigid_coefficient = 1
     knock_up = JUMP_POWER * 1.4
     knock_back = 0.1
+
     @staticmethod
     def exit(megamen):
         megamen.atk_box.reset()
@@ -297,7 +298,6 @@ class Uppercut:
             megamen.atk_box.knock_back = -Uppercut.knock_back
         else:
             megamen.atk_box.knock_back = Uppercut.knock_back
-
 
     @staticmethod
     def do(megamen):
@@ -380,8 +380,6 @@ class ChargingShot:
                     2] * 0.5,
                 megamen.y + megamen.size * ChargingShot.frame[0][3] // 2 + 5,
                 -1)
-        ChargingShot.projectile.frame = 0
-        ChargingShot.projectile.speed = 0
 
     @staticmethod
     def do(megamen):
@@ -396,18 +394,8 @@ class ChargingShot:
         game_world.erase_obj(ChargingShot.projectile)
         charged_time = game_framework.time.time() - ChargingShot.start_time
         if charged_time > 0.5:
-            if megamen.face_dir == 'r':
-                projectile = megamen_projectile.MegaChargingShot(
-                    megamen.x + ChargingShot.frame[0][2] * megamen.size // 2,
-                    megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, 1)
-            else:
-                projectile = megamen_projectile.MegaChargingShot(
-                    megamen.x - ChargingShot.frame[0][2] * megamen.size // 2,
-                    megamen.y + megamen.size * ChargingShot.frame[0][3] // 2, -1)
-            projectile.size = min(charged_time, 2)
-            projectile.damage = int(7.5 * min(charged_time, 2))
-            projectile.rigid_coefficient = 0.5 * min(charged_time, 2)
-            megamen.control_method.add_atk_collision(projectile)
+            megamen.fire_charging_shot(ChargingShot.frame[0][2] * megamen.size // 2,
+                                       ChargingShot.frame[0][3] * megamen.size // 2, charged_time)
 
 
 class FireSword:
@@ -676,6 +664,18 @@ class MegaMen:
             self.control_method.add_atk_collision(megamen_projectile.MegaCogwheel(self.x + fire_x, self.y + fire_y, 1))
         else:
             self.control_method.add_atk_collision(megamen_projectile.MegaCogwheel(self.x - fire_x, self.y + fire_y, -1))
+
+    def fire_charging_shot(self, fire_x, fire_y, charged_time):
+        if self.face_dir == 'r':
+            self.control_method.add_atk_collision(
+                megamen_projectile.MegaChargingShot(
+                    self.x + fire_x,
+                    self.y + fire_y, 1, charged_time))
+        else:
+            self.control_method.add_atk_collision(
+                megamen_projectile.MegaChargingShot(
+                    self.x - fire_x,
+                    self.y + fire_y, -1, charged_time))
 
     def fire_knuckle(self):
         self.control_method.add_atk_collision(megamen_projectile.MegaKnuckle(self.x, self.y, self.size))
