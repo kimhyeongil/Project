@@ -552,9 +552,6 @@ class Mario:
     def handle_event(self, e):
         self.state_machine.handle_event(("INPUT", e, self.up))
 
-    def get_hitbox(self):
-        pass
-
     def next_frame(self):
         state = self.state_machine.state
         self.frame = (self.frame + state.FRAME_PER_SEC * game_framework.frame_time) % state.nFrame
@@ -575,7 +572,9 @@ class Mario:
         if self.control_method.isHit(group):
             self.state_machine.handle_event(("HIT", 0))
 
-    def hit(self, damage, rigid):
+    def hit(self, damage, rigid, knock_up=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
+        self.speed[1] += knock_up
+        self.isFall = True
         self.hp -= damage

@@ -256,11 +256,11 @@ class Uppercut:
              (97, 1031, 24, 56), ]
     nFrame = 3
 
-    FRAME_PER_SEC = 13
+    FRAME_PER_SEC = 15
     JUMP_POWER = 13
     damage = 10
     rigid_coefficient = 1
-
+    isDown = False
     @staticmethod
     def exit(megamen):
         megamen.atk_box.reset()
@@ -271,6 +271,8 @@ class Uppercut:
         megamen.speed[0] = 0
         megamen.atk_box.damage = Uppercut.damage
         megamen.atk_box.rigid_coefficient = Uppercut.rigid_coefficient
+        megamen.atk_box.knock_up = Uppercut.JUMP_POWER * 1.4
+        Uppercut.isDown = False
 
     @staticmethod
     def do(megamen):
@@ -278,17 +280,18 @@ class Uppercut:
         megamen.next_frame()
         int_frame = int(megamen.frame)
         state = Uppercut
-        dx, dy, sx, sy = 2, 2, 0, 0
-        if int_frame == 0:
-            sx, sy = 10, 10
-        elif int_frame == 1:
-            sx, sy = 20, 30
-        elif int_frame == 2:
-            dy, sx, sy = 1.2, 20, 30
-        if megamen.face_dir == "l":
-            dx *= -1
-        megamen.set_atk_box(state.frame[int_frame][2] * megamen.size // dx,
-                            state.frame[int_frame][3] * megamen.size // dy, sx, sy)
+        if not Uppercut.isDown:
+            dx, dy, sx, sy = 2, 2, 0, 0
+            if int_frame == 0:
+                sx, sy = 10, 10
+            elif int_frame == 1:
+                sx, sy = 20, 30
+            elif int_frame == 2 and isRepeat:
+                dy, sx, sy = 1.2, 20, 30
+            if megamen.face_dir == "l":
+                dx *= -1
+            megamen.set_atk_box(state.frame[int_frame][2] * megamen.size // dx,
+                                state.frame[int_frame][3] * megamen.size // dy, sx, sy)
         if not megamen.isFall:
             if int_frame == 0 and isRepeat:
                 megamen.state_machine.handle_event(("EOA", 0))
@@ -296,6 +299,7 @@ class Uppercut:
                 megamen.speed[1] = state.JUMP_POWER
         if megamen.speed[1] < 0:
             megamen.atk_box.reset()
+            Uppercut.isDown = True
 
 
 class CogwheelShot:
@@ -456,6 +460,7 @@ class RushTornado:
             megamen.speed[0] = -RushTornado.RUSH_SPEED
         megamen.fire_tornado(0, RushTornado.frame[0][3])
         megamen.control_method.ultimate_gage -= 3
+
     @staticmethod
     def do(megamen):
         isRepeat = False if int(megamen.frame) == 0 else True
@@ -667,7 +672,6 @@ class MegaMen:
         self.state_machine.update()
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time, 3)
 
-
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
@@ -717,17 +721,18 @@ class AtkBox:
         self.bb = None
         self.damage = 0
         self.rigid_coefficient = 0
+        self.knock_up = 0
 
     def get_bb(self):
         return self.bb
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            other.hit(self.damage, self.rigid_coefficient)
-            self.damage = 0
-            self.rigid_coefficient = 0
+            other.hit(self.damage, self.rigid_coefficient, self.knock_up)
+            self.reset()
 
     def reset(self):
         self.bb = None
         self.damage = 0
         self.rigid_coefficient = 0
+        self.knock_up = 0
