@@ -23,6 +23,31 @@ def land(e):
     return e[0] == "LAND"
 
 
+def fall(e):
+    return e == "FALL"
+
+
+class Fall:
+    frame = [(98, 1622, 37, 50)]
+    nFrame = 1
+
+    FRAME_PER_SEC = 1
+
+    @staticmethod
+    def exit(megamen):
+        pass
+
+    @staticmethod
+    def enter(megamen):
+        megamen.frame = 0
+
+    @staticmethod
+    def do(megamen):
+        megamen.next_frame()
+        if not megamen.isFall:
+            megamen.state_machine.handle_event(("LAND", 0))
+
+
 class Land:
     frame = [
         (226, 1621, 38, 39),
@@ -161,11 +186,8 @@ class Run:
 
 class Jump:
     frame = [(16, 1622, 32, 44),
-             (55, 1622, 36, 49),
-             (98, 1622, 37, 50),
-             (142, 1622, 33, 46),
-             ]
-    nFrame = 4
+             (55, 1622, 36, 49), ]
+    nFrame = 2
 
     JUMP_POWER = 15
     FRAME_PER_SEC = 8
@@ -182,10 +204,8 @@ class Jump:
     @staticmethod
     def do(megamen):
         megamen.next_frame()
-        if megamen.isFall:
-            megamen.frame = min(megamen.frame, 2)
-        else:
-            megamen.state_machine.handle_event(("LAND", 0))
+        if megamen.speed[1] < 0:
+            megamen.state_machine.handle_event("FALL")
 
 
 class JumpKnuckle:
@@ -261,6 +281,7 @@ class Uppercut:
     damage = 10
     rigid_coefficient = 1
     isDown = False
+
     @staticmethod
     def exit(megamen):
         megamen.atk_box.reset()
@@ -292,14 +313,11 @@ class Uppercut:
                 dx *= -1
             megamen.set_atk_box(state.frame[int_frame][2] * megamen.size // dx,
                                 state.frame[int_frame][3] * megamen.size // dy, sx, sy)
-        if not megamen.isFall:
-            if int_frame == 0 and isRepeat:
-                megamen.state_machine.handle_event(("EOA", 0))
-            if int_frame == 1:
-                megamen.speed[1] = state.JUMP_POWER
+
+        if int_frame == 1:
+            megamen.speed[1] = state.JUMP_POWER
         if megamen.speed[1] < 0:
-            megamen.atk_box.reset()
-            Uppercut.isDown = True
+            megamen.state_machine.handle_event(("EOA", 0))
 
 
 class CogwheelShot:
@@ -558,7 +576,7 @@ class StateMachine:
                             },
                       AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
-                      Jump: {land: Land, megamen.control_method.atk1_down: JumpShot,
+                      Jump: {fall: Fall, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.atk2_down: JumpKnuckle,
                              megamen.control_method.ultimate_down: FireSword},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
@@ -569,13 +587,17 @@ class StateMachine:
                                   megamen.control_method.move_r_up: RunShot, megamen.control_method.move_l_up: RunShot,
                                   end_of_animation: AnimationEnd},
                       ChargingShot: {megamen.control_method.atk2_up: AnimationEnd},
-                      Uppercut: {end_of_animation: Land},
+                      Uppercut: {end_of_animation: Fall},
                       RushTornado: {end_of_animation: AnimationEnd},
                       FireSword: {end_of_animation: Land},
                       JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot},
                       UpTornado: {end_of_animation: Land},
                       JumpKnuckle: {land: Land},
-                      CogwheelShot: {end_of_animation: AnimationEnd}}
+                      CogwheelShot: {end_of_animation: AnimationEnd},
+                      Fall: {land: Land, megamen.control_method.atk1_down: JumpShot,
+                             megamen.control_method.atk2_down: JumpKnuckle,
+                             megamen.control_method.ultimate_down: FireSword
+                             }}
 
     def draw(self):
         frame = int(self.megamen.frame)
