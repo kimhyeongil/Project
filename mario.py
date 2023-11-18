@@ -79,6 +79,7 @@ class AnimationEnd:
     def enter(mario):
         mario.frame = 0
         mario.rigid_time = 0
+        mario.atk_box.reset()
         mario.state_machine.handle_event(("CHECK_STATE", mario.dir))
 
 
@@ -297,20 +298,62 @@ class OneJabTwoPunchThreeKick:
              (125, 2181, 40, 38),
              (169, 2181, 32, 38),
              (205, 2182, 23, 37),
-             (232, 2180, 23, 33), ]
+             (232, 2180, 26, 33), ]
     nFrame = 17
-    FRAME_PER_SEC = 25
+    FRAME_PER_SEC = 17
+    JUMP_POWER = 5
+    damage = 5
+    rigid_coefficient = 0.1
+    knock_up = 10
 
     @staticmethod
     def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
+        mario.atk_box.damage = OneJabTwoPunchThreeKick.damage
+        mario.atk_box.rigid_coefficient = OneJabTwoPunchThreeKick.rigid_coefficient
 
     @staticmethod
     def do(mario):
-        isRepeat = False if int(mario.frame) == 0 else True
+        isRepeat0 = False if int(mario.frame) == 0 else True
+        isRepeat6 = True if int(mario.frame) == 6 else False
+        isJumped = True if int(mario.frame) == 12 else False
         mario.next_frame()
-        if int(mario.frame) == 0 and isRepeat:
+
+        state = OneJabTwoPunchThreeKick
+        int_frame = int(mario.frame)
+        dx, dy, sx, sy = state.frame[int_frame][2] * mario.size // 2, state.frame[int_frame][3] * mario.size // 2, 0, 0
+        if int_frame == 0:
+            sx, sy = 10, 10
+        elif int_frame < 3:
+            sx, sy = 20, 20
+            if int_frame == 2:
+                dy -= 10
+        elif int_frame == 6:
+            if not isRepeat6:
+                mario.atk_box.damage = OneJabTwoPunchThreeKick.damage
+                mario.atk_box.rigid_coefficient = OneJabTwoPunchThreeKick.rigid_coefficient
+            dx -= 10
+            dy -= 10
+            sx, sy = 12, 12
+        elif 7 <= int_frame <= 9:
+            sx, sy = 25, 25
+        elif 12 <= int_frame <= 14:
+            if int_frame == 12 and not isJumped:
+                mario.isFall = True
+                mario.speed[1] = OneJabTwoPunchThreeKick.JUMP_POWER
+                mario.atk_box.knock_up = state.knock_up
+                mario.atk_box.damage = OneJabTwoPunchThreeKick.damage
+                mario.atk_box.rigid_coefficient = OneJabTwoPunchThreeKick.rigid_coefficient
+            sx, sy = 25, dy
+            dy += 10
+            if int_frame == 14:
+                sx, sy = 10, 15
+        if int_frame <= 14:
+            mario.set_atk_box(dx - sx + 5, dy, sx, sy)
+        else:
+            mario.atk_box.reset()
+        if int_frame == 0 and isRepeat0:
             mario.state_machine.handle_event(("EOA", 0))
 
 
@@ -490,8 +533,8 @@ class StateMachine:
             )
 
     def update(self):
-        self.mario.move()
         self.state.do(self.mario)
+        self.mario.move()
 
     def handle_event(self, e):
         if self.mario.control_method.up_down(e):
@@ -520,21 +563,32 @@ class Mario:
         self.face_dir = control_method.start_face
         self.dir = 0
         self.speed = [0, 0]
-        self.atk_box = None
+        self.atk_box = AtkBox()
         self.hp = 100
         self.rigid_time = 0
         self.resist_coefficient = 0.25
         self.font = load_font('ENCR10B.TTF', 40)
         self.state_machine = StateMachine(self)
         self.up = False
+        control_method.add_atk_collision(self.atk_box)
         if Mario.img == None:
             Mario.img = load_image('mario.png')
+
+    def set_atk_box(self, dx, dy, sx, sy):
+        if self.face_dir == "l":
+            atkX, atkY = self.x - dx, self.y + dy
+            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+        else:
+            atkX, atkY = self.x + dx, self.y + dy
+            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
 
     def draw(self):
         self.state_machine.draw()
         frame = int(self.frame)
         state = self.state_machine.state
         draw_rectangle(*self.get_bb())
+        if self.atk_box.get_bb():
+            draw_rectangle(*self.atk_box.get_bb())
         self.font.draw(self.x, self.y + state.frame[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
         self.font.draw(self.x, 300, f"{round(self.control_method.ultimate_gage, 2)}", (0, 0, 0))
 
@@ -574,7 +628,8 @@ class Mario:
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
         self.speed[1] += knock_up
         self.speed[0] = knock_back
-        self.isFall = True
+        if self.speed[1] != 0:
+            self.isFall = True
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
 
@@ -592,9 +647,9 @@ class AtkBox:
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
-            self.reset()
-
+            if self.damage > 0:
+                other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
+                self.reset()
     def reset(self):
         self.bb = None
         self.damage = 0

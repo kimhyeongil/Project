@@ -775,10 +775,13 @@ class MegaMen:
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
-        self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
+        self.rigid_time += rigid * self.hp / 125 * self.resist_coefficient
         self.speed[1] += knock_up
         self.speed[0] = knock_back
-        self.isFall = True
+        print(self.rigid_time)
+        print(self.isFall)
+        if self.speed[1] != 0:
+            self.isFall = True
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
 
@@ -796,8 +799,9 @@ class AtkBox:
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
-            self.reset()
+            if self.damage > 0:
+                other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
+                self.reset()
 
     def reset(self):
         self.bb = None
