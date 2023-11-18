@@ -569,8 +569,7 @@ class Mario:
             self.speed[1] = 0
             self.isFall = False
 
-
-    def hit(self, damage, rigid, knock_up=0, knock_back=0):
+    def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
         self.speed[1] += knock_up
@@ -578,3 +577,26 @@ class Mario:
         self.isFall = True
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
+
+
+class AtkBox:
+    def __init__(self):
+        self.bb = None
+        self.damage = 0
+        self.rigid_coefficient = 0
+        self.knock_up = 0
+        self.knock_back = 0
+
+    def get_bb(self):
+        return self.bb
+
+    def handle_collision(self, group, other):
+        if other.control_method.isHit(group):
+            other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
+            self.reset()
+
+    def reset(self):
+        self.bb = None
+        self.damage = 0
+        self.rigid_coefficient = 0
+        self.knock_up = 0

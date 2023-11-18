@@ -1,3 +1,5 @@
+import time
+
 from pico2d import load_image, draw_rectangle, load_font
 import game_framework
 import game_world
@@ -27,6 +29,14 @@ def fall(e):
     return e == "FALL"
 
 
+def time_out(e):
+    return e[0] == "TIMEOUT"
+
+
+def hit(e):
+    return e[0] == "HIT"
+
+
 class Fall:
     frame = [(98, 1622, 37, 50)]
     nFrame = 1
@@ -46,6 +56,28 @@ class Fall:
         megamen.next_frame()
         if not megamen.isFall:
             megamen.state_machine.handle_event(("LAND", 0))
+
+
+class Hit:
+    frame = [(13, 1297, 35, 47,)]
+    nFrame = 1
+    FRAME_PER_SEC = 0
+    start_time = 0
+
+    @staticmethod
+    def enter(megamen):
+        megamen.frame = 0
+        Hit.start_time = time.time()
+
+    @staticmethod
+    def do(megamen):
+        megamen.next_frame()
+        if time.time() - Hit.start_time >= megamen.rigid_time and not megamen.isFall:
+            megamen.state_machine.handle_event(("TIMEOUT", 0))
+
+    @staticmethod
+    def exit(megamen):
+        pass
 
 
 class Land:
@@ -553,7 +585,7 @@ class StateMachine:
         self.megamen = megamen
         self.table = {Idle: {megamen.control_method.move_r_down: Run, megamen.control_method.move_l_down: Run,
                              megamen.control_method.move_r_up: Run, megamen.control_method.move_l_up: Run,
-                             megamen.control_method.jump_down: Jump,
+                             megamen.control_method.jump_down: Jump, hit: Hit,
                              megamen.control_method.atk1_down: SmallShot,
                              megamen.control_method.atk2_down: ChargingShot,
                              megamen.control_method.up_atk1_down: Uppercut,
@@ -562,7 +594,7 @@ class StateMachine:
                              megamen.control_method.up_ultimate_down: RushTornado},
                       Run: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
-                            megamen.control_method.jump_down: Jump,
+                            megamen.control_method.jump_down: Jump, hit: Hit,
                             megamen.control_method.atk1_down: RunShot,
                             megamen.control_method.atk2_down: ChargingShot,
                             megamen.control_method.up_atk1_down: Uppercut,
@@ -573,7 +605,7 @@ class StateMachine:
                       AnimationEnd: {check_run: Run, check_idle: Idle},
                       Land: {end_of_animation: AnimationEnd},
                       Jump: {fall: Fall, megamen.control_method.atk1_down: JumpShot,
-                             megamen.control_method.atk2_down: JumpKnuckle,
+                             megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
                              megamen.control_method.ultimate_down: FireSword},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
@@ -592,8 +624,8 @@ class StateMachine:
                       CogwheelShot: {end_of_animation: AnimationEnd},
                       Fall: {land: Land, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.atk2_down: JumpKnuckle,
-                             megamen.control_method.ultimate_down: FireSword
-                             }}
+                             megamen.control_method.ultimate_down: FireSword},
+                      Hit: {time_out: AnimationEnd}}
 
     def draw(self):
         frame = int(self.megamen.frame)
@@ -643,6 +675,7 @@ class MegaMen:
         self.control_method = control_method
         self.state_machine = StateMachine(self)
         self.resist_coefficient = 0.5
+        self.rigid_time = 0
         self.font = load_font('ENCR10B.TTF', 40)
         control_method.add_atk_collision(self.atk_box)
         self.up = False
@@ -740,10 +773,14 @@ class MegaMen:
             self.speed[1] = 0
             self.isFall = False
 
-    def hit(self, damage, rigid):
+    def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
+        self.speed[1] += knock_up
+        self.speed[0] = knock_back
+        self.isFall = True
         self.hp -= damage
+        self.state_machine.handle_event(("HIT", 0))
 
 
 class AtkBox:
