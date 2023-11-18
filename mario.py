@@ -44,7 +44,6 @@ class Hit:
     @staticmethod
     def enter(mario):
         mario.frame = 0
-        mario.speed[0] = 0
         Hit.start_time = time.time()
 
     @staticmethod
@@ -569,12 +568,13 @@ class Mario:
             self.y = other.y + 1
             self.speed[1] = 0
             self.isFall = False
-        if self.control_method.isHit(group):
-            self.state_machine.handle_event(("HIT", 0))
 
-    def hit(self, damage, rigid, knock_up=0):
+
+    def hit(self, damage, rigid, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
         self.speed[1] += knock_up
+        self.speed[0] = knock_back
         self.isFall = True
         self.hp -= damage
+        self.state_machine.handle_event(("HIT", 0))
