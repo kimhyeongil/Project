@@ -765,7 +765,7 @@ class Mario:
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.resist_coefficient
         state = self.state_machine.state
-        if state == Idle or state == Run or state == Jump or state == Fall:
+        if state == Idle or state == Run or state == Jump or state == Fall or state == Hit:
             self.speed[1] += knock_up
             self.speed[0] = knock_back
         if self.speed[1] != 0:
