@@ -220,7 +220,7 @@ class MegaKnuckle:
         self.dir = 0
         self.frame = 0
         self.size = size
-        self.speed = 0
+        self.speed = -10
         game_world.add_obj(self, 1)
         game_world.add_collision_pair("knuckle:ground", self, None)
 
@@ -245,7 +245,7 @@ class MegaKnuckle:
         if group == "knuckle:ground":
             game_world.erase_obj(self)
         elif other.control_method.isHit(group):
-            other.hit(*self.ATK_INFO)
+            other.hit(*self.ATK_INFO, self.speed - 30)
             game_world.erase_obj(self)
 
 

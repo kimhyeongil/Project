@@ -660,7 +660,7 @@ class MegaMen:
         if MegaMen.img == None:
             MegaMen.img = load_image('megamen.png')
 
-    def set_atk_box(self, dx, dy, sx, sy):
+    def set_atk_bb(self, dx, dy, sx, sy):
         if self.face_dir == "l":
             atkX, atkY = self.x - dx, self.y + dy
             self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
@@ -757,10 +757,14 @@ class MegaMen:
             2] * self.size // 2, self.y + state.FRAME_INFO[int_frame][3] * self.size
 
     def handle_collision(self, group, other):
-        if group == "character:ground" and self.isFall:
+        if group == "character:ground":
             self.y = other.y + 1
-            self.speed[1] = 0
-            self.isFall = False
+            if self.speed[1] > -30:
+                print(self.speed[1])
+                self.speed[1] = 0
+                self.isFall = False
+            else:
+                self.speed[1] = -(self.speed[1] + 30)
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)

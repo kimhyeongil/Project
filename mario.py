@@ -300,7 +300,7 @@ class OneJabTwoPunchThreeKick:
                   (205, 2182, 23, 37),
                   (232, 2180, 26, 33), ]
     nFrame = 17
-    FRAME_PER_SEC = 20
+    FRAME_PER_SEC = 17
     JUMP_POWER = 5
     ATK_BB_INFO = {0: (31, 34, 10, 10),
                    1: (33, 32, 20, 20),
@@ -312,8 +312,8 @@ class OneJabTwoPunchThreeKick:
                    12: (28, 53, 25, 43),
                    13: (20, 48, 25, 38),
                    14: (17, 48, 10, 15)}
-    ATK_INFO = {0: (5, 0.1),
-                6: (3, 0.2),
+    ATK_INFO = {0: (5, 0.05),
+                6: (3, 0.1),
                 12: (7, 0.1, 10)}
 
     @staticmethod
@@ -613,12 +613,17 @@ class Mario:
     def handle_collision(self, group, other):
         if group == "character:ground":
             self.y = other.y + 1
-            self.speed[1] = 0
-            self.isFall = False
+            if self.speed[1] > -30:
+                print(self.speed[1])
+                self.speed[1] = 0
+                self.isFall = False
+            else:
+                self.speed[1] = -(self.speed[1] + 30)
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 100 * self.resist_coefficient
+        print(knock_up)
         self.speed[1] += knock_up
         self.speed[0] = knock_back
         if self.speed[1] != 0:
