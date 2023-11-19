@@ -90,6 +90,8 @@ class Hit:
 
     @staticmethod
     def do(mario):
+        if not mario.isFall:
+            mario.speed[0] = mario.speed[0] * (1 - game_framework.frame_time)
         if time.time() - Hit.start_time >= mario.rigid_time and not mario.isFall:
             mario.state_machine.handle_event(("TIMEOUT", 0))
 
@@ -805,5 +807,5 @@ class AtkBox:
 
     def reset(self):
         self.bb = None
-        self.info = (0, 0, 0, self.info[3])
+        self.info = (0, 0, 0, 0)
         self.effect = None

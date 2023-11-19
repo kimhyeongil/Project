@@ -72,6 +72,8 @@ class Hit:
     @staticmethod
     def do(megamen):
         megamen.next_frame()
+        if not megamen.isFall:
+            megamen.speed[0] = megamen.speed[0] * (1 - game_framework.frame_time)
         if time.time() - Hit.start_time >= megamen.rigid_time and not megamen.isFall:
             megamen.state_machine.handle_event(("TIMEOUT", 0))
 
@@ -794,4 +796,4 @@ class AtkBox:
 
     def reset(self):
         self.bb = None
-        self.info = (0, 0, 0, self.info[3])
+        self.info = (0, 0, 0, 0)
