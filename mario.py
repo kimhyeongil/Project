@@ -111,7 +111,7 @@ class Land:
         old_frame = int(mario.frame)
         mario.next_frame()
         int_frame = int(mario.frame)
-        if int_frame == 0 and old_frame != 0:
+        if int_frame == 0 and int_frame != old_frame:
             mario.state_machine.handle_event(("EOA", 0))
 
 
@@ -185,7 +185,7 @@ class TurnKick:
             mario.set_atk_bb(*state.ATK_BB_INFO[int_frame])
         else:
             mario.atk_box.reset()
-        if int_frame == 0 and old_frame != 0:
+        if int_frame == 0 and int_frame != old_frame:
             mario.state_machine.handle_event(("EOA", 0))
 
 
@@ -267,7 +267,7 @@ class JumpKick:
         state = JumpKick
         int_frame = int(mario.frame)
         if int_frame == 1:
-            if old_frame != int_frame:
+            if int_frame != old_frame:
                 mario.set_atk_bb(*state.ATK_BB_INFO)
                 mario.set_atk_info(*state.ATK_INFO, mario.speed[0])
         else:
@@ -321,7 +321,7 @@ class JumpSuperPunch:
         state = JumpSuperPunch
         int_frame = int(mario.frame)
         if 3 <= int_frame <= 7:
-            if old_frame != 3 and int_frame == 3:
+            if int_frame == 3 and int_frame != old_frame:
                 mario.set_atk_info(*state.ATK_INFO, abs(mario.speed[0] * 1.3))
             mario.set_atk_bb(*state.ATK_BB_INFO[int_frame - 3])
         else:
@@ -372,7 +372,7 @@ class JumpSpinKick:
         state = JumpSpinKick
         int_frame = int(mario.frame)
         if 1 <= int_frame <= 7:
-            if old_frame != int_frame:
+            if int_frame != old_frame:
                 mario.set_atk_bb(*state.ATK_BB_INFO[int_frame - 1])
                 mario.set_atk_info(*state.ATK_INFO)
         else:
@@ -429,7 +429,7 @@ class OneJabTwoPunchThreeKick:
 
         state = OneJabTwoPunchThreeKick
         int_frame = int(mario.frame)
-        if old_frame != int_frame:
+        if int_frame != old_frame:
             if int_frame == 6:
                 mario.set_atk_info(*state.ATK_INFO[int_frame])
             if int_frame == 12:
@@ -440,7 +440,7 @@ class OneJabTwoPunchThreeKick:
             mario.set_atk_bb(*state.ATK_BB_INFO[int_frame])
         else:
             mario.atk_box.reset()
-        if int_frame == 0 and old_frame != 0:
+        if int_frame == 0 and int_frame != old_frame:
             mario.state_machine.handle_event(("EOA", 0))
 
 
@@ -509,7 +509,7 @@ class SomersaultKick:
         int_frame = int(mario.frame)
         if 1 <= int_frame <= 5:
             mario.set_atk_bb(*state.ATK_BB_INFO[int_frame - 1])
-            if int_frame == 3 and old_frame != 3:
+            if int_frame == 3 and int_frame != old_frame:
                 mario.set_atk_info(*state.ATK_INFO[1])
         else:
             mario.atk_box.bb = None
@@ -549,12 +549,12 @@ class MagicCape:
         state = MagicCape
         int_frame = int(mario.frame)
         if int_frame == 4:
-            if old_frame != int_frame:
+            if int_frame != old_frame:
                 mario.set_atk_bb(*state.ATK_BB_INFO)
                 mario.set_atk_info(*state.ATK_INFO)
         else:
             mario.atk_box.bb = None
-        if int_frame == 0 and old_frame != 0:
+        if int_frame == 0 and int_frame != old_frame:
             mario.state_machine.handle_event(("EOA", 0))
 
 
@@ -585,12 +585,12 @@ class PalmStrike:
         state = PalmStrike
         int_frame = int(mario.frame)
         if 4 <= int_frame <= 5:
-            if old_frame != 4 and int_frame == 4:
+            if int_frame == 4 and int_frame != old_frame:
                 mario.set_atk_info(*state.ATK_INFO)
             mario.set_atk_bb(*state.ATK_BB_INFO)
         else:
             mario.atk_box.bb = None
-        if int_frame == 0 and old_frame != 0:
+        if int_frame == 0 and int_frame != old_frame:
             mario.state_machine.handle_event(("EOA", 0))
 
 
