@@ -56,6 +56,10 @@ class MegaBuster:
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
+            if group == "Player1:Player2":
+                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+            else:
+                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)
 
 
@@ -100,6 +104,10 @@ class MegaTornado:
         cur_time = time.time()
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.05:
             other.hit(*self.ATK_INFO)
+            if group == "Player1:Player2":
+                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+            else:
+                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
             self.cooltime = cur_time
 
 
@@ -178,6 +186,10 @@ class MegaChargingShot:
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
+            if group == "Player1:Player2":
+                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+            else:
+                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)
 
 
@@ -227,6 +239,10 @@ class MegaHurricane:
         cur_time = time.time()
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.1:
             other.hit(*self.ATK_INFO)
+            if group == "Player1:Player2":
+                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+            else:
+                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
             self.cooltime = cur_time
 
 
@@ -266,6 +282,10 @@ class MegaKnuckle:
             game_world.erase_obj(self)
         elif other.control_method.isHit(group):
             other.hit(*self.ATK_INFO, self.speed - 30)
+            if group == "Player1:Player2":
+                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+            else:
+                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)
 
 
@@ -315,4 +335,8 @@ class MegaCogwheel:
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
+            if group == "Player1:Player2":
+                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+            else:
+                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)

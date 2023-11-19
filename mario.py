@@ -4,6 +4,8 @@ from pico2d import *
 
 import game_framework
 import game_world
+import player1_control
+import player2_control
 
 
 # state = JumpSuperPunch
@@ -269,7 +271,7 @@ class JumpKick:
         if int_frame == 1:
             if int_frame != old_frame:
                 mario.set_atk_bb(*state.ATK_BB_INFO)
-                mario.set_atk_info(*state.ATK_INFO, mario.speed[0])
+                mario.set_atk_info(*state.ATK_INFO, abs(mario.speed[0]))
         else:
             mario.atk_box.bb = None
         if not mario.isFall:
@@ -728,7 +730,7 @@ class Mario:
 
     def update(self):
         self.state_machine.update()
-        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time, 3)
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time / 100, 3)
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
@@ -762,7 +764,7 @@ class Mario:
                 self.speed[1] = -(self.speed[1] + 30)
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
-        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 200, 3)
         self.rigid_time += rigid * self.resist_coefficient
         state = self.state_machine.state
         if state == Idle or state == Run or state == Jump or state == Fall or state == Hit:
@@ -795,8 +797,13 @@ class AtkBox:
                         other.face_dir = "r"
                     else:
                         other.face_dir = "l"
+                if group == "Player1:Player2":
+                    player1_control.ultimate_gage += self.info[0] / 100
+                else:
+                    player2_control.ultimate_gage += self.info[0] / 100
                 self.reset()
 
     def reset(self):
         self.bb = None
         self.info = (0, 0, 0, self.info[3])
+        self.effect = None

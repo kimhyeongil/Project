@@ -715,7 +715,7 @@ class MegaMen:
 
     def update(self):
         self.state_machine.update()
-        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time, 3)
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time / 100, 3)
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
@@ -759,7 +759,7 @@ class MegaMen:
                 self.speed[1] = -(self.speed[1] + 30)
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
-        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
+        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 200, 3)
         self.rigid_time += rigid * self.resist_coefficient
         state = self.state_machine.state
         if state == Idle or state == Run or state == Jump or state == Fall or state == Hit:
@@ -786,6 +786,10 @@ class AtkBox:
         if other.control_method.isHit(group):
             if self.info[0] > 0:
                 other.hit(*self.info)
+                if group == "Player1:Player2":
+                    player1_control.ultimate_gage += self.info[0] / 100
+                else:
+                    player2_control.ultimate_gage += self.info[0] / 100
                 self.reset()
 
     def reset(self):
