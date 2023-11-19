@@ -110,22 +110,32 @@ class MegaChargingShot:
                   (693, 1621, 94, 40,), ]
     nFrame = 4
 
-    def __init__(self, x, y, dir, charged_time=0):
+    def __init__(self, x=0, y=0, dir=0, charged_time=0, megamen=None):
         self.img = projectile
-        self.x, self.y = x, y
-        if charged_time == 0:
-            self.frame = 0
-            self.speed = 0
+        self.frame = 0
+        self.size = 1
+        if megamen:
+            if megamen.face_dir == "r":
+                self.dir = 1
+            else:
+                self.dir = -1
+            self.x = megamen.x + (megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][
+                                      2] * megamen.size // 2 + 10) * self.dir
+            self.y = megamen.y + megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][3] * megamen.size // 2 + 5
+            self.megamen = megamen
         else:
-            self.frame = MegaChargingShot.nFrame - 1
-            self.speed = 10 * dir
-        self.dir = dir
-        self.size = max(charged_time, 1)
-        damage = int(7.5 * charged_time)
-        rigid = 0.5 * charged_time
-        back = 3 * max(charged_time - 0.5, 0)
-        up = 7 * max(charged_time - 0.7, 0)
-        self.ATK_INFO = (damage, rigid, back, up)
+            self.megamen = None
+            self.x, self.y = x, y
+            if charged_time != 0:
+                self.frame = MegaChargingShot.nFrame - 1
+                self.speed = 10 * dir
+            self.dir = dir
+            self.size = max(charged_time, 1)
+            damage = int(7.5 * charged_time)
+            rigid = 0.5 * charged_time
+            back = 3 * max(charged_time - 0.5, 0)
+            up = 7 * max(charged_time - 0.7, 0)
+            self.ATK_INFO = (damage, rigid, back, up)
         game_world.add_obj(self, 1)
 
     def draw(self):
@@ -144,7 +154,17 @@ class MegaChargingShot:
         draw_rectangle(*self.get_bb())
 
     def update(self):
-        self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
+        if self.megamen:
+            megamen = self.megamen
+            if megamen.face_dir == "r":
+                self.dir = 1
+            else:
+                self.dir = -1
+            self.x = megamen.x + (megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][
+                                      2] * megamen.size // 2 + 10) * self.dir
+            self.y = megamen.y + megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][3] * megamen.size // 2 + 5
+        else:
+            self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.x > 800 - 50 or self.x < 0 + 50:
             game_world.erase_obj(self)
 

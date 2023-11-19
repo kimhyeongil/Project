@@ -383,18 +383,7 @@ class ChargingShot:
         megamen.frame = 0
         megamen.speed[0] = 0
         ChargingShot.start_time = game_framework.time.time()
-        if megamen.face_dir == 'r':
-            ChargingShot.projectile = megamen_projectile.MegaChargingShot(
-                megamen.x + ChargingShot.FRAME_INFO[0][2] * megamen.size // 2 +
-                megamen_projectile.MegaChargingShot.FRAME_INFO[0][2] * 0.5,
-                megamen.y + megamen.size * ChargingShot.FRAME_INFO[0][3] // 2 + 5,
-                1)
-        else:
-            ChargingShot.projectile = megamen_projectile.MegaChargingShot(
-                megamen.x - ChargingShot.FRAME_INFO[0][2] * megamen.size // 2 -
-                megamen_projectile.MegaChargingShot.FRAME_INFO[0][2] * 0.5,
-                megamen.y + megamen.size * ChargingShot.FRAME_INFO[0][3] // 2 + 5,
-                -1)
+        ChargingShot.projectile = megamen_projectile.MegaChargingShot(megamen=megamen)
 
     @staticmethod
     def do(megamen):
@@ -601,7 +590,7 @@ class StateMachine:
                       JumpKnuckle: {land: Land},
                       CogwheelShot: {end_of_animation: AnimationEnd},
                       Fall: {land: Land, megamen.control_method.atk1_down: JumpShot,
-                             megamen.control_method.atk2_down: JumpKnuckle,
+                             megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
                              megamen.control_method.ultimate_down: FireSword},
                       Hit: {time_out: AnimationEnd}}
 
@@ -760,7 +749,6 @@ class MegaMen:
         if group == "character:ground":
             self.y = other.y + 1
             if self.speed[1] > -30:
-                print(self.speed[1])
                 self.speed[1] = 0
                 self.isFall = False
             else:
@@ -769,8 +757,10 @@ class MegaMen:
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 2, 3)
         self.rigid_time += rigid * self.hp / 125 * self.resist_coefficient
-        self.speed[1] += knock_up
-        self.speed[0] = knock_back
+        state = self.state_machine.state
+        if state == Idle or state == Run or state == Jump or state == Fall:
+            self.speed[1] += knock_up
+            self.speed[0] = knock_back
         if self.speed[1] != 0:
             self.isFall = True
         self.hp -= damage
