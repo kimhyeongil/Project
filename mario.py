@@ -36,7 +36,7 @@ def hit(e):
 
 
 class Hit:
-    frame = [(15, 973, 26, 34,), ]
+    FRAME_INFO = [(15, 973, 26, 34,), ]
     nFrame = 1
     FRAME_PER_SEC = 15
     start_time = 0
@@ -54,9 +54,9 @@ class Hit:
 
 
 class Land:
-    frame = [(111, 2401, 26, 34,),
-             (141, 2401, 26, 33,),
-             (171, 2401, 26, 34,), ]
+    FRAME_INFO = [(111, 2401, 26, 34,),
+                  (141, 2401, 26, 33,),
+                  (171, 2401, 26, 34,), ]
 
     nFrame = 3
     FRAME_PER_SEC = 15
@@ -84,16 +84,16 @@ class AnimationEnd:
 
 
 class Idle:
-    frame = [(18, 2466, 23, 36),
-             (45, 2466, 23, 37),
-             (72, 2466, 23, 38),
-             (99, 2466, 24, 38),
-             (126, 2466, 25, 37),
-             (153, 2466, 25, 36),
-             (126, 2466, 25, 37),
-             (99, 2466, 24, 38),
-             (72, 2466, 23, 38),
-             (45, 2466, 23, 37)]
+    FRAME_INFO = [(18, 2466, 23, 36),
+                  (45, 2466, 23, 37),
+                  (72, 2466, 23, 38),
+                  (99, 2466, 24, 38),
+                  (126, 2466, 25, 37),
+                  (153, 2466, 25, 36),
+                  (126, 2466, 25, 37),
+                  (99, 2466, 24, 38),
+                  (72, 2466, 23, 38),
+                  (45, 2466, 23, 37)]
     nFrame = 10
     FRAME_PER_SEC = 10
 
@@ -108,15 +108,15 @@ class Idle:
 
 
 class TurnKick:
-    frame = [(14, 1492, 26, 36),
-             (46, 1492, 45, 32),
-             (97, 1492, 39, 31),
-             (142, 1492, 36, 33),
-             (184, 1492, 34, 35),
-             (224, 1492, 32, 34),
-             (262, 1492, 33, 32),
-             (301, 1492, 33, 31),
-             (340, 1492, 25, 34), ]
+    FRAME_INFO = [(14, 1492, 26, 36),
+                  (46, 1492, 45, 32),
+                  (97, 1492, 39, 31),
+                  (142, 1492, 36, 33),
+                  (184, 1492, 34, 35),
+                  (224, 1492, 32, 34),
+                  (262, 1492, 33, 32),
+                  (301, 1492, 33, 31),
+                  (340, 1492, 25, 34), ]
     nFrame = 9
     FRAME_PER_SEC = 18
 
@@ -134,14 +134,14 @@ class TurnKick:
 
 
 class Run:
-    frame = [(12, 2343, 28, 36),
-             (44, 2345, 30, 34),
-             (82, 2342, 29, 36),
-             (116, 2340, 24, 36),
-             (146, 2342, 28, 36),
-             (181, 2343, 30, 34),
-             (220, 2342, 28, 36),
-             (254, 2340, 24, 36), ]
+    FRAME_INFO = [(12, 2343, 28, 36),
+                  (44, 2345, 30, 34),
+                  (82, 2342, 29, 36),
+                  (116, 2340, 24, 36),
+                  (146, 2342, 28, 36),
+                  (181, 2343, 30, 34),
+                  (220, 2342, 28, 36),
+                  (254, 2340, 24, 36), ]
     nFrame = 8
     RUN_SPEED = 3.5
     FRAME_PER_SEC = 8
@@ -160,9 +160,9 @@ class Run:
 
 
 class Jump:
-    frame = [(15, 2403, 24, 40),
-             (45, 2404, 27, 39),
-             (78, 2401, 29, 42)]
+    FRAME_INFO = [(15, 2403, 24, 40),
+                  (45, 2404, 27, 39),
+                  (78, 2401, 29, 42)]
     nFrame = 3
     JUMP_POWER = 15
     FRAME_PER_SEC = 10
@@ -184,11 +184,11 @@ class Jump:
 
 
 class JumpKick:
-    frame = [(11, 2101, 31, 40,),
-             (48, 2110, 36, 30,),
-             (48, 2110, 36, 30,),
-             (90, 2101, 30, 40,),
-             (126, 2099, 29, 42,), ]
+    FRAME_INFO = [(11, 2101, 31, 40,),
+                  (48, 2110, 36, 30,),
+                  (48, 2110, 36, 30,),
+                  (90, 2101, 30, 40,),
+                  (126, 2099, 29, 42,), ]
 
     nFrame = 5
     FRAME_PER_SEC = 12
@@ -210,22 +210,22 @@ class JumpKick:
 
 
 class JumpSuperPunch:
-    frame = [(14, 1419, 32, 40,),
-             (52, 1419, 32, 40,),
-             (90, 1419, 32, 40,),
-             (129, 1419, 35, 40,),
-             (170, 1420, 29, 38,),
-             (205, 1421, 44, 38,),
-             (255, 1421, 42, 36,),
-             (303, 1419, 32, 38,),
-             (341, 1419, 30, 40,),
-             (377, 1426, 34, 32,),
-             (417, 1436, 36, 21,),
-             (16, 1378, 35, 29,),
-             (57, 1373, 35, 34,),
-             (98, 1374, 36, 34,),
-             (140, 1371, 36, 31,),
-             (181, 1374, 34, 34,), ]
+    FRAME_INFO = [(14, 1419, 32, 40,),
+                  (52, 1419, 32, 40,),
+                  (90, 1419, 32, 40,),
+                  (129, 1419, 35, 40,),
+                  (170, 1420, 29, 38,),
+                  (205, 1421, 44, 38,),
+                  (255, 1421, 42, 36,),
+                  (303, 1419, 32, 38,),
+                  (341, 1419, 30, 40,),
+                  (377, 1426, 34, 32,),
+                  (417, 1436, 36, 21,),
+                  (16, 1378, 35, 29,),
+                  (57, 1373, 35, 34,),
+                  (98, 1374, 36, 34,),
+                  (140, 1371, 36, 31,),
+                  (181, 1374, 34, 34,), ]
 
     nFrame = 16
     FRAME_PER_SEC = 24
@@ -251,16 +251,16 @@ class JumpSuperPunch:
 
 
 class JumpSpinKick:
-    frame = [(14, 1316, 31, 40,),
-             (51, 1322, 39, 26,),
-             (96, 1324, 39, 20,),
-             (141, 1316, 39, 36,),
-             (186, 1323, 39, 27,),
-             (231, 1326, 39, 20,),
-             (276, 1327, 39, 22,),
-             (321, 1318, 39, 36,),
-             (367, 1316, 30, 40,),
-             (403, 1314, 29, 42,), ]
+    FRAME_INFO = [(14, 1316, 31, 40,),
+                  (51, 1322, 39, 26,),
+                  (96, 1324, 39, 20,),
+                  (141, 1316, 39, 36,),
+                  (186, 1323, 39, 27,),
+                  (231, 1326, 39, 20,),
+                  (276, 1327, 39, 22,),
+                  (321, 1318, 39, 36,),
+                  (367, 1316, 30, 40,),
+                  (403, 1314, 29, 42,), ]
 
     nFrame = 10
     FRAME_PER_SEC = 25
@@ -282,36 +282,45 @@ class JumpSpinKick:
 
 
 class OneJabTwoPunchThreeKick:
-    frame = [(12, 2232, 36, 34),
-             (54, 2232, 48, 32),
-             (105, 2232, 44, 32),
-             (152, 2232, 34, 32),
-             (193, 2232, 34, 32),
-             (233, 2232, 31, 34),
-             (270, 2232, 31, 34),
-             (307, 2232, 44, 32),
-             (356, 2232, 40, 32),
-             (400, 2232, 35, 32),
-             (13, 2180, 27, 34),
-             (46, 2181, 23, 36),
-             (73, 2181, 48, 43),
-             (125, 2181, 40, 38),
-             (169, 2181, 32, 38),
-             (205, 2182, 23, 37),
-             (232, 2180, 26, 33), ]
+    FRAME_INFO = [(12, 2232, 36, 34),
+                  (54, 2232, 48, 32),
+                  (105, 2232, 44, 32),
+                  (152, 2232, 34, 32),
+                  (193, 2232, 34, 32),
+                  (233, 2232, 31, 34),
+                  (270, 2232, 31, 34),
+                  (307, 2232, 44, 32),
+                  (356, 2232, 40, 32),
+                  (400, 2232, 35, 32),
+                  (13, 2180, 27, 34),
+                  (46, 2181, 23, 36),
+                  (73, 2181, 48, 43),
+                  (125, 2181, 40, 38),
+                  (169, 2181, 32, 38),
+                  (205, 2182, 23, 37),
+                  (232, 2180, 26, 33), ]
     nFrame = 17
-    FRAME_PER_SEC = 17
+    FRAME_PER_SEC = 20
     JUMP_POWER = 5
-    damage = 5
-    rigid_coefficient = 0.1
-    knock_up = 10
+    ATK_BB_INFO = {0: (31, 34, 10, 10),
+                   1: (33, 32, 20, 20),
+                   2: (29, 22, 20, 20),
+                   6: (14, 24, 12, 12),
+                   7: (24, 32, 25, 25),
+                   8: (20, 32, 25, 25),
+                   9: (15, 32, 25, 25),
+                   12: (28, 53, 25, 43),
+                   13: (20, 48, 25, 38),
+                   14: (17, 48, 10, 15)}
+    ATK_INFO = {0: (5, 0.1),
+                6: (3, 0.2),
+                12: (7, 0.1, 10)}
 
     @staticmethod
     def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
-        mario.atk_box.damage = OneJabTwoPunchThreeKick.damage
-        mario.atk_box.rigid_coefficient = OneJabTwoPunchThreeKick.rigid_coefficient
+        mario.set_atk_info(*OneJabTwoPunchThreeKick.ATK_INFO[0])
 
     @staticmethod
     def do(mario):
@@ -322,35 +331,14 @@ class OneJabTwoPunchThreeKick:
 
         state = OneJabTwoPunchThreeKick
         int_frame = int(mario.frame)
-        dx, dy, sx, sy = state.frame[int_frame][2] * mario.size // 2, state.frame[int_frame][3] * mario.size // 2, 0, 0
-        if int_frame == 0:
-            sx, sy = 10, 10
-        elif int_frame < 3:
-            sx, sy = 20, 20
-            if int_frame == 2:
-                dy -= 10
-        elif int_frame == 6:
-            if not isRepeat6:
-                mario.atk_box.damage = OneJabTwoPunchThreeKick.damage
-                mario.atk_box.rigid_coefficient = OneJabTwoPunchThreeKick.rigid_coefficient
-            dx -= 10
-            dy -= 10
-            sx, sy = 12, 12
-        elif 7 <= int_frame <= 9:
-            sx, sy = 25, 25
-        elif 12 <= int_frame <= 14:
-            if int_frame == 12 and not isJumped:
-                mario.isFall = True
-                mario.speed[1] = OneJabTwoPunchThreeKick.JUMP_POWER
-                mario.atk_box.knock_up = state.knock_up
-                mario.atk_box.damage = OneJabTwoPunchThreeKick.damage
-                mario.atk_box.rigid_coefficient = OneJabTwoPunchThreeKick.rigid_coefficient
-            sx, sy = 25, dy
-            dy += 10
-            if int_frame == 14:
-                sx, sy = 10, 15
-        if int_frame <= 14:
-            mario.set_atk_box(dx - sx + 5, dy, sx, sy)
+        if int_frame == 6 and not isRepeat6:
+            mario.set_atk_info(*state.ATK_INFO[int_frame])
+        if int_frame == 12 and not isJumped:
+            mario.isFall = True
+            mario.speed[1] = OneJabTwoPunchThreeKick.JUMP_POWER
+            mario.set_atk_info(*state.ATK_INFO[int_frame])
+        if int_frame <= 14 and state.ATK_BB_INFO.get(int_frame):
+            mario.set_atk_bb(*state.ATK_BB_INFO[int_frame])
         else:
             mario.atk_box.reset()
         if int_frame == 0 and isRepeat0:
@@ -358,10 +346,10 @@ class OneJabTwoPunchThreeKick:
 
 
 class Uppercut:
-    frame = [(14, 1940, 35, 30),
-             (54, 1939, 34, 38),
-             (96, 1939, 22, 53),
-             (54, 1939, 34, 38), ]
+    FRAME_INFO = [(14, 1940, 35, 30),
+                  (54, 1939, 34, 38),
+                  (96, 1939, 22, 53),
+                  (54, 1939, 34, 38), ]
     nFrame = 4
     FRAME_PER_SEC = 12
     JUMP_POWER = 13
@@ -386,15 +374,15 @@ class Uppercut:
 
 
 class SomersaultKick:
-    frame = [(141, 2401, 26, 33),
-             (14, 1838, 37, 37),
-             (57, 1857, 50, 26),
-             (113, 1863, 37, 52),
-             (156, 1863, 38, 32),
-             (200, 1859, 38, 30),
-             (244, 1851, 37, 31),
-             (287, 1844, 23, 37),
-             (316, 1838, 29, 42), ]
+    FRAME_INFO = [(141, 2401, 26, 33),
+                  (14, 1838, 37, 37),
+                  (57, 1857, 50, 26),
+                  (113, 1863, 37, 52),
+                  (156, 1863, 38, 32),
+                  (200, 1859, 38, 30),
+                  (244, 1851, 37, 31),
+                  (287, 1844, 23, 37),
+                  (316, 1838, 29, 42), ]
     nFrame = 9
     FRAME_PER_SEC = 15
     JUMP_POWER = 12
@@ -417,16 +405,16 @@ class SomersaultKick:
 
 
 class MagicCape:
-    frame = [(40, 1153, 30, 37),
-             (80, 1153, 23, 37),
-             (109, 1153, 53, 38),
-             (168, 1153, 47, 34),
-             (221, 1153, 45, 52),
-             (275, 1153, 26, 53),
-             (307, 1153, 27, 38),
-             (340, 1153, 38, 35),
-             (384, 1153, 27, 34),
-             (418, 1153, 25, 34), ]
+    FRAME_INFO = [(40, 1153, 30, 37),
+                  (80, 1153, 23, 37),
+                  (109, 1153, 53, 38),
+                  (168, 1153, 47, 34),
+                  (221, 1153, 45, 52),
+                  (275, 1153, 26, 53),
+                  (307, 1153, 27, 38),
+                  (340, 1153, 38, 35),
+                  (384, 1153, 27, 34),
+                  (418, 1153, 25, 34), ]
     nFrame = 10
     FRAME_PER_SEC = 12
 
@@ -444,14 +432,14 @@ class MagicCape:
 
 
 class PalmStrike:
-    frame = [(13, 1559, 24, 35),
-             (43, 1564, 27, 32),
-             (76, 1561, 26, 42),
-             (108, 1561, 27, 40),
-             (141, 1561, 42, 35),
-             (141, 1561, 42, 35),
-             (189, 1561, 37, 37),
-             (232, 1561, 25, 34), ]
+    FRAME_INFO = [(13, 1559, 24, 35),
+                  (43, 1564, 27, 32),
+                  (76, 1561, 26, 42),
+                  (108, 1561, 27, 40),
+                  (141, 1561, 42, 35),
+                  (141, 1561, 42, 35),
+                  (189, 1561, 37, 37),
+                  (232, 1561, 25, 34), ]
     nFrame = 8
     FRAME_PER_SEC = 12
 
@@ -516,20 +504,20 @@ class StateMachine:
         frame = int(self.mario.frame)
         if self.mario.face_dir == "r":
             self.mario.img.clip_draw(
-                *self.state.frame[frame],
+                *self.state.FRAME_INFO[frame],
                 self.mario.x,
-                self.mario.y + self.mario.size * self.state.frame[frame][3] // 2,
-                self.state.frame[frame][2] * self.mario.size,
-                self.state.frame[frame][3] * self.mario.size
+                self.mario.y + self.mario.size * self.state.FRAME_INFO[frame][3] // 2,
+                self.state.FRAME_INFO[frame][2] * self.mario.size,
+                self.state.FRAME_INFO[frame][3] * self.mario.size
             )
         elif self.mario.face_dir == "l":
             self.mario.img.clip_composite_draw(
-                *self.state.frame[frame],
+                *self.state.FRAME_INFO[frame],
                 0, 'h',
                 self.mario.x,
-                self.mario.y + self.mario.size * self.state.frame[frame][3] // 2,
-                self.state.frame[frame][2] * self.mario.size,
-                self.state.frame[frame][3] * self.mario.size
+                self.mario.y + self.mario.size * self.state.FRAME_INFO[frame][3] // 2,
+                self.state.FRAME_INFO[frame][2] * self.mario.size,
+                self.state.FRAME_INFO[frame][3] * self.mario.size
             )
 
     def update(self):
@@ -574,13 +562,18 @@ class Mario:
         if Mario.img == None:
             Mario.img = load_image('mario.png')
 
-    def set_atk_box(self, dx, dy, sx, sy):
+    def set_atk_bb(self, dx, dy, sx, sy):
         if self.face_dir == "l":
             atkX, atkY = self.x - dx, self.y + dy
             self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
         else:
             atkX, atkY = self.x + dx, self.y + dy
             self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+
+    def set_atk_info(self, DAMAGE, RIGID, KNOCK_UP=0, KNOCK_BACK=0):
+        if self.face_dir == "l":
+            KNOCK_BACK *= -1
+        self.atk_box.set_info(DAMAGE, RIGID, KNOCK_UP, KNOCK_BACK)
 
     def draw(self):
         self.state_machine.draw()
@@ -589,7 +582,7 @@ class Mario:
         draw_rectangle(*self.get_bb())
         if self.atk_box.get_bb():
             draw_rectangle(*self.atk_box.get_bb())
-        self.font.draw(self.x, self.y + state.frame[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        self.font.draw(self.x, self.y + state.FRAME_INFO[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
         self.font.draw(self.x, 300, f"{round(self.control_method.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
@@ -614,8 +607,8 @@ class Mario:
     def get_bb(self):
         frame = int(self.frame)
         state = self.state_machine.state
-        return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
-            2] * self.size // 2, self.y + state.frame[frame][3] * self.size
+        return self.x - state.FRAME_INFO[frame][2] * self.size // 2, self.y, self.x + state.FRAME_INFO[frame][
+            2] * self.size // 2, self.y + state.FRAME_INFO[frame][3] * self.size
 
     def handle_collision(self, group, other):
         if group == "character:ground":
@@ -637,21 +630,20 @@ class Mario:
 class AtkBox:
     def __init__(self):
         self.bb = None
-        self.damage = 0
-        self.rigid_coefficient = 0
-        self.knock_up = 0
-        self.knock_back = 0
+        self.info = (0, 0, 0, 0)
 
     def get_bb(self):
         return self.bb
 
+    def set_info(self, D, R, U, B):
+        self.info = (D, R, U, B)
+
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            if self.damage > 0:
-                other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
+            if self.info[0] > 0:
+                other.hit(*self.info)
                 self.reset()
+
     def reset(self):
         self.bb = None
-        self.damage = 0
-        self.rigid_coefficient = 0
-        self.knock_up = 0
+        self.info = (0, 0, 0, self.info[3])

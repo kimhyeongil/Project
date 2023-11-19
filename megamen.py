@@ -38,7 +38,7 @@ def hit(e):
 
 
 class Fall:
-    frame = [(98, 1622, 37, 50)]
+    FRAME_INFO = [(98, 1622, 37, 50)]
     nFrame = 1
 
     FRAME_PER_SEC = 1
@@ -59,7 +59,7 @@ class Fall:
 
 
 class Hit:
-    frame = [(13, 1297, 35, 47,)]
+    FRAME_INFO = [(13, 1297, 35, 47,)]
     nFrame = 1
     FRAME_PER_SEC = 0
     start_time = 0
@@ -81,7 +81,7 @@ class Hit:
 
 
 class Land:
-    frame = [
+    FRAME_INFO = [
         (226, 1621, 38, 39),
         (268, 1622, 38, 39),
         (184, 1622, 38, 39), ]
@@ -119,9 +119,9 @@ class AnimationEnd:
 
 
 class Idle:
-    frame = [(16, 1774, 31, 45),
-             (52, 1774, 31, 45),
-             (16, 1774, 31, 45), ]
+    FRAME_INFO = [(16, 1774, 31, 45),
+                  (52, 1774, 31, 45),
+                  (16, 1774, 31, 45), ]
     nFrame = 3
     FRAME_PER_SEC = 2
 
@@ -140,16 +140,16 @@ class Idle:
 
 
 class RunShot:
-    frame = [(62, 1434, 42, 43),
-             (110, 1434, 39, 44),
-             (218, 1556, 44, 44),
-             (170, 1433, 46, 43),
-             (239, 1433, 45, 43),
-             (287, 1433, 42, 44),
-             (334, 1433, 40, 45),
-             (314, 1562, 44, 44),
-             (394, 1435, 46, 42),
-             (464, 1434, 45, 42), ]
+    FRAME_INFO = [(62, 1434, 42, 43),
+                  (110, 1434, 39, 44),
+                  (218, 1556, 44, 44),
+                  (170, 1433, 46, 43),
+                  (239, 1433, 45, 43),
+                  (287, 1433, 42, 44),
+                  (334, 1433, 40, 45),
+                  (314, 1562, 44, 44),
+                  (394, 1435, 46, 42),
+                  (464, 1434, 45, 42), ]
     nFrame = 10
 
     FRAME_PER_SEC = 12
@@ -173,26 +173,25 @@ class RunShot:
         isRepeat = False if int(megamen.frame) == 0 else True
         isShot = False if int(megamen.frame) % 4 == 0 else True
         megamen.next_frame()
-        if int(megamen.frame) % 4 == 0 and isShot and int(megamen.frame) != 0:
-            game_world.add_obj(
-                megamen_projectile.MegaBuster(megamen.x + RunShot.frame[int(megamen.frame)][2] * megamen.dir,
-                                              megamen.y + RunShot.frame[int(megamen.frame)][3] * megamen.size // 2,
-                                              megamen.dir), 1)
-        if int(megamen.frame) == 0 and isRepeat:
+        int_frame = int(megamen.frame)
+        if int_frame % 4 == 0 and isShot and int_frame != 0:
+            megamen.fire_megabuster(RunShot.FRAME_INFO[int_frame][2],
+                                    RunShot.FRAME_INFO[int_frame][3] * megamen.size // 2 + 5)
+        if int_frame == 0 and isRepeat:
             megamen.state_machine.handle_event(("EOA", 0))
 
 
 class Run:
-    frame = [(101, 1706, 30, 43),
-             (149, 1706, 27, 44),
-             (189, 1705, 37, 44),
-             (232, 1705, 42, 43),
-             (278, 1705, 37, 43),
-             (326, 1705, 30, 44),
-             (373, 1705, 28, 45),
-             (414, 1705, 33, 44),
-             (457, 1706, 40, 42),
-             (503, 1706, 38, 42), ]
+    FRAME_INFO = [(101, 1706, 30, 43),
+                  (149, 1706, 27, 44),
+                  (189, 1705, 37, 44),
+                  (232, 1705, 42, 43),
+                  (278, 1705, 37, 43),
+                  (326, 1705, 30, 44),
+                  (373, 1705, 28, 45),
+                  (414, 1705, 33, 44),
+                  (457, 1706, 40, 42),
+                  (503, 1706, 38, 42), ]
     nFrame = 10
 
     RUN_SPEED = 2.5
@@ -205,11 +204,10 @@ class Run:
     @staticmethod
     def enter(megamen):
         if megamen.dir == 1:
-            megamen.speed[0] = Run.RUN_SPEED
             megamen.face_dir = "r"
         else:
-            megamen.speed[0] = -Run.RUN_SPEED
             megamen.face_dir = "l"
+        megamen.speed[0] = Run.RUN_SPEED * megamen.dir
 
     @staticmethod
     def do(megamen):
@@ -217,8 +215,8 @@ class Run:
 
 
 class Jump:
-    frame = [(16, 1622, 32, 44),
-             (55, 1622, 36, 49), ]
+    FRAME_INFO = [(16, 1622, 32, 44),
+                  (55, 1622, 36, 49), ]
     nFrame = 2
 
     JUMP_POWER = 15
@@ -241,13 +239,13 @@ class Jump:
 
 
 class JumpKnuckle:
-    frame = [(24, 305, 34, 46,),
-             (66, 311, 40, 39,),
-             (115, 306, 39, 45,),
-             (166, 306, 34, 46,),
-             (210, 308, 35, 47,),
-             (255, 306, 37, 50,),
-             ]
+    FRAME_INFO = [(24, 305, 34, 46,),
+                  (66, 311, 40, 39,),
+                  (115, 306, 39, 45,),
+                  (166, 306, 34, 46,),
+                  (210, 308, 35, 47,),
+                  (255, 306, 37, 50,),
+                  ]
     nFrame = 6
     FRAME_PER_SEC = 8
     SPEED = 15
@@ -272,12 +270,12 @@ class JumpKnuckle:
 
 
 class SmallShot:
-    frame = [(13, 1491, 44, 44),
-             (62, 1491, 46, 44),
-             (113, 1491, 44, 44),
-             (163, 1491, 45, 44),
-             (214, 1491, 46, 44),
-             (265, 1491, 44, 44), ]
+    FRAME_INFO = [(13, 1491, 44, 44),
+                  (62, 1491, 46, 44),
+                  (113, 1491, 44, 44),
+                  (163, 1491, 45, 44),
+                  (214, 1491, 46, 44),
+                  (265, 1491, 44, 44), ]
     nFrame = 6
     FRAME_PER_SEC = 6
 
@@ -295,25 +293,25 @@ class SmallShot:
         isRepeat = False if int(megamen.frame) == 0 else True
         isShot = False if int(megamen.frame) % 2 == 0 else True
         megamen.next_frame()
-        if int(megamen.frame) % 2 == 0 and isShot and int(megamen.frame) != 0:
-            megamen.fire_megabuster(SmallShot.frame[int(megamen.frame)][2],
-                                    SmallShot.frame[int(megamen.frame)][3] * megamen.size // 2)
-        if int(megamen.frame) == 0 and isRepeat:
+        int_frame = int(megamen.frame)
+        if int_frame % 2 == 0 and isShot and int_frame != 0:
+            megamen.fire_megabuster(SmallShot.FRAME_INFO[int_frame][2],
+                                    SmallShot.FRAME_INFO[int_frame][3] * megamen.size // 2 + 5)
+        if int_frame == 0 and isRepeat:
             megamen.state_machine.handle_event(("EOA", 0))
 
 
 class Uppercut:
-    frame = [(20, 1031, 29, 42),
-             (56, 1031, 35, 39),
-             (97, 1031, 24, 56), ]
+    FRAME_INFO = [(20, 1031, 29, 42),
+                  (56, 1031, 35, 39),
+                  (97, 1031, 24, 56), ]
     nFrame = 3
-
     FRAME_PER_SEC = 15
+
     JUMP_POWER = 13
-    damage = 10
-    rigid_coefficient = 1
-    knock_up = JUMP_POWER * 1.4
-    knock_back = 0.1
+
+    ATK_INFO = (10, 1, 18.2, 0.1)
+    ATK_BB_INFO = [(29, 42, 10, 10), (35, 39, 20, 30), (24, 280 / 3, 20, 30)]
 
     @staticmethod
     def exit(megamen):
@@ -323,30 +321,14 @@ class Uppercut:
     def enter(megamen):
         megamen.frame = 0
         megamen.speed[0] = 0
-        megamen.atk_box.damage = Uppercut.damage
-        megamen.atk_box.rigid_coefficient = Uppercut.rigid_coefficient
-        megamen.atk_box.knock_up = Uppercut.knock_up
-        if megamen.face_dir == "l":
-            megamen.atk_box.knock_back = -Uppercut.knock_back
-        else:
-            megamen.atk_box.knock_back = Uppercut.knock_back
+        megamen.set_atk_info(*Uppercut.ATK_INFO)
 
     @staticmethod
     def do(megamen):
         megamen.next_frame()
         int_frame = int(megamen.frame)
         state = Uppercut
-        dx, dy, sx, sy = 2, 2, 0, 0
-        if int_frame == 0:
-            sx, sy = 10, 10
-        elif int_frame == 1:
-            sx, sy = 20, 30
-        elif int_frame == 2:
-            dy, sx, sy = 1.2, 20, 30
-        if megamen.face_dir == "l":
-            dx *= -1
-        megamen.set_atk_box(state.frame[int_frame][2] * megamen.size // dx,
-                            state.frame[int_frame][3] * megamen.size // dy, sx, sy)
+        megamen.set_atk_bb(*state.ATK_BB_INFO[int_frame])
         if int_frame == 1:
             megamen.speed[1] = state.JUMP_POWER
         if int_frame >= 1 and megamen.speed[1] < 2:
@@ -354,12 +336,12 @@ class Uppercut:
 
 
 class CogwheelShot:
-    frame = [(27, 556, 31, 45,),
-             (68, 556, 31, 45,),
-             (111, 556, 42, 44,),
-             (158, 556, 40, 41,),
-             (205, 556, 34, 44,),
-             (252, 556, 31, 45,), ]
+    FRAME_INFO = [(27, 556, 31, 45,),
+                  (68, 556, 31, 45,),
+                  (111, 556, 42, 44,),
+                  (158, 556, 40, 41,),
+                  (205, 556, 34, 44,),
+                  (252, 556, 31, 45,), ]
 
     nFrame = 6
     FRAME_PER_SEC = 9
@@ -379,15 +361,16 @@ class CogwheelShot:
         isRepeat = False if int(megamen.frame) == 0 else True
         isShot = True if int(megamen.frame) == 3 else False
         megamen.next_frame()
-        if int(megamen.frame) == 3 and not isShot:
-            megamen.fire_cogwheel(CogwheelShot.frame[int(megamen.frame)][2],
-                                  CogwheelShot.frame[int(megamen.frame)][3] * megamen.size // 2)
-        if int(megamen.frame) == 0 and isRepeat:
+        int_frame = int(megamen.frame)
+        if int_frame == 3 and not isShot:
+            megamen.fire_cogwheel(CogwheelShot.FRAME_INFO[int_frame][2],
+                                  CogwheelShot.FRAME_INFO[int_frame][3] * megamen.size // 2 - 5)
+        if int_frame == 0 and isRepeat:
             megamen.state_machine.handle_event(("EOA", 0))
 
 
 class ChargingShot:
-    frame = [(355, 1491, 47, 42)]
+    FRAME_INFO = [(355, 1491, 47, 42)]
 
     nFrame = 1
     FRAME_PER_SEC = 6
@@ -402,15 +385,15 @@ class ChargingShot:
         ChargingShot.start_time = game_framework.time.time()
         if megamen.face_dir == 'r':
             ChargingShot.projectile = megamen_projectile.MegaChargingShot(
-                megamen.x + ChargingShot.frame[0][2] * megamen.size // 2 + megamen_projectile.MegaChargingShot.frame[0][
-                    2] * 0.5,
-                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2 + 5,
+                megamen.x + ChargingShot.FRAME_INFO[0][2] * megamen.size // 2 +
+                megamen_projectile.MegaChargingShot.FRAME_INFO[0][2] * 0.5,
+                megamen.y + megamen.size * ChargingShot.FRAME_INFO[0][3] // 2 + 5,
                 1)
         else:
             ChargingShot.projectile = megamen_projectile.MegaChargingShot(
-                megamen.x - ChargingShot.frame[0][2] * megamen.size // 2 - megamen_projectile.MegaChargingShot.frame[0][
-                    2] * 0.5,
-                megamen.y + megamen.size * ChargingShot.frame[0][3] // 2 + 5,
+                megamen.x - ChargingShot.FRAME_INFO[0][2] * megamen.size // 2 -
+                megamen_projectile.MegaChargingShot.FRAME_INFO[0][2] * 0.5,
+                megamen.y + megamen.size * ChargingShot.FRAME_INFO[0][3] // 2 + 5,
                 -1)
 
     @staticmethod
@@ -426,36 +409,36 @@ class ChargingShot:
         game_world.erase_obj(ChargingShot.projectile)
         charged_time = game_framework.time.time() - ChargingShot.start_time
         if charged_time > 0.5:
-            megamen.fire_charging_shot(ChargingShot.frame[0][2] * megamen.size // 2,
-                                       ChargingShot.frame[0][3] * megamen.size // 2, charged_time)
+            megamen.fire_charging_shot(ChargingShot.FRAME_INFO[0][2] * megamen.size // 2,
+                                       ChargingShot.FRAME_INFO[0][3] * megamen.size // 2, charged_time)
 
 
 class FireSword:
-    frame = [(23, 472, 37, 46),
-             (67, 472, 35, 44),
-             (123, 462, 57, 55),
-             (185, 464, 56, 55),
-             (248, 470, 54, 45),
-             (309, 472, 54, 46),
-             (364, 474, 35, 47,),
-             (409, 472, 37, 50,), ]
+    FRAME_INFO = [(23, 472, 37, 46),
+                  (67, 472, 35, 44),
+                  (123, 462, 57, 55),
+                  (185, 464, 56, 55),
+                  (248, 470, 54, 45),
+                  (309, 472, 54, 46),
+                  (364, 474, 35, 47),
+                  (409, 472, 37, 50,), ]
     nFrame = 8
     FRAME_PER_SEC = 16
-    damage = 10
-    rigid_coefficient = 1
-    knock_up = 10
-    knock_back = 2
+
+    ATK_INFO = (10, 1, 10, 2)
+    ATK_BB_INFO = [(37, 46, 20, 46),
+                   (35, 44, 20, 44),
+                   (57, 55, 20, 55),
+                   (56, 55, 20, 55),
+                   (54, 45, 20, 45),
+                   (54, 46, 20, 46),
+                   (35, 47, 20, 47),
+                   (37, 50, 20, 50)]
 
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
-        megamen.atk_box.damage = FireSword.damage
-        megamen.atk_box.rigid_coefficient = FireSword.rigid_coefficient
-        megamen.atk_box.knock_up = FireSword.knock_up
-        if megamen.face_dir == "l":
-            megamen.atk_box.knock_back = -FireSword.knock_back
-        else:
-            megamen.atk_box.knock_back = FireSword.knock_back
+        megamen.set_atk_info(*FireSword.ATK_INFO)
         megamen.control_method.ultimate_gage -= 1
 
     @staticmethod
@@ -464,16 +447,11 @@ class FireSword:
         megamen.next_frame()
         int_frame = int(megamen.frame)
         state = FireSword
-        dx = 2
-        if megamen.face_dir == "l":
-            dx *= -1
-        megamen.set_atk_box(state.frame[int_frame][2] * megamen.size // dx,
-                            state.frame[int_frame][3] * megamen.size // 2, 20,
-                            state.frame[int_frame][3] * megamen.size // 2)
-        if int_frame == state.nFrame - 1:
+        megamen.set_atk_bb(*state.ATK_BB_INFO[int_frame])
+        if int_frame == state.nFrame - 2:
             megamen.atk_box.reset()
-        if ((not megamen.isFall and int(megamen.frame) == state.nFrame - 1)
-                or (isRepeat and int(megamen.frame) == 0)):
+        if ((not megamen.isFall and int_frame == state.nFrame - 1)
+                or (isRepeat and int_frame == 0)):
             megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
@@ -482,17 +460,17 @@ class FireSword:
 
 
 class RushTornado:
-    frame = [(22, 140, 34, 50),
-             (60, 140, 37, 50),
-             (102, 140, 26, 50),
-             (134, 140, 31, 50),
-             (174, 140, 34, 50),
-             (216, 140, 26, 50),
-             (253, 140, 31, 47),
-             (292, 143, 40, 40),
-             (336, 143, 38, 40),
-             (380, 145, 38, 39),
-             (424, 145, 34, 44), ]
+    FRAME_INFO = [(22, 140, 34, 50),
+                  (60, 140, 37, 50),
+                  (102, 140, 26, 50),
+                  (134, 140, 31, 50),
+                  (174, 140, 34, 50),
+                  (216, 140, 26, 50),
+                  (253, 140, 31, 47),
+                  (292, 143, 40, 40),
+                  (336, 143, 38, 40),
+                  (380, 145, 38, 39),
+                  (424, 145, 34, 44), ]
     nFrame = 11
     FRAME_PER_SEC = 22
     RUSH_SPEED = 5
@@ -504,7 +482,7 @@ class RushTornado:
             megamen.speed[0] = RushTornado.RUSH_SPEED
         else:
             megamen.speed[0] = -RushTornado.RUSH_SPEED
-        megamen.fire_tornado(0, RushTornado.frame[0][3])
+        megamen.fire_tornado(0, RushTornado.FRAME_INFO[0][3])
         megamen.control_method.ultimate_gage -= 3
 
     @staticmethod
@@ -520,9 +498,9 @@ class RushTornado:
 
 
 class JumpShot:
-    frame = [(52, 1369, 38, 49),
-             (95, 1369, 39, 50),
-             (139, 1369, 38, 46), ]
+    FRAME_INFO = [(52, 1369, 38, 49),
+                  (95, 1369, 39, 50),
+                  (139, 1369, 38, 46), ]
     nFrame = 3
     FRAME_PER_SEC = 9
 
@@ -534,9 +512,10 @@ class JumpShot:
     def do(megamen):
         isShot = False if int(megamen.frame) == 1 else True
         megamen.next_frame()
-        if int(megamen.frame) == 1 and isShot:
-            megamen.fire_megabuster(JumpShot.frame[int(megamen.frame)][2],
-                                    JumpShot.frame[int(megamen.frame)][3] * megamen.size // 2)
+        int_frame = int(megamen.frame)
+        if int_frame == 1 and isShot:
+            megamen.fire_megabuster(JumpShot.FRAME_INFO[int_frame][2],
+                                    JumpShot.FRAME_INFO[int_frame][3] * megamen.size // 2)
         if not megamen.isFall:
             megamen.state_machine.handle_event(("LAND", 0))
 
@@ -546,12 +525,12 @@ class JumpShot:
 
 
 class UpTornado:
-    frame = [(25, 387, 36, 50,),
-             (68, 387, 36, 50,),
-             (110, 387, 33, 50,),
-             (151, 387, 31, 51,),
-             (188, 387, 34, 50,),
-             (230, 387, 37, 50,), ]
+    FRAME_INFO = [(25, 387, 36, 50,),
+                  (68, 387, 36, 50,),
+                  (110, 387, 33, 50,),
+                  (151, 387, 31, 51,),
+                  (188, 387, 34, 50,),
+                  (230, 387, 37, 50,), ]
     nFrame = 6
     FRAME_PER_SEC = 12
     JUMP_POWER = 12
@@ -570,7 +549,6 @@ class UpTornado:
         megamen.next_frame()
         if int(megamen.frame) == UpTornado.nFrame - 1:
             game_world.erase_obj(UpTornado.PROJECTILE)
-        if not megamen.isFall:
             megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
@@ -619,7 +597,7 @@ class StateMachine:
                       RushTornado: {end_of_animation: AnimationEnd},
                       FireSword: {end_of_animation: Land},
                       JumpShot: {land: Land, megamen.control_method.atk1_down: JumpShot},
-                      UpTornado: {end_of_animation: Land},
+                      UpTornado: {end_of_animation: Fall},
                       JumpKnuckle: {land: Land},
                       CogwheelShot: {end_of_animation: AnimationEnd},
                       Fall: {land: Land, megamen.control_method.atk1_down: JumpShot,
@@ -628,23 +606,23 @@ class StateMachine:
                       Hit: {time_out: AnimationEnd}}
 
     def draw(self):
-        frame = int(self.megamen.frame)
+        int_frame = int(self.megamen.frame)
         if self.megamen.face_dir == "r":
             self.megamen.img.clip_draw(
-                *self.state.frame[frame],
+                *self.state.FRAME_INFO[int_frame],
                 self.megamen.x,
-                self.megamen.y + self.megamen.size * self.state.frame[frame][3] // 2,
-                self.state.frame[frame][2] * self.megamen.size,
-                self.state.frame[frame][3] * self.megamen.size
+                self.megamen.y + self.state.FRAME_INFO[int_frame][3] * self.megamen.size // 2,
+                self.state.FRAME_INFO[int_frame][2] * self.megamen.size,
+                self.state.FRAME_INFO[int_frame][3] * self.megamen.size
             )
         elif self.megamen.face_dir == "l":
             self.megamen.img.clip_composite_draw(
-                *self.state.frame[frame],
+                *self.state.FRAME_INFO[int_frame],
                 0, 'h',
                 self.megamen.x,
-                self.megamen.y + self.megamen.size * self.state.frame[frame][3] // 2,
-                self.state.frame[frame][2] * self.megamen.size,
-                self.state.frame[frame][3] * self.megamen.size
+                self.megamen.y + self.state.FRAME_INFO[int_frame][3] * self.megamen.size // 2,
+                self.state.FRAME_INFO[int_frame][2] * self.megamen.size,
+                self.state.FRAME_INFO[int_frame][3] * self.megamen.size
             )
 
     def update(self):
@@ -683,14 +661,25 @@ class MegaMen:
             MegaMen.img = load_image('megamen.png')
 
     def set_atk_box(self, dx, dy, sx, sy):
-        atkX, atkY = self.x + dx, self.y + dy
-        self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+        if self.face_dir == "l":
+            atkX, atkY = self.x - dx, self.y + dy
+            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+        else:
+            atkX, atkY = self.x + dx, self.y + dy
+            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+
+    def set_atk_info(self, DAMAGE, RIGID, KNOCK_UP=0, KNOCK_BACK=0):
+        if self.face_dir == "l":
+            KNOCK_BACK *= -1
+        self.atk_box.set_info(DAMAGE, RIGID, KNOCK_UP, KNOCK_BACK)
 
     def fire_megabuster(self, fire_x, fire_y):
         if self.face_dir == "r":
-            self.control_method.add_atk_collision(megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1))
+            self.control_method.add_atk_collision(
+                megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1))
         else:
-            self.control_method.add_atk_collision(megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1))
+            self.control_method.add_atk_collision(
+                megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1))
 
     def fire_cogwheel(self, fire_x, fire_y):
         if self.face_dir == "r":
@@ -723,12 +712,12 @@ class MegaMen:
 
     def draw(self):
         self.state_machine.draw()
-        frame = int(self.frame)
+        int_frame = int(self.frame)
         state = self.state_machine.state
         draw_rectangle(*self.get_bb())
         if self.atk_box.get_bb():
             draw_rectangle(*self.atk_box.get_bb())
-        self.font.draw(self.x, self.y + state.frame[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        self.font.draw(self.x, self.y + state.FRAME_INFO[int_frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
         self.font.draw(self.x, 300, f"{round(self.control_method.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
@@ -762,10 +751,10 @@ class MegaMen:
             self.frame = min(self.frame, state.nFrame - 1)
 
     def get_bb(self):
-        frame = int(self.frame)
+        int_frame = int(self.frame)
         state = self.state_machine.state
-        return self.x - state.frame[frame][2] * self.size // 2, self.y, self.x + state.frame[frame][
-            2] * self.size // 2, self.y + state.frame[frame][3] * self.size
+        return self.x - state.FRAME_INFO[int_frame][2] * self.size // 2, self.y, self.x + state.FRAME_INFO[int_frame][
+            2] * self.size // 2, self.y + state.FRAME_INFO[int_frame][3] * self.size
 
     def handle_collision(self, group, other):
         if group == "character:ground" and self.isFall:
@@ -778,8 +767,6 @@ class MegaMen:
         self.rigid_time += rigid * self.hp / 125 * self.resist_coefficient
         self.speed[1] += knock_up
         self.speed[0] = knock_back
-        print(self.rigid_time)
-        print(self.isFall)
         if self.speed[1] != 0:
             self.isFall = True
         self.hp -= damage
@@ -789,22 +776,20 @@ class MegaMen:
 class AtkBox:
     def __init__(self):
         self.bb = None
-        self.damage = 0
-        self.rigid_coefficient = 0
-        self.knock_up = 0
-        self.knock_back = 0
+        self.info = (0, 0, 0, 0)
 
     def get_bb(self):
         return self.bb
 
+    def set_info(self, D, R, U, B):
+        self.info = (D, R, U, B)
+
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            if self.damage > 0:
-                other.hit(self.damage, self.rigid_coefficient, self.knock_up, self.knock_back)
+            if self.info[0] > 0:
+                other.hit(*self.info)
                 self.reset()
 
     def reset(self):
         self.bb = None
-        self.damage = 0
-        self.rigid_coefficient = 0
-        self.knock_up = 0
+        self.info = (0, 0, 0, self.info[3])
