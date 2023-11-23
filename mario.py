@@ -80,6 +80,10 @@ class Hit:
     start_time = 0
 
     @staticmethod
+    def exit(mario):
+        mario.rigid_time = 0
+
+    @staticmethod
     def enter(mario):
         mario.frame = 0
         Hit.start_time = time.time()

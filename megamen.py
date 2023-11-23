@@ -75,7 +75,7 @@ class Hit:
 
     @staticmethod
     def exit(megamen):
-        pass
+        megamen.rigid_time = 0
 
 
 class Land:
