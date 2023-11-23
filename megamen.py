@@ -576,7 +576,7 @@ class StateMachine:
                             megamen.control_method.up_ultimate_down: RushTornado
                             },
                       AnimationEnd: {check_run: Run, check_idle: Idle},
-                      Land: {end_of_animation: AnimationEnd},
+                      Land: {end_of_animation: AnimationEnd, hit: Hit},
                       Jump: {fall: Fall, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
                              megamen.control_method.ultimate_down: FireSword},
@@ -764,13 +764,13 @@ class MegaMen:
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 200, 3)
         self.rigid_time += rigid * self.resist_coefficient
         state = self.state_machine.state
-        if state == Idle or state == Run or state == Jump or state == Fall or state == Hit:
-            self.speed[1] += knock_up
-            self.speed[0] = knock_back
         if self.speed[1] != 0:
             self.isFall = True
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
+        if self.state_machine.state == Hit:
+            self.speed[1] += knock_up
+            self.speed[0] = knock_back
 
 
 class AtkBox:
