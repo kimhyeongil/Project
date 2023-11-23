@@ -63,8 +63,11 @@ class Fall:
     FRAME_PER_SEC = 1
 
     @staticmethod
+    def exit(mario):
+        pass
+
+    @staticmethod
     def enter(mario):
-        mario.atk_box.reset()
         mario.frame = 0
 
     @staticmethod
@@ -105,9 +108,12 @@ class Land:
     FRAME_PER_SEC = 15
 
     @staticmethod
+    def exit(mario):
+        pass
+
+    @staticmethod
     def enter(mario):
         mario.frame = 0
-        mario.atk_box.reset()
         mario.speed[0] = 0
 
     @staticmethod
@@ -134,8 +140,11 @@ class Idle:
     FRAME_PER_SEC = 10
 
     @staticmethod
+    def exit(mario):
+        pass
+
+    @staticmethod
     def enter(mario):
-        mario.atk_box.reset()
         mario.speed = [0, 0]
         mario.state_machine.handle_event(("CHECK_RUN", mario.dir))
 
@@ -162,6 +171,10 @@ class TurnKick:
                    3: (26, 30, 15, 10),
                    4: (27, 30, 12, 10)}
     ATK_INFO = (5, 0.1, 6, 4)
+
+    @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
 
     @staticmethod
     def enter(mario):
@@ -198,6 +211,10 @@ class Run:
     FRAME_PER_SEC = 8
 
     @staticmethod
+    def exit(mario):
+        pass
+
+    @staticmethod
     def enter(mario):
         mario.speed[0] = Run.RUN_SPEED * mario.dir
         if mario.dir == 1:
@@ -218,11 +235,14 @@ class Jump:
     FRAME_PER_SEC = 10
 
     @staticmethod
+    def exit(mario):
+        pass
+
+    @staticmethod
     def enter(mario):
         mario.frame = 0
         mario.isFall = True
         mario.speed[1] = Jump.JUMP_POWER
-        mario.atk_box.reset()
 
     @staticmethod
     def do(mario):
@@ -245,6 +265,10 @@ class JumpKick:
     SPEED = 1
     ATK_BB_INFO = (21, 15, 20, 20)
     ATK_INFO = (5, 0.3, 0)
+
+    @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
 
     @staticmethod
     def enter(mario):
@@ -299,6 +323,10 @@ class JumpSuperPunch:
     ATK_INFO = (15, 0.1, -40)
 
     @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
+
+    @staticmethod
     def enter(mario):
         mario.frame = 0
         if mario.face_dir == "r":
@@ -349,6 +377,10 @@ class JumpSpinKick:
                    (19, 18, 25, 17),
                    (19, 32, 25, 17)]
     ATK_INFO = (2, 0.05, 0, -1)
+
+    @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
 
     @staticmethod
     def enter(mario):
@@ -411,6 +443,10 @@ class OneJabTwoPunchThreeKick:
                 12: (7, 0.1, 10)}
 
     @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
+
+    @staticmethod
     def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
@@ -451,6 +487,10 @@ class Uppercut:
     ATK_INFO = (10, 0.1, 15, 0)
 
     @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
+
+    @staticmethod
     def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
@@ -488,6 +528,10 @@ class SomersaultKick:
                    (-15, 6, 20, 12)]
     ATK_INFO = [(10, 0.1, 15, 0),
                 (10, 0.1, -35, 0)]
+
+    @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
 
     @staticmethod
     def enter(mario):
@@ -531,6 +575,10 @@ class MagicCape:
     ATK_INFO = (10, 0.1, 0, 0)
 
     @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
+
+    @staticmethod
     def enter(mario):
         mario.frame = 0
         mario.control_method.ultimate_gage -= 3
@@ -565,6 +613,10 @@ class PalmStrike:
     FRAME_PER_SEC = 12
     ATK_BB_INFO = (34, 35, 15, 20)
     ATK_INFO = (20, 0.1, 10, 10)
+
+    @staticmethod
+    def exit(mario):
+        mario.atk_box.reset()
 
     @staticmethod
     def enter(mario):
@@ -661,6 +713,7 @@ class StateMachine:
     def handle_event(self, e):
         for check, next_state in self.table[self.state].items():
             if check(e):
+                self.state.exit(self.mario)
                 self.state = next_state
                 self.state.enter(self.mario)
 
