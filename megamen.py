@@ -115,6 +115,7 @@ class Idle:
     @staticmethod
     def enter(megamen):
         megamen.speed = [0, 0]
+        megamen.frame = 0
         megamen.state_machine.handle_event(("CHECK_RUN", megamen.dir))
 
     @staticmethod
@@ -190,6 +191,7 @@ class Run:
 
     @staticmethod
     def enter(megamen):
+        megamen.frame = 0
         if megamen.dir == 1:
             megamen.face_dir = "r"
         else:
@@ -313,14 +315,15 @@ class Uppercut:
 
     @staticmethod
     def do(megamen):
+        old_frame = int(megamen.frame)
         megamen.next_frame()
         int_frame = int(megamen.frame)
         state = Uppercut
         megamen.set_atk_bb(*state.ATK_BB_INFO[int_frame])
-        if int_frame == 1:
-            megamen.speed[1] = state.JUMP_POWER
-        if int_frame >= 1 and megamen.speed[1] < 2:
+        if megamen.speed[1] < 1 and megamen.isFall:
             megamen.state_machine.handle_event(("EOA", 0))
+        if int_frame == 1 and int_frame != old_frame:
+            megamen.speed[1] = state.JUMP_POWER
 
 
 class CogwheelShot:
@@ -604,8 +607,8 @@ class StateMachine:
             )
 
     def update(self):
-        self.megamen.move()
         self.state.do(self.megamen)
+        self.megamen.move()
 
     def handle_event(self, e):
         for check, next_state in self.table[self.state].items():
@@ -700,13 +703,20 @@ class MegaMen:
 
     def update(self):
         self.state_machine.update()
+        if not game_world.collide(play_sever.ground, self):
+            self.isFall = True
+        else:
+            self.y = play_sever.ground.y
+            if self.speed[1] > -30:
+                self.speed[1] = 0
+                self.isFall = False
+            else:
+                self.speed[1] = -(self.speed[1] + 30)
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time / 100, 3)
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
-        if self.speed[1] > 0:
-            self.isFall = True
         if self.isFall:
             self.speed[1] -= game_world.g * game_framework.frame_time
 
@@ -735,20 +745,11 @@ class MegaMen:
             2] * self.size // 2, self.y + state.FRAME_INFO[int_frame][3] * self.size
 
     def handle_collision(self, group, other):
-        if group == "character:ground":
-            self.y = other.y + 1
-            if self.speed[1] > -30:
-                self.speed[1] = 0
-                self.isFall = False
-            else:
-                self.speed[1] = -(self.speed[1] + 30)
+        pass
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 200, 3)
         self.rigid_time += rigid * self.resist_coefficient
-        state = self.state_machine.state
-        if self.speed[1] != 0:
-            self.isFall = True
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:

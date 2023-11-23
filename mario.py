@@ -4,6 +4,7 @@ from pico2d import *
 
 import game_framework
 import game_world
+import play_sever
 import player1_control
 import player2_control
 
@@ -241,7 +242,6 @@ class Jump:
     @staticmethod
     def enter(mario):
         mario.frame = 0
-        mario.isFall = True
         mario.speed[1] = Jump.JUMP_POWER
 
     @staticmethod
@@ -463,7 +463,6 @@ class OneJabTwoPunchThreeKick:
             if int_frame == 6:
                 mario.set_atk_info(*state.ATK_INFO[int_frame])
             if int_frame == 12:
-                mario.isFall = True
                 mario.speed[1] = OneJabTwoPunchThreeKick.JUMP_POWER
                 mario.set_atk_info(*state.ATK_INFO[int_frame])
         if state.ATK_BB_INFO.get(int_frame):
@@ -498,15 +497,15 @@ class Uppercut:
 
     @staticmethod
     def do(mario):
+        old_frame = int(mario.frame)
         mario.next_frame()
         state = Uppercut
         int_frame = int(mario.frame)
         mario.set_atk_bb(*state.ATK_BB_INFO[int_frame])
         if mario.speed[1] < 1 and mario.isFall:
             mario.state_machine.handle_event(("EOA", 0))
-        if int_frame == 1 and not mario.isFall:
-            mario.isFall = True
-            mario.speed[1] = Uppercut.JUMP_POWER
+        if int_frame == 1 and int_frame != old_frame:
+            mario.speed[1] = state.JUMP_POWER
 
 
 class SomersaultKick:
@@ -554,7 +553,6 @@ class SomersaultKick:
         if int_frame == 8:
             mario.state_machine.handle_event(("EOA", 0))
         elif int_frame == 1 and not mario.isFall:
-            mario.isFall = True
             mario.speed[1] = state.JUMP_POWER
 
 
@@ -766,6 +764,15 @@ class Mario:
 
     def update(self):
         self.state_machine.update()
+        if not game_world.collide(play_sever.ground, self):
+            self.isFall = True
+        else:
+            self.y = play_sever.ground.y
+            if self.speed[1] > -30:
+                self.speed[1] = 0
+                self.isFall = False
+            else:
+                self.speed[1] = -(self.speed[1] + 30)
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time / 100, 3)
 
     def move(self):
@@ -799,26 +806,16 @@ class Mario:
             2] * self.size // 2, self.y + state.FRAME_INFO[frame][3] * self.size
 
     def handle_collision(self, group, other):
-        if group == "character:ground":
-            self.y = other.y + 1
-            if self.speed[1] > -30:
-                print(self.speed[1])
-                self.speed[1] = 0
-                self.isFall = False
-            else:
-                self.speed[1] = -(self.speed[1] + 30)
+        pass
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 200, 3)
         self.rigid_time += rigid * self.resist_coefficient
-        if self.speed[1] != 0:
-            self.isFall = True
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
             self.speed[1] += knock_up
             self.speed[0] = knock_back
-
 
 class AtkBox:
     def __init__(self):
