@@ -14,11 +14,7 @@ def end_of_animation(e):
 
 
 def check_run(e):
-    return e[0] == "CHECK_STATE" and e[1] != 0
-
-
-def check_idle(e):
-    return e[0] == "CHECK_STATE" and e[1] == 0
+    return e[0] == "CHECK_RUN" and e[1] != 0
 
 
 def land(e):
@@ -109,18 +105,6 @@ class Land:
             megamen.state_machine.handle_event(("EOA", 0))
 
 
-class AnimationEnd:
-    @staticmethod
-    def exit(megamen):
-        pass
-
-    @staticmethod
-    def enter(megamen):
-        megamen.frame = 0
-        megamen.atk_box.reset()
-        megamen.state_machine.handle_event(("CHECK_STATE", megamen.dir, megamen.up))
-
-
 class Idle:
     FRAME_INFO = [(16, 1774, 31, 45),
                   (52, 1774, 31, 45),
@@ -131,7 +115,7 @@ class Idle:
     @staticmethod
     def enter(megamen):
         megamen.speed = [0, 0]
-        megamen.dir = 0
+        megamen.state_machine.handle_event(("CHECK_RUN", megamen.dir))
 
     @staticmethod
     def do(megamen):
@@ -558,7 +542,7 @@ class StateMachine:
         self.megamen = megamen
         self.table = {Idle: {megamen.control_method.move_r_down: Run, megamen.control_method.move_l_down: Run,
                              megamen.control_method.move_r_up: Run, megamen.control_method.move_l_up: Run,
-                             megamen.control_method.jump_down: Jump, hit: Hit,
+                             megamen.control_method.jump_down: Jump, hit: Hit, check_run: Run,
                              megamen.control_method.atk1_down: SmallShot,
                              megamen.control_method.atk2_down: ChargingShot,
                              megamen.control_method.up_atk1_down: Uppercut,
@@ -575,30 +559,29 @@ class StateMachine:
                             megamen.control_method.ultimate_down: CogwheelShot,
                             megamen.control_method.up_ultimate_down: RushTornado
                             },
-                      AnimationEnd: {check_run: Run, check_idle: Idle},
-                      Land: {end_of_animation: AnimationEnd, hit: Hit},
+                      Land: {end_of_animation: Idle, hit: Hit},
                       Jump: {fall: Fall, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
                              megamen.control_method.ultimate_down: FireSword},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
-                                end_of_animation: AnimationEnd},
+                                end_of_animation: Idle},
                       SmallShot: {megamen.control_method.move_r_down: RunShot,
                                   megamen.control_method.move_l_down: RunShot,
                                   megamen.control_method.move_r_up: RunShot, megamen.control_method.move_l_up: RunShot,
-                                  end_of_animation: AnimationEnd},
-                      ChargingShot: {megamen.control_method.atk2_up: AnimationEnd},
+                                  end_of_animation: Idle},
+                      ChargingShot: {megamen.control_method.atk2_up: Idle},
                       Uppercut: {end_of_animation: Fall},
-                      RushTornado: {end_of_animation: AnimationEnd},
+                      RushTornado: {end_of_animation: Idle},
                       FireSword: {end_of_animation: Land},
                       JumpShot: {end_of_animation: Fall},
                       UpTornado: {end_of_animation: Fall},
                       JumpKnuckle: {land: Land},
-                      CogwheelShot: {end_of_animation: AnimationEnd},
+                      CogwheelShot: {end_of_animation: Idle},
                       Fall: {land: Land, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
                              megamen.control_method.ultimate_down: FireSword},
-                      Hit: {time_out: AnimationEnd}}
+                      Hit: {time_out: Idle}}
 
     def draw(self):
         int_frame = int(self.megamen.frame)

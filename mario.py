@@ -37,11 +37,7 @@ def end_of_animation(e):
 
 
 def check_run(e):
-    return e[0] == "CHECK_STATE" and e[1] != 0
-
-
-def check_idle(e):
-    return e[0] == "CHECK_STATE" and e[1] == 0
+    return e[0] == "CHECK_RUN" and e[1] != 0
 
 
 def land(e):
@@ -119,15 +115,6 @@ class Land:
             mario.state_machine.handle_event(("EOA", 0))
 
 
-class AnimationEnd:
-    @staticmethod
-    def enter(mario):
-        mario.frame = 0
-        mario.rigid_time = 0
-        mario.atk_box.reset()
-        mario.state_machine.handle_event(("CHECK_STATE", mario.dir))
-
-
 class Idle:
     FRAME_INFO = [(18, 2466, 23, 36),
                   (45, 2466, 23, 37),
@@ -144,9 +131,9 @@ class Idle:
 
     @staticmethod
     def enter(mario):
-        mario.speed = [0, 0]
-        mario.dir = 0
         mario.atk_box.reset()
+        mario.speed = [0, 0]
+        mario.state_machine.handle_event(("CHECK_RUN", mario.dir))
 
     @staticmethod
     def do(mario):
@@ -208,7 +195,6 @@ class Run:
 
     @staticmethod
     def enter(mario):
-        mario.atk_box.reset()
         mario.speed[0] = Run.RUN_SPEED * mario.dir
         if mario.dir == 1:
             mario.face_dir = "r"
@@ -604,7 +590,7 @@ class StateMachine:
         self.mario = mario
         self.table = {Idle: {mario.control_method.move_r_down: Run, mario.control_method.move_l_down: Run,
                              mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run,
-                             mario.control_method.jump_down: Jump, hit: Hit,
+                             mario.control_method.jump_down: Jump, hit: Hit, check_run: Run,
                              mario.control_method.atk1_down: OneJabTwoPunchThreeKick,
                              mario.control_method.atk2_down: TurnKick,
                              mario.control_method.up_atk1_down: Uppercut,
@@ -622,21 +608,20 @@ class StateMachine:
                             mario.control_method.ultimate_down: PalmStrike,
                             mario.control_method.up_ultimate_down: MagicCape
                             },
-                      AnimationEnd: {check_run: Run, check_idle: Idle},
-                      Land: {end_of_animation: AnimationEnd, hit: Hit},
+                      Land: {end_of_animation: Idle, hit: Hit},
                       Jump: {fall: Fall, mario.control_method.atk1_down: JumpKick,
                              mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
                              mario.control_method.ultimate_down: JumpSuperPunch},
-                      OneJabTwoPunchThreeKick: {end_of_animation: AnimationEnd},
-                      TurnKick: {end_of_animation: AnimationEnd},
+                      OneJabTwoPunchThreeKick: {end_of_animation: Idle},
+                      TurnKick: {end_of_animation: Idle},
                       SomersaultKick: {end_of_animation: Fall},
                       Uppercut: {end_of_animation: Fall},
-                      MagicCape: {end_of_animation: AnimationEnd},
-                      PalmStrike: {end_of_animation: AnimationEnd},
+                      MagicCape: {end_of_animation: Idle},
+                      PalmStrike: {end_of_animation: Idle},
                       JumpKick: {land: Land},
                       JumpSpinKick: {land: Land},
                       JumpSuperPunch: {land: Land},
-                      Hit: {time_out: AnimationEnd},
+                      Hit: {time_out: Idle},
                       Fall: {land: Land, mario.control_method.atk1_down: JumpKick,
                              mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
                              mario.control_method.ultimate_down: JumpSuperPunch}
@@ -670,14 +655,6 @@ class StateMachine:
         self.mario.move()
 
     def handle_event(self, e):
-        if self.mario.control_method.up_down(e):
-            self.mario.up = True
-        elif self.mario.control_method.up_up(e):
-            self.mario.up = False
-        elif self.mario.control_method.move_r_down(e) or self.mario.control_method.move_l_up(e):
-            self.mario.dir += 1
-        elif self.mario.control_method.move_l_down(e) or self.mario.control_method.move_r_up(e):
-            self.mario.dir -= 1
         for check, next_state in self.table[self.state].items():
             if check(e):
                 self.state = next_state
@@ -741,7 +718,16 @@ class Mario:
             self.speed[1] -= game_world.g * game_framework.frame_time
 
     def handle_event(self, e):
-        self.state_machine.handle_event(("INPUT", e, self.up))
+        input_e = ("INPUT", e, self.up)
+        if self.control_method.up_down(input_e):
+            self.up = True
+        elif self.control_method.up_up(input_e):
+            self.up = False
+        elif self.control_method.move_r_down(input_e) or self.control_method.move_l_up(input_e):
+            self.dir += 1
+        elif self.control_method.move_l_down(input_e) or self.control_method.move_r_up(input_e):
+            self.dir -= 1
+        self.state_machine.handle_event(input_e)
 
     def next_frame(self):
         state = self.state_machine.state

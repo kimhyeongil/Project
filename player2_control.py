@@ -5,7 +5,7 @@ import game_world
 x = 600
 start_face = "l"
 
-ultimate_gage = 0
+ultimate_gage = 3
 
 
 def move_r_down(e):
