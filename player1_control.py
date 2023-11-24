@@ -22,8 +22,16 @@ def move_l_up(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_a
 
 
+def defence_down(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_s
+
+
+def defence_up(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_s
+
+
 def jump_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_h
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_h
 
 
 def atk1_down(e):

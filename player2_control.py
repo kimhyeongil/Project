@@ -1,4 +1,5 @@
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_SLASH, SDLK_COMMA, SDLK_PERIOD, SDLK_UP, SDLK_k
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_SLASH, SDLK_COMMA, SDLK_PERIOD, SDLK_UP, SDLK_k, \
+    SDLK_DOWN
 
 import game_world
 
@@ -23,7 +24,7 @@ def move_l_up(e):
 
 
 def jump_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_SLASH
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SLASH
 
 
 def atk1_down(e):
@@ -52,6 +53,14 @@ def up_down(e):
 
 def up_up(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_UP
+
+
+def defence_down(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_DOWN
+
+
+def defence_up(e):
+    return e[0] == "INPUT" and e[1].type == SDL_KEYUP and e[1].key == SDLK_DOWN
 
 
 def ultimate_down(e):

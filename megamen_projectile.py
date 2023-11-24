@@ -103,7 +103,10 @@ class MegaTornado:
     def handle_collision(self, group, other):
         cur_time = time.time()
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.05:
-            other.hit(*self.ATK_INFO, knock_back=self.speed / 1.2)
+            if other.x > self.x:
+                other.hit(*self.ATK_INFO, knock_back=-self.speed / 2)
+            else:
+                other.hit(*self.ATK_INFO, knock_back=self.speed)
             if group == "Player1:Player2":
                 play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
             else:
