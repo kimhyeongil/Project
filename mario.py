@@ -5,8 +5,6 @@ from pico2d import *
 import game_framework
 import game_world
 import play_sever
-import player1_control
-import player2_control
 
 
 # state = JumpSuperPunch
@@ -77,6 +75,28 @@ class Fall:
             mario.state_machine.handle_event(("LAND", 0))
 
 
+class Defense:
+    FRAME_INFO = [(154, 881, 26, 34,),
+                  (186, 881, 28, 34,),
+                  (220, 881, 23, 34,)]
+    nFrame = 3
+    FRAME_PER_SEC = 36
+
+    @staticmethod
+    def exit(mario):
+        pass
+
+    @staticmethod
+    def enter(mario):
+        mario.frame = 0
+        mario.speed[0] = 0
+
+    @staticmethod
+    def do(mario):
+        mario.next_frame()
+        mario.frame = min(mario.frame, 2)
+
+
 class Hit:
     FRAME_INFO = [(15, 973, 26, 34,), ]
     nFrame = 1
@@ -94,8 +114,6 @@ class Hit:
 
     @staticmethod
     def do(mario):
-        if not mario.isFall:
-            mario.speed[0] = mario.speed[0] * (1 - game_framework.frame_time)
         if time.time() - Hit.start_time >= mario.rigid_time and not mario.isFall:
             mario.state_machine.handle_event(("TIMEOUT", 0))
 
@@ -226,6 +244,7 @@ class Run:
     @staticmethod
     def do(mario):
         mario.next_frame()
+        mario.speed[0] = Run.RUN_SPEED * mario.dir
 
 
 class Jump:
@@ -646,7 +665,7 @@ class StateMachine:
                              mario.control_method.move_r_up: Run, mario.control_method.move_l_up: Run,
                              mario.control_method.jump_down: Jump, hit: Hit, check_run: Run,
                              mario.control_method.atk1_down: OneJabTwoPunchThreeKick,
-                             mario.control_method.atk2_down: TurnKick,
+                             mario.control_method.atk2_down: TurnKick, mario.control_method.defence_down: Defense,
                              mario.control_method.up_atk1_down: Uppercut,
                              mario.control_method.up_atk2_down: SomersaultKick,
                              mario.control_method.ultimate_down: PalmStrike,
@@ -654,7 +673,7 @@ class StateMachine:
                              },
                       Run: {mario.control_method.move_r_up: Idle, mario.control_method.move_l_up: Idle,
                             mario.control_method.move_r_down: Idle, mario.control_method.move_l_down: Idle,
-                            mario.control_method.jump_down: Jump, hit: Hit,
+                            mario.control_method.jump_down: Jump, hit: Hit, mario.control_method.defence_down: Defense,
                             mario.control_method.atk1_down: OneJabTwoPunchThreeKick,
                             mario.control_method.atk2_down: TurnKick,
                             mario.control_method.up_atk1_down: Uppercut,
@@ -662,6 +681,7 @@ class StateMachine:
                             mario.control_method.ultimate_down: PalmStrike,
                             mario.control_method.up_ultimate_down: MagicCape
                             },
+                      Defense: {mario.control_method.defence_up: Idle},
                       Land: {end_of_animation: Idle, hit: Hit},
                       Jump: {fall: Fall, mario.control_method.atk1_down: JumpKick,
                              mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
@@ -721,6 +741,7 @@ class Mario:
     resist_coefficient = 0.25
     size = 2
     hp = 100
+    weight = 75
 
     def __init__(self, control_method):
         self.isFall = True
@@ -781,6 +802,15 @@ class Mario:
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.isFall:
             self.speed[1] -= game_world.g * game_framework.frame_time
+        else:
+            if self.speed[0] > 0.001:
+                self.speed[0] -= 0.5 * self.weight * 10 * game_framework.frame_time
+                if self.speed[0] <= 0.001:
+                    self.speed[0] = 0
+            elif self.speed[0] < -0.001:
+                self.speed[0] += 0.5 * self.weight * 10 * game_framework.frame_time
+                if -0.001 <= self.speed[0]:
+                    self.speed[0] = 0
 
     def handle_event(self, e):
         input_e = ("INPUT", e, self.up, self.ultimate_gage)
@@ -811,10 +841,14 @@ class Mario:
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
-        self.rigid_time += rigid * self.resist_coefficient
+        if self.state_machine.state == Defense:
+            damage /= 2
+            self.speed[1] += knock_up // 2
+            self.speed[0] = knock_back // 2
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
+            self.rigid_time += rigid * self.resist_coefficient
             self.speed[1] += knock_up
             self.speed[0] = knock_back
 

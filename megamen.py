@@ -33,6 +33,28 @@ def hit(e):
     return e[0] == "HIT"
 
 
+class Defense:
+    FRAME_INFO = [(26, 635, 31, 45,),
+                  (64, 635, 31, 43,),
+                  (101, 635, 31, 43,)]
+    nFrame = 3
+    FRAME_PER_SEC = 36
+
+    @staticmethod
+    def exit(megamen):
+        pass
+
+    @staticmethod
+    def enter(megamen):
+        megamen.frame = 0
+        megamen.speed[0] = 0
+
+    @staticmethod
+    def do(megamen):
+        megamen.next_frame()
+        megamen.frame = min(megamen.frame, 2)
+
+
 class Fall:
     FRAME_INFO = [(98, 1622, 37, 50)]
     nFrame = 1
@@ -158,6 +180,7 @@ class RunShot:
 
     @staticmethod
     def do(megamen):
+        megamen.speed[0] = Run.RUN_SPEED * megamen.dir
         old_frame = int(megamen.frame)
         megamen.next_frame()
         int_frame = int(megamen.frame)
@@ -196,11 +219,11 @@ class Run:
             megamen.face_dir = "r"
         else:
             megamen.face_dir = "l"
-        megamen.speed[0] = Run.RUN_SPEED * megamen.dir
 
     @staticmethod
     def do(megamen):
         megamen.next_frame()
+        megamen.speed[0] = Run.RUN_SPEED * megamen.dir
 
 
 class Jump:
@@ -546,7 +569,7 @@ class StateMachine:
         self.table = {Idle: {megamen.control_method.move_r_down: Run, megamen.control_method.move_l_down: Run,
                              megamen.control_method.move_r_up: Run, megamen.control_method.move_l_up: Run,
                              megamen.control_method.jump_down: Jump, hit: Hit, check_run: Run,
-                             megamen.control_method.atk1_down: SmallShot,
+                             megamen.control_method.atk1_down: SmallShot, megamen.control_method.defence_down: Defense,
                              megamen.control_method.atk2_down: ChargingShot,
                              megamen.control_method.up_atk1_down: Uppercut,
                              megamen.control_method.up_atk2_down: UpTornado,
@@ -555,13 +578,14 @@ class StateMachine:
                       Run: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                             megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
                             megamen.control_method.jump_down: Jump, hit: Hit,
-                            megamen.control_method.atk1_down: RunShot,
+                            megamen.control_method.atk1_down: RunShot, megamen.control_method.defence_down: Defense,
                             megamen.control_method.atk2_down: ChargingShot,
                             megamen.control_method.up_atk1_down: Uppercut,
                             megamen.control_method.up_atk2_down: UpTornado,
                             megamen.control_method.ultimate_down: CogwheelShot,
                             megamen.control_method.up_ultimate_down: RushTornado
                             },
+                      Defense: {megamen.control_method.defence_up: Idle},
                       Land: {end_of_animation: Idle, hit: Hit},
                       Jump: {fall: Fall, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
@@ -623,6 +647,8 @@ class MegaMen:
     hp = 125
     resist_coefficient = 0.5
     size = 2
+    weight = 200
+
     def __init__(self, control_method):
         self.isFall = True
         self.x, self.y = control_method.x, game_world.ground
@@ -634,7 +660,7 @@ class MegaMen:
         self.control_method = control_method
         self.state_machine = StateMachine(self)
         self.rigid_time = 0
-        self.ultimate_gage = 0
+        self.ultimate_gage = 3
         self.font = load_font('ENCR10B.TTF', 40)
         control_method.add_atk_collision(self.atk_box)
         self.up = False
@@ -719,6 +745,15 @@ class MegaMen:
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.isFall:
             self.speed[1] -= game_world.g * game_framework.frame_time
+        else:
+            if self.speed[0] > 0.001:
+                self.speed[0] -= 0.5 * self.weight * 10 * game_framework.frame_time
+                if self.speed[0] <= 0.001:
+                    self.speed[0] = 0
+            elif self.speed[0] < -0.001:
+                self.speed[0] += 0.5 * self.weight * 10 * game_framework.frame_time
+                if -0.001 <= self.speed[0]:
+                    self.speed[0] = 0
 
     def handle_event(self, e):
         input_e = ("INPUT", e, self.up, self.ultimate_gage)
@@ -749,10 +784,14 @@ class MegaMen:
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
         self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
-        self.rigid_time += rigid * self.resist_coefficient
+        if self.state_machine.state == Defense:
+            damage /= 2
+            self.speed[1] += knock_up // 2
+            self.speed[0] = knock_back // 2
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
+            self.rigid_time += rigid * self.resist_coefficient
             self.speed[1] += knock_up
             self.speed[0] = knock_back
 
