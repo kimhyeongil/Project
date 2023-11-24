@@ -4,9 +4,9 @@ from pico2d import *
 
 import game_framework
 import game_world
+import play_sever
 import player1_control
 import player2_control
-from ground import Ground
 
 projectile = None
 
@@ -16,7 +16,7 @@ class MegaBuster:
                   (559, 1439, 10, 7,), ]
     FRAME_PER_SEC = 5
     nFrame = 2
-    ATK_INFO = (1, 0.5, 0, 0.1)
+    ATK_INFO = (1, 0.5, 0, 1)
 
     def __init__(self, x, y, dir):
         self.img = projectile
@@ -57,9 +57,9 @@ class MegaBuster:
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
             else:
-                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)
 
 
@@ -69,7 +69,7 @@ class MegaTornado:
                   (697, 143, 66, 59,), ]
     nFrame = 3
     FRAME_PER_SEC = 18
-    ATK_INFO = (1, 0.15)
+    ATK_INFO = (1.2, 0.2)
 
     def __init__(self, x, y, speed):
         self.img = projectile
@@ -103,11 +103,11 @@ class MegaTornado:
     def handle_collision(self, group, other):
         cur_time = time.time()
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.05:
-            other.hit(*self.ATK_INFO)
+            other.hit(*self.ATK_INFO, knock_back=self.speed / 1.2)
             if group == "Player1:Player2":
-                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
             else:
-                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
             self.cooltime = cur_time
 
 
@@ -187,9 +187,9 @@ class MegaChargingShot:
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
             else:
-                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)
 
 
@@ -240,9 +240,9 @@ class MegaHurricane:
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.1:
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
             else:
-                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
             self.cooltime = cur_time
 
 
@@ -283,9 +283,9 @@ class MegaKnuckle:
         elif other.control_method.isHit(group):
             other.hit(*self.ATK_INFO, self.speed - 30)
             if group == "Player1:Player2":
-                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
             else:
-                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)
 
 
@@ -336,7 +336,7 @@ class MegaCogwheel:
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                player1_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
             else:
-                player2_control.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
             game_world.erase_obj(self)

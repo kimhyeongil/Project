@@ -345,7 +345,7 @@ class CogwheelShot:
     def enter(megamen):
         megamen.frame = 0
         megamen.speed[0] = 0
-        megamen.control_method.ultimate_gage -= 1
+        megamen.ultimate_gage -= 1
 
     @staticmethod
     def do(megamen):
@@ -419,7 +419,7 @@ class FireSword:
     def enter(megamen):
         megamen.frame = 0
         megamen.set_atk_info(*FireSword.ATK_INFO)
-        megamen.control_method.ultimate_gage -= 1
+        megamen.ultimate_gage -= 1
 
     @staticmethod
     def do(megamen):
@@ -463,7 +463,7 @@ class RushTornado:
         else:
             megamen.speed[0] = -RushTornado.RUSH_SPEED
         megamen.fire_tornado(0, RushTornado.FRAME_INFO[0][3])
-        megamen.control_method.ultimate_gage -= 3
+        megamen.ultimate_gage -= 3
 
     @staticmethod
     def do(megamen):
@@ -620,21 +620,21 @@ class StateMachine:
 
 class MegaMen:
     img = None
-
+    hp = 125
+    resist_coefficient = 0.5
+    size = 2
     def __init__(self, control_method):
         self.isFall = True
         self.x, self.y = control_method.x, game_world.ground
         self.frame = 0
-        self.size = 2
         self.dir = 0
-        self.hp = 125
         self.speed = [0, 0]
         self.atk_box = AtkBox()
         self.face_dir = control_method.start_face
         self.control_method = control_method
         self.state_machine = StateMachine(self)
-        self.resist_coefficient = 0.5
         self.rigid_time = 0
+        self.ultimate_gage = 0
         self.font = load_font('ENCR10B.TTF', 40)
         control_method.add_atk_collision(self.atk_box)
         self.up = False
@@ -699,7 +699,7 @@ class MegaMen:
         if self.atk_box.get_bb():
             draw_rectangle(*self.atk_box.get_bb())
         self.font.draw(self.x, self.y + state.FRAME_INFO[int_frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
-        self.font.draw(self.x, 300, f"{round(self.control_method.ultimate_gage, 2)}", (0, 0, 0))
+        self.font.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
@@ -712,7 +712,7 @@ class MegaMen:
                 self.isFall = False
             else:
                 self.speed[1] = -(self.speed[1] + 30)
-        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + game_framework.frame_time / 100, 3)
+        self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 100, 3)
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
@@ -721,7 +721,7 @@ class MegaMen:
             self.speed[1] -= game_world.g * game_framework.frame_time
 
     def handle_event(self, e):
-        input_e = ("INPUT", e, self.up)
+        input_e = ("INPUT", e, self.up, self.ultimate_gage)
         if self.control_method.up_down(input_e):
             self.up = True
         elif self.control_method.up_up(input_e):
@@ -748,7 +748,7 @@ class MegaMen:
         pass
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
-        self.control_method.ultimate_gage = min(self.control_method.ultimate_gage + damage / 200, 3)
+        self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
         self.rigid_time += rigid * self.resist_coefficient
         self.hp -= damage
         self.state_machine.handle_event(("HIT", 0))
@@ -773,9 +773,9 @@ class AtkBox:
             if self.info[0] > 0:
                 other.hit(*self.info)
                 if group == "Player1:Player2":
-                    player1_control.ultimate_gage += self.info[0] / 100
+                    play_sever.player1.ultimate_gage += self.info[0] / 100
                 else:
-                    player2_control.ultimate_gage += self.info[0] / 100
+                    play_sever.player2.ultimate_gage += self.info[0] / 100
                 self.reset()
 
     def reset(self):

@@ -5,8 +5,6 @@ import game_world
 x = 600
 start_face = "l"
 
-ultimate_gage = 3
-
 
 def move_r_down(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_RIGHT
@@ -57,11 +55,11 @@ def up_up(e):
 
 
 def ultimate_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k and not e[2] and ultimate_gage >= 1
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k and not e[2] and e[3] >= 1
 
 
 def up_ultimate_down(e):
-    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k and e[2] and ultimate_gage >= 3
+    return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_k and e[2] and e[3] >= 3
 
 
 def add_atk_collision(o):
