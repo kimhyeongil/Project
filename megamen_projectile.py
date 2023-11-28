@@ -5,8 +5,6 @@ from pico2d import *
 import game_framework
 import game_world
 import play_sever
-import player1_control
-import player2_control
 
 projectile = None
 
@@ -16,13 +14,15 @@ class MegaBuster:
                   (559, 1439, 10, 7,), ]
     FRAME_PER_SEC = 5
     nFrame = 2
-    ATK_INFO = (1, 0.5, 0, 1)
+    ATK_INFO = (1, 0.6, 0, 1)
 
     def __init__(self, x, y, dir):
         self.img = projectile
         self.x, self.y = x, y
         self.speed = 10 * dir
         self.dir = dir
+        self.ATK_INFO = list(MegaBuster.ATK_INFO)
+        self.ATK_INFO[3] *= dir
         self.frame = 0
         self.size = 2
         game_world.add_obj(self, 1)
@@ -57,9 +57,9 @@ class MegaBuster:
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)
 
 
@@ -69,7 +69,7 @@ class MegaTornado:
                   (697, 143, 66, 59,), ]
     nFrame = 3
     FRAME_PER_SEC = 18
-    ATK_INFO = (1.2, 0.2)
+    ATK_INFO = (1, 0.1)
 
     def __init__(self, x, y, speed):
         self.img = projectile
@@ -77,7 +77,7 @@ class MegaTornado:
         self.speed = speed
         self.frame = 0
         self.size = 1.7
-        self.cooltime = 0
+        self.cooltime = 0.01
         game_world.add_obj(self, 0)
 
     def draw(self):
@@ -101,17 +101,16 @@ class MegaTornado:
                 self.y + self.FRAME_INFO[int_frame][3] * self.size // 2)
 
     def handle_collision(self, group, other):
-        cur_time = time.time()
-        if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.05:
-            if other.x > self.x:
-                other.hit(*self.ATK_INFO, knock_back=-self.speed / 2)
-            else:
-                other.hit(*self.ATK_INFO, knock_back=self.speed)
+        self.cooltime -= game_framework.frame_time
+        if other.control_method.isHit(group) and self.cooltime <= 0:
+            other.hit(*self.ATK_INFO,
+                      knock_back=-(int(other.x) - int(self.x)) / (abs(int(other.x) - int(self.x)) + 1) * abs(
+                          self.speed))
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
-            self.cooltime = cur_time
+                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+            self.cooltime = 0.01
 
 
 class MegaChargingShot:
@@ -125,6 +124,17 @@ class MegaChargingShot:
         self.img = projectile
         self.frame = 0
         self.size = 1
+        self.megamen = None
+        self.x, self.y = x, y
+        self.frame = MegaChargingShot.nFrame - 1
+        self.speed = 10 * dir
+        self.dir = dir
+        self.size = max(charged_time, 1)
+        damage = int(7.5 * charged_time)
+        rigid = 0.5 * charged_time
+        back = 6 * max(charged_time - 0.5, 0) * dir
+        up = 7 * max(charged_time - 0.7, 0)
+        self.ATK_INFO = (damage, rigid, up, back)
         if megamen:
             if megamen.face_dir == "r":
                 self.dir = 1
@@ -134,19 +144,6 @@ class MegaChargingShot:
                                       2] * megamen.size // 2 + 10) * self.dir
             self.y = megamen.y + megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][3] * megamen.size // 2 + 5
             self.megamen = megamen
-        else:
-            self.megamen = None
-            self.x, self.y = x, y
-            if charged_time != 0:
-                self.frame = MegaChargingShot.nFrame - 1
-                self.speed = 10 * dir
-            self.dir = dir
-            self.size = max(charged_time, 1)
-            damage = int(7.5 * charged_time)
-            rigid = 0.5 * charged_time
-            back = 3 * max(charged_time - 0.5, 0)
-            up = 7 * max(charged_time - 0.7, 0)
-            self.ATK_INFO = (damage, rigid, back, up)
         game_world.add_obj(self, 1)
 
     def draw(self):
@@ -181,18 +178,24 @@ class MegaChargingShot:
 
     def get_bb(self):
         frame = int(self.frame)
-        return (self.x,
-                self.y - self.FRAME_INFO[frame][3] * self.size // 2,
-                self.x + self.FRAME_INFO[frame][2] * self.size // 2,
-                self.y + self.FRAME_INFO[frame][3] * self.size // 2)
+        if self.speed > 0:
+            return (self.x,
+                    self.y - self.FRAME_INFO[frame][3] * self.size // 2,
+                    self.x + self.FRAME_INFO[frame][2] * self.size // 2,
+                    self.y + self.FRAME_INFO[frame][3] * self.size // 2)
+        else:
+            return (self.x - self.FRAME_INFO[frame][2] * self.size // 2,
+                    self.y - self.FRAME_INFO[frame][3] * self.size // 2,
+                    self.x,
+                    self.y + self.FRAME_INFO[frame][3] * self.size // 2)
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)
 
 
@@ -202,7 +205,7 @@ class MegaHurricane:
                   (379, 393, 35, 37,), ]
     FRAME_PER_SEC = 6
     nFrame = 3
-    ATK_INFO = (1, 0.1, 3, 0)
+    ATK_INFO = (1, 0.1, 3)
 
     def __init__(self, megamen):
         self.img = projectile
@@ -243,9 +246,9 @@ class MegaHurricane:
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.1:
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             self.cooltime = cur_time
 
 
@@ -284,11 +287,11 @@ class MegaKnuckle:
         if group == "knuckle:ground":
             game_world.erase_obj(self)
         elif other.control_method.isHit(group):
-            other.hit(*self.ATK_INFO, self.speed - 30)
+            other.hit(*self.ATK_INFO, knock_up=self.speed - 20)
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)
 
 
@@ -297,12 +300,14 @@ class MegaCogwheel:
                   (332, 571, 20, 20,), ]
     FRAME_PER_SEC = 12
     nFrame = 2
-    ATK_INFO = (15, 2, 0, 4)
+    ATK_INFO = (25, 2, 0, 8)
 
     def __init__(self, x, y, dir):
         self.img = projectile
         self.x, self.y = x, y
         self.speed = 10 * dir
+        self.ATK_INFO = list(MegaCogwheel.ATK_INFO)
+        self.ATK_INFO[3] *= dir
         self.dir = dir
         self.frame = 0
         self.size = 2
@@ -339,7 +344,7 @@ class MegaCogwheel:
         if other.control_method.isHit(group):
             other.hit(*self.ATK_INFO)
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage += self.ATK_INFO[0] / 100
+                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)

@@ -14,8 +14,8 @@ from ground import Ground
 
 def init():
     megamen_projectile.projectile = load_image('megamen.png')
-    play_sever.player1 = MegaMen(player1_control)
-    play_sever.player2 = Mario(player2_control)
+    play_sever.player1 = Mario(player1_control)
+    play_sever.player2 = MegaMen(player2_control)
     play_sever.ground = Ground(300)
     game_world.add_obj(play_sever.player1, 1)
     game_world.add_obj(play_sever.player2, 1)

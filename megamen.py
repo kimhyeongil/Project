@@ -3,10 +3,8 @@ import time
 from pico2d import load_image, draw_rectangle, load_font
 import game_framework
 import game_world
-import megamen_projectile
+from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaCogwheel
 import play_sever
-import player1_control
-import player2_control
 
 
 def end_of_animation(e):
@@ -41,7 +39,7 @@ class Defense:
     FRAME_PER_SEC = 36
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -62,7 +60,7 @@ class Fall:
     FRAME_PER_SEC = 1
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -96,7 +94,7 @@ class Hit:
             megamen.state_machine.handle_event(("TIMEOUT", 0))
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         megamen.rigid_time = 0
 
 
@@ -110,7 +108,7 @@ class Land:
     FRAME_PER_SEC = 18
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -145,7 +143,7 @@ class Idle:
         megamen.next_frame()
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
 
@@ -166,7 +164,7 @@ class RunShot:
     RUN_SPEED = 2.5
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -209,7 +207,7 @@ class Run:
     FRAME_PER_SEC = 12
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -235,7 +233,7 @@ class Jump:
     FRAME_PER_SEC = 8
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -263,7 +261,7 @@ class JumpKnuckle:
     SPEED = 15
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -293,7 +291,7 @@ class SmallShot:
     FRAME_PER_SEC = 6
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -327,7 +325,7 @@ class Uppercut:
     ATK_BB_INFO = [(29, 42, 10, 10), (35, 39, 20, 30), (24, 280 / 3, 20, 30)]
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         megamen.atk_box.reset()
 
     @staticmethod
@@ -361,7 +359,7 @@ class CogwheelShot:
     FRAME_PER_SEC = 9
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
     @staticmethod
@@ -388,32 +386,30 @@ class ChargingShot:
 
     nFrame = 1
     FRAME_PER_SEC = 6
-    start_time = 0
-
-    projectile = None
 
     @staticmethod
     def enter(megamen):
         megamen.frame = 0
         megamen.speed[0] = 0
-        ChargingShot.start_time = game_framework.time.time()
-        ChargingShot.projectile = megamen_projectile.MegaChargingShot(megamen=megamen)
+        megamen.start_time = game_framework.time.time()
+        megamen.charged_time = 0
+        megamen.charged_effect = MegaChargingShot(megamen=megamen)
+        megamen.charged_effect.frame = 0
 
     @staticmethod
     def do(megamen):
-        charged_time = game_framework.time.time() - ChargingShot.start_time
-        if charged_time >= 0.5:
-            ChargingShot.projectile.frame = 1
-        if charged_time >= 2:
-            ChargingShot.projectile.frame = 2
+        megamen.charged_time += game_framework.frame_time
+        if megamen.charged_time >= 0.5:
+            megamen.charged_effect.frame = 1
+        if megamen.charged_time >= 2:
+            megamen.charged_effect.frame = 2
 
     @staticmethod
-    def exit(megamen):
-        game_world.erase_obj(ChargingShot.projectile)
-        charged_time = game_framework.time.time() - ChargingShot.start_time
-        if charged_time > 0.5:
+    def exit(megamen, e):
+        game_world.erase_obj(megamen.charged_effect)
+        if not hit(e) and megamen.charged_time >= 0.5:
             megamen.fire_charging_shot(ChargingShot.FRAME_INFO[0][2] * megamen.size // 2,
-                                       ChargingShot.FRAME_INFO[0][3] * megamen.size // 2, charged_time)
+                                       ChargingShot.FRAME_INFO[0][3] * megamen.size // 2)
 
 
 class FireSword:
@@ -458,7 +454,7 @@ class FireSword:
             megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         megamen.atk_box.reset()
 
 
@@ -490,6 +486,10 @@ class RushTornado:
 
     @staticmethod
     def do(megamen):
+        if megamen.face_dir == "r":
+            megamen.speed[0] = RushTornado.RUSH_SPEED
+        else:
+            megamen.speed[0] = -RushTornado.RUSH_SPEED
         old_frame = int(megamen.frame)
         megamen.next_frame()
         int_frame = int(megamen.frame)
@@ -497,7 +497,7 @@ class RushTornado:
             megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
-    def exit(self):
+    def exit(megamen, e):
         pass
 
 
@@ -525,7 +525,7 @@ class JumpShot:
                 megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         pass
 
 
@@ -557,9 +557,8 @@ class UpTornado:
             megamen.state_machine.handle_event(("EOA", 0))
 
     @staticmethod
-    def exit(megamen):
+    def exit(megamen, e):
         game_world.erase_obj(UpTornado.PROJECTILE)
-        pass
 
 
 class StateMachine:
@@ -585,30 +584,33 @@ class StateMachine:
                             megamen.control_method.ultimate_down: CogwheelShot,
                             megamen.control_method.up_ultimate_down: RushTornado
                             },
-                      Defense: {megamen.control_method.defence_up: Idle},
                       Land: {end_of_animation: Idle, hit: Hit},
                       Jump: {fall: Fall, megamen.control_method.atk1_down: JumpShot,
                              megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
+                             megamen.control_method.up_atk1_down: JumpShot,
+                             megamen.control_method.up_atk2_down: JumpKnuckle,
+                             megamen.control_method.ultimate_down: FireSword},
+                      Fall: {land: Land, megamen.control_method.atk1_down: JumpShot,
+                             megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
+                             megamen.control_method.up_atk1_down: JumpShot,
                              megamen.control_method.ultimate_down: FireSword},
                       RunShot: {megamen.control_method.move_r_down: Idle, megamen.control_method.move_l_down: Idle,
                                 megamen.control_method.move_r_up: Idle, megamen.control_method.move_l_up: Idle,
-                                end_of_animation: Idle},
+                                end_of_animation: Idle, hit: Hit},
                       SmallShot: {megamen.control_method.move_r_down: RunShot,
                                   megamen.control_method.move_l_down: RunShot,
                                   megamen.control_method.move_r_up: RunShot, megamen.control_method.move_l_up: RunShot,
-                                  end_of_animation: Idle},
-                      ChargingShot: {megamen.control_method.atk2_up: Idle},
+                                  end_of_animation: Idle, hit: Hit},
+                      ChargingShot: {megamen.control_method.atk2_up: Idle, hit: Hit},
                       Uppercut: {end_of_animation: Fall},
                       RushTornado: {end_of_animation: Idle},
                       FireSword: {end_of_animation: Land},
-                      JumpShot: {end_of_animation: Fall},
+                      JumpShot: {end_of_animation: Fall, hit: Hit},
                       UpTornado: {end_of_animation: Fall},
                       JumpKnuckle: {land: Land},
                       CogwheelShot: {end_of_animation: Idle},
-                      Fall: {land: Land, megamen.control_method.atk1_down: JumpShot,
-                             megamen.control_method.atk2_down: JumpKnuckle, hit: Hit,
-                             megamen.control_method.ultimate_down: FireSword},
-                      Hit: {time_out: Idle}}
+                      Hit: {time_out: Idle},
+                      Defense: {megamen.control_method.defence_up: Idle}, }
 
     def draw(self):
         int_frame = int(self.megamen.frame)
@@ -637,17 +639,17 @@ class StateMachine:
     def handle_event(self, e):
         for check, next_state in self.table[self.state].items():
             if check(e):
-                self.state.exit(self.megamen)
+                self.state.exit(self.megamen, e)
                 self.state = next_state
                 self.state.enter(self.megamen)
 
 
 class MegaMen:
     img = None
-    hp = 125
-    resist_coefficient = 0.5
+    maxHp = 125 * 1.5
+    resist_coefficient = 0.375
     size = 2
-    weight = 200
+    weight = 100
 
     def __init__(self, control_method):
         self.isFall = True
@@ -655,11 +657,16 @@ class MegaMen:
         self.frame = 0
         self.dir = 0
         self.speed = [0, 0]
-        self.atk_box = AtkBox()
+        self.charged_time = 0
+        self.charged_effect = None
+        self.atk_box = AtkBox(self)
+        self.debuff = None
+        self.debuff_time = 0
         self.face_dir = control_method.start_face
         self.control_method = control_method
         self.state_machine = StateMachine(self)
         self.rigid_time = 0
+        self.hp = MegaMen.maxHp
         self.ultimate_gage = 3
         self.font = load_font('ENCR10B.TTF', 40)
         control_method.add_atk_collision(self.atk_box)
@@ -668,12 +675,7 @@ class MegaMen:
             MegaMen.img = load_image('megamen.png')
 
     def set_atk_bb(self, dx, dy, sx, sy):
-        if self.face_dir == "l":
-            atkX, atkY = self.x - dx, self.y + dy
-            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
-        else:
-            atkX, atkY = self.x + dx, self.y + dy
-            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+        self.atk_box.box_info = (dx, dy, sx, sy)
 
     def set_atk_info(self, DAMAGE, RIGID, KNOCK_UP=0, KNOCK_BACK=0):
         if self.face_dir == "l":
@@ -682,40 +684,33 @@ class MegaMen:
 
     def fire_megabuster(self, fire_x, fire_y):
         if self.face_dir == "r":
-            self.control_method.add_atk_collision(
-                megamen_projectile.MegaBuster(self.x + fire_x, self.y + fire_y, 1))
+            self.control_method.add_atk_collision(MegaBuster(self.x + fire_x, self.y + fire_y, 1))
         else:
-            self.control_method.add_atk_collision(
-                megamen_projectile.MegaBuster(self.x - fire_x, self.y + fire_y, -1))
+            self.control_method.add_atk_collision(MegaBuster(self.x - fire_x, self.y + fire_y, -1))
 
     def fire_cogwheel(self, fire_x, fire_y):
         if self.face_dir == "r":
-            self.control_method.add_atk_collision(megamen_projectile.MegaCogwheel(self.x + fire_x, self.y + fire_y, 1))
+            self.control_method.add_atk_collision(MegaCogwheel(self.x + fire_x, self.y + fire_y, 1))
         else:
-            self.control_method.add_atk_collision(megamen_projectile.MegaCogwheel(self.x - fire_x, self.y + fire_y, -1))
+            self.control_method.add_atk_collision(MegaCogwheel(self.x - fire_x, self.y + fire_y, -1))
 
-    def fire_charging_shot(self, fire_x, fire_y, charged_time):
+    def fire_charging_shot(self, fire_x, fire_y):
+        self.charged_time = min(self.charged_time, 2)
         if self.face_dir == 'r':
             self.control_method.add_atk_collision(
-                megamen_projectile.MegaChargingShot(
-                    self.x + fire_x,
-                    self.y + fire_y, 1, charged_time))
+                MegaChargingShot(self.x + fire_x, self.y + fire_y, 1, self.charged_time))
         else:
             self.control_method.add_atk_collision(
-                megamen_projectile.MegaChargingShot(
-                    self.x - fire_x,
-                    self.y + fire_y, -1, charged_time))
+                MegaChargingShot(self.x - fire_x, self.y + fire_y, -1, self.charged_time))
 
     def fire_knuckle(self):
-        self.control_method.add_atk_collision(megamen_projectile.MegaKnuckle(self.x, self.y, self.size))
+        self.control_method.add_atk_collision(MegaKnuckle(self.x, self.y, self.size))
 
     def fire_tornado(self, fire_x, fire_y):
         if self.face_dir == "r":
-            self.control_method.add_atk_collision(
-                megamen_projectile.MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]))
+            self.control_method.add_atk_collision(MegaTornado(self.x + fire_x, self.y + fire_y, self.speed[0]))
         else:
-            self.control_method.add_atk_collision(
-                megamen_projectile.MegaTornado(self.x - fire_x, self.y + fire_y, self.speed[0]))
+            self.control_method.add_atk_collision(MegaTornado(self.x - fire_x, self.y + fire_y, self.speed[0]))
 
     def draw(self):
         self.state_machine.draw()
@@ -729,6 +724,15 @@ class MegaMen:
 
     def update(self):
         self.state_machine.update()
+        self.debuff_time -= game_framework.frame_time
+        if self.debuff_time < 0:
+            if self.debuff == "confusion":
+                self.dir *= -1
+                if self.dir == 1:
+                    self.face_dir = "r"
+                elif self.dir == -1:
+                    self.face_dir = "l"
+            self.debuff = None
         if not game_world.collide(play_sever.ground, self):
             self.isFall = True
         else:
@@ -747,11 +751,11 @@ class MegaMen:
             self.speed[1] -= game_world.g * game_framework.frame_time
         else:
             if self.speed[0] > 0.001:
-                self.speed[0] -= 0.5 * self.weight * 10 * game_framework.frame_time
+                self.speed[0] -= 0.5 * 10 * game_framework.frame_time
                 if self.speed[0] <= 0.001:
                     self.speed[0] = 0
             elif self.speed[0] < -0.001:
-                self.speed[0] += 0.5 * self.weight * 10 * game_framework.frame_time
+                self.speed[0] += 0.5 * 10 * game_framework.frame_time
                 if -0.001 <= self.speed[0]:
                     self.speed[0] = 0
 
@@ -762,9 +766,15 @@ class MegaMen:
         elif self.control_method.up_up(input_e):
             self.up = False
         elif self.control_method.move_r_down(input_e) or self.control_method.move_l_up(input_e):
-            self.dir += 1
+            if self.debuff == "confusion":
+                self.dir -= 1
+            else:
+                self.dir += 1
         elif self.control_method.move_l_down(input_e) or self.control_method.move_r_up(input_e):
-            self.dir -= 1
+            if self.debuff == "confusion":
+                self.dir += 1
+            else:
+                self.dir -= 1
         self.state_machine.handle_event(input_e)
 
     def next_frame(self):
@@ -786,23 +796,30 @@ class MegaMen:
         self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
         if self.state_machine.state == Defense:
             damage /= 2
-            self.speed[1] += knock_up // 2
-            self.speed[0] = knock_back // 2
-        self.hp -= damage
+            self.speed[1] += 6 * (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) * (damage + 2) / self.weight * knock_up * 2
+            self.speed[0] = knock_back / 2
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
-            self.rigid_time += rigid * self.resist_coefficient
-            self.speed[1] += knock_up
+            self.rigid_time += rigid * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
+            self.speed[1] += 6 * (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) * (damage + 2) / self.weight * knock_up * 2
             self.speed[0] = knock_back
+        self.hp -= damage
 
 
 class AtkBox:
-    def __init__(self):
-        self.bb = None
+    def __init__(self, megamen):
+        self.box_info = None
         self.info = (0, 0, 0, 0)
+        self.effect = None
+        self.megamen = megamen
 
     def get_bb(self):
-        return self.bb
+        if self.box_info:
+            if self.megamen.face_dir == "l":
+                atkX, atkY = self.megamen.x - self.box_info[0], self.megamen.y + self.box_info[1]
+            else:
+                atkX, atkY = self.megamen.x + self.box_info[0], self.megamen.y + self.box_info[1]
+            return atkX - self.box_info[2], atkY - self.box_info[3], atkX + self.box_info[2], atkY + self.box_info[3]
 
     def set_info(self, D, R, U, B):
         self.info = (D, R, U, B)
@@ -811,12 +828,9 @@ class AtkBox:
         if other.control_method.isHit(group):
             if self.info[0] > 0:
                 other.hit(*self.info)
-                if group == "Player1:Player2":
-                    play_sever.player1.ultimate_gage += self.info[0] / 100
-                else:
-                    play_sever.player2.ultimate_gage += self.info[0] / 100
+                self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.info[0] / 100, 3)
                 self.reset()
 
     def reset(self):
-        self.bb = None
+        self.box_info = None
         self.info = (0, 0, 0, 0)

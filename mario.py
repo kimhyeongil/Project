@@ -275,14 +275,12 @@ class Jump:
 class JumpKick:
     FRAME_INFO = [(11, 2101, 31, 40,),
                   (48, 2110, 36, 30,),
-                  (48, 2110, 36, 30,),
-                  (90, 2101, 30, 40,),
-                  (126, 2099, 29, 42,), ]
+                  (90, 2101, 30, 40,)]
 
-    nFrame = 5
-    FRAME_PER_SEC = 13
+    nFrame = 3
+    FRAME_PER_SEC = 6
     SPEED = 1
-    ATK_BB_INFO = (21, 15, 20, 20)
+    ATK_BB_INFO = (26, 15, 20, 20)
     ATK_INFO = (5, 0.3, 0)
 
     @staticmethod
@@ -305,10 +303,11 @@ class JumpKick:
         int_frame = int(mario.frame)
         if int_frame == 1:
             if int_frame != old_frame:
+                mario.y += 20
                 mario.set_atk_bb(*state.ATK_BB_INFO)
-                mario.set_atk_info(*state.ATK_INFO, abs(mario.speed[0]))
+                mario.set_atk_info(*state.ATK_INFO, abs(mario.speed[0]) + 5)
         else:
-            mario.atk_box.bb = None
+            mario.atk_box.box_info = None
         if not mario.isFall:
             mario.state_machine.handle_event(("LAND", 0))
 
@@ -366,7 +365,7 @@ class JumpSuperPunch:
                 mario.set_atk_info(*state.ATK_INFO, abs(mario.speed[0] * 1.3))
             mario.set_atk_bb(*state.ATK_BB_INFO[int_frame - 3])
         else:
-            mario.atk_box.bb = None
+            mario.atk_box.box_info = None
         if not int_frame == state.nFrame - 1:
             mario.speed[1] = 0
         if not mario.isFall:
@@ -421,7 +420,7 @@ class JumpSpinKick:
                 mario.set_atk_bb(*state.ATK_BB_INFO[int_frame - 1])
                 mario.set_atk_info(*state.ATK_INFO)
         else:
-            mario.atk_box.bb = None
+            mario.atk_box.box_info = None
         if not mario.isFall:
             mario.state_machine.handle_event(("LAND", 0))
 
@@ -447,8 +446,7 @@ class OneJabTwoPunchThreeKick:
     nFrame = 17
     FRAME_PER_SEC = 17
     JUMP_POWER = 5
-    ATK_BB_INFO = {0: (31, 34, 10, 10),
-                   1: (33, 32, 20, 20),
+    ATK_BB_INFO = {1: (33, 32, 20, 20),
                    2: (29, 22, 20, 20),
                    6: (14, 24, 12, 12),
                    7: (24, 32, 25, 25),
@@ -457,8 +455,8 @@ class OneJabTwoPunchThreeKick:
                    12: (28, 53, 25, 43),
                    13: (20, 48, 25, 38),
                    14: (17, 48, 10, 15)}
-    ATK_INFO = {0: (5, 0.1),
-                6: (3, 0.2),
+    ATK_INFO = {1: (5, 0.3),
+                6: (3, 0.4),
                 12: (7, 0.1, 10)}
 
     @staticmethod
@@ -469,21 +467,19 @@ class OneJabTwoPunchThreeKick:
     def enter(mario):
         mario.frame = 0
         mario.speed[0] = 0
-        mario.set_atk_info(*OneJabTwoPunchThreeKick.ATK_INFO[0])
 
     @staticmethod
     def do(mario):
         old_frame = int(mario.frame)
         mario.next_frame()
-
         state = OneJabTwoPunchThreeKick
         int_frame = int(mario.frame)
         if int_frame != old_frame:
-            if int_frame == 6:
+            if int_frame == 1 or int_frame == 6 or int_frame == 12:
                 mario.set_atk_info(*state.ATK_INFO[int_frame])
             if int_frame == 12:
                 mario.speed[1] = OneJabTwoPunchThreeKick.JUMP_POWER
-                mario.set_atk_info(*state.ATK_INFO[int_frame])
+
         if state.ATK_BB_INFO.get(int_frame):
             mario.set_atk_bb(*state.ATK_BB_INFO[int_frame])
         else:
@@ -565,10 +561,10 @@ class SomersaultKick:
         int_frame = int(mario.frame)
         if 1 <= int_frame <= 5:
             mario.set_atk_bb(*state.ATK_BB_INFO[int_frame - 1])
-            if int_frame == 3 and int_frame != old_frame:
+            if int_frame == 4 and int_frame != old_frame:
                 mario.set_atk_info(*state.ATK_INFO[1])
         else:
-            mario.atk_box.bb = None
+            mario.atk_box.box_info = None
         if int_frame == 8:
             mario.state_machine.handle_event(("EOA", 0))
         elif int_frame == 1 and not mario.isFall:
@@ -612,7 +608,7 @@ class MagicCape:
                 mario.set_atk_bb(*state.ATK_BB_INFO)
                 mario.set_atk_info(*state.ATK_INFO)
         else:
-            mario.atk_box.bb = None
+            mario.atk_box.box_info = None
         if int_frame == 0 and int_frame != old_frame:
             mario.state_machine.handle_event(("EOA", 0))
 
@@ -652,7 +648,7 @@ class PalmStrike:
                 mario.set_atk_info(*state.ATK_INFO)
             mario.set_atk_bb(*state.ATK_BB_INFO)
         else:
-            mario.atk_box.bb = None
+            mario.atk_box.box_info = None
         if int_frame == 0 and int_frame != old_frame:
             mario.state_machine.handle_event(("EOA", 0))
 
@@ -685,9 +681,16 @@ class StateMachine:
                       Land: {end_of_animation: Idle, hit: Hit},
                       Jump: {fall: Fall, mario.control_method.atk1_down: JumpKick,
                              mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
-                             mario.control_method.ultimate_down: JumpSuperPunch},
-                      OneJabTwoPunchThreeKick: {end_of_animation: Idle},
-                      TurnKick: {end_of_animation: Idle},
+                             mario.control_method.ultimate_down: JumpSuperPunch,
+                             mario.control_method.up_atk1_down: JumpKick,
+                             mario.control_method.up_atk2_down: JumpSpinKick},
+                      Fall: {land: Land, mario.control_method.atk1_down: JumpKick,
+                             mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
+                             mario.control_method.ultimate_down: JumpSuperPunch,
+                             mario.control_method.up_atk1_down: JumpKick,
+                             mario.control_method.up_atk2_down: JumpSpinKick},
+                      OneJabTwoPunchThreeKick: {end_of_animation: Idle, hit: Hit},
+                      TurnKick: {end_of_animation: Idle, hit: Hit},
                       SomersaultKick: {end_of_animation: Fall},
                       Uppercut: {end_of_animation: Fall},
                       MagicCape: {end_of_animation: Idle},
@@ -696,9 +699,6 @@ class StateMachine:
                       JumpSpinKick: {land: Land},
                       JumpSuperPunch: {land: Land},
                       Hit: {time_out: Idle},
-                      Fall: {land: Land, mario.control_method.atk1_down: JumpKick,
-                             mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
-                             mario.control_method.ultimate_down: JumpSuperPunch}
                       }
 
     def start(self):
@@ -740,7 +740,7 @@ class Mario:
     img = None
     resist_coefficient = 0.25
     size = 2
-    hp = 100
+    maxHp = 100 * 1.5
     weight = 75
 
     def __init__(self, control_method):
@@ -750,8 +750,11 @@ class Mario:
         self.control_method = control_method
         self.face_dir = control_method.start_face
         self.dir = 0
+        self.hp = Mario.maxHp
+        self.debuff = None
+        self.debuff_time = 0
         self.speed = [0, 0]
-        self.atk_box = AtkBox()
+        self.atk_box = AtkBox(self)
         self.rigid_time = 0
         self.ultimate_gage = 3
         self.font = load_font('ENCR10B.TTF', 40)
@@ -762,12 +765,7 @@ class Mario:
             Mario.img = load_image('mario.png')
 
     def set_atk_bb(self, dx, dy, sx, sy):
-        if self.face_dir == "l":
-            atkX, atkY = self.x - dx, self.y + dy
-            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
-        else:
-            atkX, atkY = self.x + dx, self.y + dy
-            self.atk_box.bb = (atkX - sx, atkY - sy, atkX + sx, atkY + sy)
+        self.atk_box.box_info = (dx, dy, sx, sy)
 
     def set_atk_info(self, DAMAGE, RIGID, KNOCK_UP=0, KNOCK_BACK=0):
         if self.face_dir == "l":
@@ -786,6 +784,15 @@ class Mario:
 
     def update(self):
         self.state_machine.update()
+        self.debuff_time -= game_framework.frame_time
+        if self.debuff_time < 0:
+            if self.debuff == "confusion":
+                self.dir *= -1
+                if self.dir == 1:
+                    self.face_dir = "r"
+                elif self.dir == -1:
+                    self.face_dir = "l"
+            self.debuff = None
         if not game_world.collide(play_sever.ground, self):
             self.isFall = True
         else:
@@ -804,11 +811,11 @@ class Mario:
             self.speed[1] -= game_world.g * game_framework.frame_time
         else:
             if self.speed[0] > 0.001:
-                self.speed[0] -= 0.5 * self.weight * 10 * game_framework.frame_time
+                self.speed[0] -= 0.5 * 10 * game_framework.frame_time
                 if self.speed[0] <= 0.001:
                     self.speed[0] = 0
             elif self.speed[0] < -0.001:
-                self.speed[0] += 0.5 * self.weight * 10 * game_framework.frame_time
+                self.speed[0] += 0.5 * 10 * game_framework.frame_time
                 if -0.001 <= self.speed[0]:
                     self.speed[0] = 0
 
@@ -819,9 +826,15 @@ class Mario:
         elif self.control_method.up_up(input_e):
             self.up = False
         elif self.control_method.move_r_down(input_e) or self.control_method.move_l_up(input_e):
-            self.dir += 1
+            if self.debuff == "confusion":
+                self.dir -= 1
+            else:
+                self.dir += 1
         elif self.control_method.move_l_down(input_e) or self.control_method.move_r_up(input_e):
-            self.dir -= 1
+            if self.debuff == "confusion":
+                self.dir += 1
+            else:
+                self.dir -= 1
         self.state_machine.handle_event(input_e)
 
     def next_frame(self):
@@ -843,24 +856,30 @@ class Mario:
         self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
         if self.state_machine.state == Defense:
             damage /= 2
-            self.speed[1] += knock_up // 2
-            self.speed[0] = knock_back // 2
-        self.hp -= damage
+            self.speed[1] += 6 * (Mario.maxHp / (self.hp + Mario.maxHp)) * (damage + 2) / self.weight * 2 * knock_up
+            self.speed[0] = knock_back / 2
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
-            self.rigid_time += rigid * self.resist_coefficient
-            self.speed[1] += knock_up
+            self.rigid_time += rigid * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
+            self.speed[1] += 6 * (Mario.maxHp / (self.hp + Mario.maxHp)) * (damage + 2) / self.weight * 2 * knock_up
             self.speed[0] = knock_back
+        self.hp -= damage
 
 
 class AtkBox:
-    def __init__(self):
-        self.bb = None
+    def __init__(self, mario):
+        self.box_info = None
         self.info = (0, 0, 0, 0)
         self.effect = None
+        self.mario = mario
 
     def get_bb(self):
-        return self.bb
+        if self.box_info:
+            if self.mario.face_dir == "l":
+                atkX, atkY = self.mario.x - self.box_info[0], self.mario.y + self.box_info[1]
+            else:
+                atkX, atkY = self.mario.x + self.box_info[0], self.mario.y + self.box_info[1]
+            return atkX - self.box_info[2], atkY - self.box_info[3], atkX + self.box_info[2], atkY + self.box_info[3]
 
     def set_info(self, D, R, U, B):
         self.info = (D, R, U, B)
@@ -874,13 +893,13 @@ class AtkBox:
                         other.face_dir = "r"
                     else:
                         other.face_dir = "l"
-                if group == "Player1:Player2":
-                    play_sever.player1.ultimate_gage += self.info[0] / 100
-                else:
-                    play_sever.player2.ultimate_gage += self.info[0] / 100
+                    other.dir *= -1
+                    other.debuff_time = 3
+                    other.debuff = "confusion"
+                self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.info[0] / 100, 3)
                 self.reset()
 
     def reset(self):
-        self.bb = None
+        self.box_info = None
         self.info = (0, 0, 0, 0)
         self.effect = None
