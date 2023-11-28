@@ -55,6 +55,10 @@ def hit(e):
     return e[0] == "HIT"
 
 
+def defense_fail(e):
+    return e[0] == "DEFENSE_FAIL"
+
+
 class Fall:
     FRAME_INFO = [(78, 2401, 29, 42)]
     nFrame = 1
@@ -110,6 +114,7 @@ class Hit:
     @staticmethod
     def enter(mario):
         mario.frame = 0
+        print("hit")
         Hit.start_time = time.time()
 
     @staticmethod
@@ -394,7 +399,7 @@ class JumpSpinKick:
                    (19, 16, 25, 17),
                    (19, 18, 25, 17),
                    (19, 32, 25, 17)]
-    ATK_INFO = (2, 0.05, 0, -1)
+    ATK_INFO = (2, 0.2, 1, -1)
 
     @staticmethod
     def exit(mario):
@@ -455,9 +460,9 @@ class OneJabTwoPunchThreeKick:
                    12: (28, 53, 25, 43),
                    13: (20, 48, 25, 38),
                    14: (17, 48, 10, 15)}
-    ATK_INFO = {1: (5, 0.3),
-                6: (3, 0.4),
-                12: (7, 0.1, 10)}
+    ATK_INFO = {1: (5, 0.3, 0, 1),
+                6: (3, 0.4, 0, 0.5),
+                12: (7, 0.1, 10, 0.3)}
 
     @staticmethod
     def exit(mario):
@@ -677,7 +682,7 @@ class StateMachine:
                             mario.control_method.ultimate_down: PalmStrike,
                             mario.control_method.up_ultimate_down: MagicCape
                             },
-                      Defense: {mario.control_method.defence_up: Idle},
+                      Defense: {mario.control_method.defence_up: Idle, defense_fail: Hit},
                       Land: {end_of_animation: Idle, hit: Hit},
                       Jump: {fall: Fall, mario.control_method.atk1_down: JumpKick,
                              mario.control_method.atk2_down: JumpSpinKick, hit: Hit,
@@ -766,6 +771,10 @@ class Mario:
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
+        if self.face_dir == "r":
+            self.atk_box.x = self.get_bb()[0]
+        else:
+            self.atk_box.x = self.get_bb()[2]
 
     def set_atk_info(self, DAMAGE, RIGID, KNOCK_UP=0, KNOCK_BACK=0):
         if self.face_dir == "l":
@@ -852,12 +861,14 @@ class Mario:
     def handle_collision(self, group, other):
         pass
 
-    def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
+    def hit(self, damage, rigid=0, knock_up=0, knock_back=0, atk_pos=None):
         self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
         if self.state_machine.state == Defense:
-            damage /= 2
-            self.speed[1] += 6 * (Mario.maxHp / (self.hp + Mario.maxHp)) * (damage + 2) / self.weight * 2 * knock_up
-            self.speed[0] = knock_back / 2
+            if (self.face_dir == "r" and atk_pos > self.x) or (self.face_dir == "l" and atk_pos < self.x):
+                damage /= 2
+                self.speed[0] = knock_back / 2
+            else:
+                self.state_machine.handle_event(("DEFENSE_FAIL", 0))
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
             self.rigid_time += rigid * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
@@ -869,9 +880,10 @@ class Mario:
 class AtkBox:
     def __init__(self, mario):
         self.box_info = None
-        self.info = (0, 0, 0, 0)
+        self.ATK_INFO = (0, 0, 0, 0)
         self.effect = None
         self.mario = mario
+        self.x = None
 
     def get_bb(self):
         if self.box_info:
@@ -882,12 +894,12 @@ class AtkBox:
             return atkX - self.box_info[2], atkY - self.box_info[3], atkX + self.box_info[2], atkY + self.box_info[3]
 
     def set_info(self, D, R, U, B):
-        self.info = (D, R, U, B)
+        self.ATK_INFO = (D, R, U, B)
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            if self.info[0] > 0:
-                other.hit(*self.info)
+            if self.ATK_INFO[0] > 0:
+                other.hit(*self.ATK_INFO, atk_pos=self.x)
                 if self.effect == "reflect":
                     if other.face_dir == "l":
                         other.face_dir = "r"
@@ -896,10 +908,10 @@ class AtkBox:
                     other.dir *= -1
                     other.debuff_time = 3
                     other.debuff = "confusion"
-                self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.info[0] / 100, 3)
+                self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.ATK_INFO[0] / 100, 3)
                 self.reset()
 
     def reset(self):
         self.box_info = None
-        self.info = (0, 0, 0, 0)
+        self.ATK_INFO = (0, 0, 0, 0)
         self.effect = None

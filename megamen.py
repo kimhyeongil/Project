@@ -31,6 +31,10 @@ def hit(e):
     return e[0] == "HIT"
 
 
+def defense_fail(e):
+    return e[0] == "DEFENSE_FAIL"
+
+
 class Defense:
     FRAME_INFO = [(26, 635, 31, 45,),
                   (64, 635, 31, 43,),
@@ -610,7 +614,7 @@ class StateMachine:
                       JumpKnuckle: {land: Land},
                       CogwheelShot: {end_of_animation: Idle},
                       Hit: {time_out: Idle},
-                      Defense: {megamen.control_method.defence_up: Idle}, }
+                      Defense: {megamen.control_method.defence_up: Idle, defense_fail: Hit}, }
 
     def draw(self):
         int_frame = int(self.megamen.frame)
@@ -676,6 +680,10 @@ class MegaMen:
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
+        if self.face_dir == "r":
+            self.atk_box.x = self.get_bb()[0]
+        else:
+            self.atk_box.x = self.get_bb()[2]
 
     def set_atk_info(self, DAMAGE, RIGID, KNOCK_UP=0, KNOCK_BACK=0):
         if self.face_dir == "l":
@@ -792,16 +800,18 @@ class MegaMen:
     def handle_collision(self, group, other):
         pass
 
-    def hit(self, damage, rigid=0, knock_up=0, knock_back=0):
+    def hit(self, damage, rigid=0, knock_up=0, knock_back=0, atk_pos=None):
         self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
         if self.state_machine.state == Defense:
-            damage /= 2
-            self.speed[1] += 6 * (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) * (damage + 2) / self.weight * knock_up * 2
-            self.speed[0] = knock_back / 2
+            if (self.face_dir == "r" and atk_pos > self.x) or (self.face_dir == "l" and atk_pos < self.x):
+                damage /= 2
+                self.speed[0] = knock_back / 2
+            else:
+                self.state_machine.handle_event(("DEFENSE_FAIL", 0))
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
             self.rigid_time += rigid * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
-            self.speed[1] += 6 * (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) * (damage + 2) / self.weight * knock_up * 2
+            self.speed[1] += 6 * (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) * (damage + 2) / self.weight * 2 * knock_up
             self.speed[0] = knock_back
         self.hp -= damage
 
@@ -809,10 +819,10 @@ class MegaMen:
 class AtkBox:
     def __init__(self, megamen):
         self.box_info = None
-        self.info = (0, 0, 0, 0)
+        self.ATK_INFO = (0, 0, 0, 0)
         self.effect = None
         self.megamen = megamen
-
+        self.x = None
     def get_bb(self):
         if self.box_info:
             if self.megamen.face_dir == "l":
@@ -822,15 +832,15 @@ class AtkBox:
             return atkX - self.box_info[2], atkY - self.box_info[3], atkX + self.box_info[2], atkY + self.box_info[3]
 
     def set_info(self, D, R, U, B):
-        self.info = (D, R, U, B)
+        self.ATK_INFO = (D, R, U, B)
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
-            if self.info[0] > 0:
-                other.hit(*self.info)
-                self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.info[0] / 100, 3)
+            if self.ATK_INFO[0] > 0:
+                other.hit(*self.ATK_INFO, atk_pos=self.x)
+                self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.ATK_INFO[0] / 100, 3)
                 self.reset()
 
     def reset(self):
         self.box_info = None
-        self.info = (0, 0, 0, 0)
+        self.ATK_INFO = (0, 0, 0, 0)
