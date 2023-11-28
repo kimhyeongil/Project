@@ -428,7 +428,7 @@ class FireSword:
     nFrame = 8
     FRAME_PER_SEC = 16
 
-    ATK_INFO = (10, 1, 10, 2)
+    ATK_INFO = (2, 1, 5, 2)
     ATK_BB_INFO = [(37, 46, 20, 46),
                    (35, 44, 20, 44),
                    (57, 55, 20, 55),
@@ -443,6 +443,7 @@ class FireSword:
         megamen.frame = 0
         megamen.set_atk_info(*FireSword.ATK_INFO)
         megamen.ultimate_gage -= 1
+        megamen.atk_box.effect = "ignition"
 
     @staticmethod
     def do(megamen):
@@ -741,6 +742,17 @@ class MegaMen:
                 elif self.dir == -1:
                     self.face_dir = "l"
             self.debuff = None
+        else:
+            if self.debuff == "burn":
+                self.hp -= 2 * game_framework.frame_time
+                if self.debuff_time < 2 and self.debuff_time + game_framework.frame_time >= 2:
+                    self.rigid_time += 0.5 * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
+                    self.speed[0] = 0
+                    self.state_machine.handle_event(("HIT", 0))
+                if self.debuff_time < 1 and self.debuff_time + game_framework.frame_time >= 1:
+                    self.rigid_time += 0.5 * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
+                    self.speed[0] = 0
+                    self.state_machine.handle_event(("HIT", 0))
         if not game_world.collide(play_sever.ground, self):
             self.isFall = True
         else:
@@ -823,6 +835,7 @@ class AtkBox:
         self.effect = None
         self.megamen = megamen
         self.x = None
+
     def get_bb(self):
         if self.box_info:
             if self.megamen.face_dir == "l":
@@ -839,6 +852,9 @@ class AtkBox:
             if self.ATK_INFO[0] > 0:
                 other.hit(*self.ATK_INFO, atk_pos=self.x)
                 self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                if self.effect == "ignition":
+                    other.debuff = "burn"
+                    other.debuff_time = 3
                 self.reset()
 
     def reset(self):

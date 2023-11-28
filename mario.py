@@ -114,7 +114,6 @@ class Hit:
     @staticmethod
     def enter(mario):
         mario.frame = 0
-        print("hit")
         Hit.start_time = time.time()
 
     @staticmethod
@@ -590,7 +589,7 @@ class MagicCape:
     nFrame = 10
     FRAME_PER_SEC = 15
     ATK_BB_INFO = (1000, 52, 1000, 1000)
-    ATK_INFO = (10, 0.1, 0, 0)
+    ATK_INFO = (15, 0.1, 0, 0)
 
     @staticmethod
     def exit(mario):
@@ -801,7 +800,20 @@ class Mario:
                     self.face_dir = "r"
                 elif self.dir == -1:
                     self.face_dir = "l"
+            if self.debuff == "burn":
+                self.hp -= 2 * - self.debuff_time
             self.debuff = None
+        else:
+            if self.debuff == "burn":
+                self.hp -= 2 * game_framework.frame_time
+                if self.debuff_time < 2 and self.debuff_time + game_framework.frame_time >= 2:
+                    self.rigid_time += 0.5 * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
+                    self.speed[0] = 0
+                    self.state_machine.handle_event(("HIT", 0))
+                if self.debuff_time < 1 and self.debuff_time + game_framework.frame_time >= 1:
+                    self.rigid_time += 0.5 * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
+                    self.speed[0] = 0
+                    self.state_machine.handle_event(("HIT", 0))
         if not game_world.collide(play_sever.ground, self):
             self.isFall = True
         else:
@@ -906,7 +918,7 @@ class AtkBox:
                     else:
                         other.face_dir = "l"
                     other.dir *= -1
-                    other.debuff_time = 3
+                    other.debuff_time = 5
                     other.debuff = "confusion"
                 self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.ATK_INFO[0] / 100, 3)
                 self.reset()
