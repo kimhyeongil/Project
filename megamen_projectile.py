@@ -211,7 +211,7 @@ class MegaHurricane:
                   (379, 393, 35, 37,), ]
     FRAME_PER_SEC = 6
     nFrame = 3
-    ATK_INFO = (1, 0.1, 3)
+    ATK_INFO = (5, 0.1, 5)
 
     def __init__(self, megamen):
         self.img = projectile

@@ -550,7 +550,7 @@ class UpTornado:
     def enter(megamen):
         megamen.frame = 0
         megamen.speed[1] = UpTornado.JUMP_POWER
-        UpTornado.PROJECTILE = megamen_projectile.MegaHurricane(megamen)
+        UpTornado.PROJECTILE = MegaHurricane(megamen)
         megamen.control_method.add_atk_collision(UpTornado.PROJECTILE)
         game_world.add_obj(UpTornado.PROJECTILE, 1)
 
