@@ -24,7 +24,7 @@ class MegaBuster:
         self.ATK_INFO = list(MegaBuster.ATK_INFO)
         self.ATK_INFO[3] *= dir
         self.frame = 0
-        self.size = 2
+        self.size = get_canvas_height() / 200
         game_world.add_obj(self, 1)
 
     def draw(self):
@@ -43,7 +43,7 @@ class MegaBuster:
     def update(self):
         self.frame = (self.frame + game_framework.frame_time * self.FRAME_PER_SEC) % self.nFrame
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
-        if self.x > 800 - 50 or self.x < 0 + 50:
+        if self.x > get_canvas_width() + 50 or self.x < 0 - 50:
             game_world.erase_obj(self)
 
     def get_bb(self):
@@ -79,7 +79,7 @@ class MegaTornado:
         self.x, self.y = x, y
         self.speed = speed
         self.frame = 0
-        self.size = 1.7
+        self.size = get_canvas_height() / 170
         self.cooltime = 0.01
         game_world.add_obj(self, 0)
 
@@ -93,7 +93,7 @@ class MegaTornado:
     def update(self):
         self.frame = (self.frame + game_framework.frame_time * self.FRAME_PER_SEC) % self.nFrame
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
-        if self.x > 800 - 50 or self.x < 0 + 50:
+        if self.x > get_canvas_width() + 50 or self.x < 0 - 50:
             game_world.erase_obj(self)
 
     def get_bb(self):
@@ -126,7 +126,7 @@ class MegaChargingShot:
     def __init__(self, x=0, y=0, dir=0, charged_time=0, megamen=None):
         self.img = projectile
         self.frame = 0
-        self.size = 1
+        self.size = get_canvas_height() / 200
         self.megamen = None
         self.x, self.y = x, y
         self.frame = MegaChargingShot.nFrame - 1
@@ -176,7 +176,7 @@ class MegaChargingShot:
             self.y = megamen.y + megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][3] * megamen.size // 2 + 5
         else:
             self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
-        if self.x > 800 - 50 or self.x < 0 + 50:
+        if self.x > get_canvas_width() + 50 or self.x < 0 - 50:
             game_world.erase_obj(self)
 
     def get_bb(self):
@@ -218,7 +218,7 @@ class MegaHurricane:
         self.x, self.y = megamen.x, megamen.y + megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][
             3] * megamen.size
         self.megamen = megamen
-        self.size = 2
+        self.size = get_canvas_height() / 200
         self.frame = 0
         self.cooltime = 0
         game_world.add_obj(self, 1)
@@ -319,7 +319,7 @@ class MegaCogwheel:
         self.ATK_INFO[3] *= dir
         self.dir = dir
         self.frame = 0
-        self.size = 2
+        self.size = get_canvas_height() / 200
         game_world.add_obj(self, 1)
 
     def draw(self):
@@ -339,7 +339,7 @@ class MegaCogwheel:
     def update(self):
         self.frame = (self.frame + game_framework.frame_time * self.FRAME_PER_SEC) % self.nFrame
         self.x += self.speed * game_world.PIXEL_PER_METER * game_framework.frame_time
-        if self.x > 800 - 50 or self.x < 0 + 50:
+        if self.x > get_canvas_width() + 50 or self.x < 0 - 50:
             game_world.erase_obj(self)
 
     def get_bb(self):
