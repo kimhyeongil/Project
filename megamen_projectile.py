@@ -60,9 +60,9 @@ class MegaBuster:
             else:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)
 
 
@@ -110,9 +110,9 @@ class MegaTornado:
                       knock_back=-(int(other.x) - int(self.x)) / (abs(int(other.x) - int(self.x)) + 1) * abs(
                           self.speed), atk_pos=self.x)
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             self.cooltime = 0.01
 
 
@@ -199,9 +199,9 @@ class MegaChargingShot:
             else:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)
 
 
@@ -252,9 +252,9 @@ class MegaHurricane:
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.1:
             other.hit(*self.ATK_INFO, atk_pos=self.x)
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             self.cooltime = cur_time
 
 
@@ -298,9 +298,9 @@ class MegaKnuckle:
             else:
                 other.hit(*self.ATK_INFO, knock_up=self.speed - 20, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)
 
 
@@ -356,7 +356,7 @@ class MegaCogwheel:
             else:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_sever.player1.ultimate_gage = min(play_sever.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
-                play_sever.player2.ultimate_gage = min(play_sever.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             game_world.erase_obj(self)
