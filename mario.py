@@ -814,10 +814,10 @@ class Mario:
                     self.rigid_time += 0.5 * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
                     self.speed[0] = 0
                     self.state_machine.handle_event(("HIT", 0))
-        if not game_world.collide(play_sever.ground, self):
+        if not game_world.collide(play_server.ground, self):
             self.isFall = True
         else:
-            self.y = play_sever.ground.y
+            self.y = play_server.ground.y
             if self.speed[1] > -30:
                 self.speed[1] = 0
                 self.isFall = False

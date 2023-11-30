@@ -15,17 +15,17 @@ from ground import Ground
 
 def init():
     megamen_projectile.projectile = load_image('megamen.png')
+    play_server.ground = Ground(100)
     player2_control.x = get_canvas_width() - 100
-    play_sever.player1 = Mario(player1_control)
-    play_sever.player2 = MegaMen(player2_control)
+    play_server.player1 = Mario(player1_control)
+    play_server.player2 = MegaMen(player2_control)
     game_world.add_obj(Background(), 0)
-    play_sever.ground = Ground(100)
-    game_world.add_obj(play_sever.ground, 0)
-    game_world.add_obj(play_sever.player1, 1)
-    game_world.add_obj(play_sever.player2, 1)
-    game_world.add_collision_pair("knuckle:ground", None, play_sever.ground)
-    game_world.add_collision_pair("Player1:Player2", None, play_sever.player2)
-    game_world.add_collision_pair("Player2:Player1", None, play_sever.player1)
+    game_world.add_obj(play_server.ground, 0)
+    game_world.add_obj(play_server.player1, 1)
+    game_world.add_obj(play_server.player2, 1)
+    game_world.add_collision_pair("knuckle:ground", None, play_server.ground)
+    game_world.add_collision_pair("Player1:Player2", None, play_server.player2)
+    game_world.add_collision_pair("Player2:Player1", None, play_server.player1)
 
 
 def handle_events():
@@ -36,8 +36,8 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         else:
-            play_sever.player1.handle_event(event)
-            play_sever.player2.handle_event(event)
+            play_server.player1.handle_event(event)
+            play_server.player2.handle_event(event)
 
 
 def finish():
