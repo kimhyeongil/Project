@@ -4,7 +4,7 @@ from pico2d import *
 
 import game_framework
 import game_world
-import play_sever
+import play_server
 
 
 # state = JumpSuperPunch
@@ -749,7 +749,7 @@ class Mario:
 
     def __init__(self, control_method):
         self.isFall = True
-        self.x, self.y = control_method.x, game_world.ground
+        self.x, self.y = control_method.x, play_server.ground.y
         self.frame = 0
         self.control_method = control_method
         self.face_dir = control_method.start_face

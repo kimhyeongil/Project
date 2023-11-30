@@ -2,7 +2,7 @@ from sdl2 import SDL_KEYDOWN, SDLK_d, SDLK_a, SDL_KEYUP, SDLK_h, SDLK_f, SDLK_g,
 
 import game_world
 
-x = 200
+x = 0 + 100
 start_face = "r"
 
 

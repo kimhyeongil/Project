@@ -4,7 +4,7 @@ from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_widt
 import game_framework
 import game_world
 from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaCogwheel
-import play_sever
+import play_server
 
 
 def end_of_animation(e):

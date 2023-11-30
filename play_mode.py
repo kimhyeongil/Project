@@ -1,12 +1,13 @@
-from pico2d import get_events, clear_canvas, update_canvas, load_image
+from pico2d import get_events, clear_canvas, update_canvas, load_image, get_canvas_width
 from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
 import player1_control
 import player2_control
 import game_framework
-import play_sever
+import play_server
 from mario import Mario
 import game_world
+from background import FixedBackground as Background
 from megamen import MegaMen
 import megamen_projectile
 from ground import Ground
@@ -14,9 +15,12 @@ from ground import Ground
 
 def init():
     megamen_projectile.projectile = load_image('megamen.png')
+    player2_control.x = get_canvas_width() - 100
     play_sever.player1 = Mario(player1_control)
     play_sever.player2 = MegaMen(player2_control)
-    play_sever.ground = Ground(300)
+    game_world.add_obj(Background(), 0)
+    play_sever.ground = Ground(100)
+    game_world.add_obj(play_sever.ground, 0)
     game_world.add_obj(play_sever.player1, 1)
     game_world.add_obj(play_sever.player2, 1)
     game_world.add_collision_pair("knuckle:ground", None, play_sever.ground)

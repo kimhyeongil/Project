@@ -1,9 +1,10 @@
+from pico2d import get_canvas_width
 from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_RIGHT, SDLK_LEFT, SDLK_SLASH, SDLK_COMMA, SDLK_PERIOD, SDLK_UP, SDLK_k, \
     SDLK_DOWN
 
 import game_world
 
-x = 600
+x = None
 start_face = "l"
 
 
