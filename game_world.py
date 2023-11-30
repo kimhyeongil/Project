@@ -1,10 +1,9 @@
 world = [[] for _ in range(10)]
 collision_pairs = {}
-PIXEL_PER_METER = 100 / 2.5  # 100픽셀 당 1미터
+PIXEL_PER_METER = 100 / 1.5  # 100픽셀 당 1미터
 
 g = 40
 time_slice = 0.01
-ground = 300
 
 
 def add_obj(o, depth):
