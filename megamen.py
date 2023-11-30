@@ -1,6 +1,6 @@
 import time
 
-from pico2d import load_image, draw_rectangle, load_font
+from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_width
 import game_framework
 import game_world
 from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaCogwheel
@@ -766,6 +766,7 @@ class MegaMen:
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
+        self.x = clamp(0 + 50, self.x, get_canvas_width() - 50)
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.isFall:
             self.speed[1] -= game_world.g * game_framework.frame_time

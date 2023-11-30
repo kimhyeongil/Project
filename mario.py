@@ -827,6 +827,7 @@ class Mario:
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
+        self.x = clamp(0 + 50, self.x, get_canvas_width() - 50)
         self.y += self.speed[1] * game_world.PIXEL_PER_METER * game_framework.frame_time
         if self.isFall:
             self.speed[1] -= game_world.g * game_framework.frame_time
