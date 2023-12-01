@@ -20,7 +20,8 @@ def init():
     play_server.ground = Ground(100)
     game_world.add_obj(play_server.ground, 1)
     game_world.add_obj(Background(), 0)
-    game_world.add_obj(Timer(99, (get_canvas_width() / 2, get_canvas_height() - 100)), 1)
+    play_server.timer = Timer(99, (get_canvas_width() / 2, get_canvas_height() - 100))
+    game_world.add_obj(play_server.timer, 1)
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
     player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
 
@@ -64,4 +65,10 @@ def draw():
 
 def update():
     game_world.update()
+    if play_server.player1.hp <= 0:
+        game_framework.quit()
+    if play_server.player2.hp <= 0:
+        game_framework.quit()
+    if play_server.timer.limit <= 0:
+        game_framework.quit()
     game_world.handle_collisons()
