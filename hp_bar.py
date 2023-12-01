@@ -20,9 +20,9 @@ class HPBar:
     def draw(self):
         HPBar.hp_back_img.clip_draw(0, 0, self.w, self.h,
                                     self.O[0] - HPBar.size * self.dir // 2, self.O[1],
-                                    HPBar.size // 2 * 2, 50)
+                                    HPBar.size - 5, 50)
         HPBar.remain_hp_img.clip_draw(0, 0, self.w, self.h,
-                                      self.O[0] - (self.HP / self.maxHP * HPBar.size * self.dir) // 2, self.O[1],
+                                      self.O[0] - (self.HP / self.maxHP * HPBar.size * self.dir // 2), self.O[1],
                                       (self.HP / self.maxHP * HPBar.size) // 2 * 2, 50)
 
     def update(self):
