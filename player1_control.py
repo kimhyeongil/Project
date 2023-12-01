@@ -6,6 +6,8 @@ x = 0 + 100
 start_face = "r"
 
 portrait_pos = None
+hp_bar_pos = None
+
 
 def move_r_down(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d

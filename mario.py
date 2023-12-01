@@ -5,6 +5,7 @@ from pico2d import *
 import game_framework
 import game_world
 import play_server
+from hp_bar import HPBar
 from portrait import Portrait
 
 
@@ -751,8 +752,8 @@ class Mario:
         control_method.add_atk_collision(self.atk_box)
         if Mario.img == None:
             Mario.img = load_image('mario.png')
-        self.portrait = Portrait(load_image("mario_portrait.png"), control_method.portrait_pos)
-        game_world.add_obj(self.portrait, 1)
+        game_world.add_obj(Portrait(load_image("mario_portrait.png"), control_method.portrait_pos), 1)
+        game_world.add_obj(HPBar(control_method.hp_bar_pos), 1)
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)

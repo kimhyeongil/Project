@@ -5,6 +5,7 @@ import player1_control
 import player2_control
 import game_framework
 import play_server
+from hp_bar import HPBar
 from mario import Mario
 import game_world
 from background import FixedBackground as Background
@@ -16,7 +17,9 @@ from ground import Ground
 def init():
     megamen_projectile.projectile = load_image('megamen.png')
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
+    player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
     player2_control.portrait_pos = (get_canvas_width() - 100, get_canvas_height() - 100)
+    player2_control.hp_bar_pos = (get_canvas_width() - 100 - HPBar.size, get_canvas_height() - 75)
     play_server.ground = Ground(100)
     player2_control.x = get_canvas_width() - 100
     play_server.player1 = Mario(player1_control)

@@ -3,6 +3,7 @@ import time
 from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_width
 import game_framework
 import game_world
+from hp_bar import HPBar
 from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaCogwheel
 import play_server
 from portrait import Portrait
@@ -679,8 +680,8 @@ class MegaMen:
         self.up = False
         if MegaMen.img == None:
             MegaMen.img = load_image('megamen.png')
-        self.portrait = Portrait(load_image("megamen_portrait.png"), control_method.portrait_pos)
-        game_world.add_obj(self.portrait, 1)
+        game_world.add_obj(Portrait(load_image("megamen_portrait.png"), control_method.portrait_pos), 1)
+        game_world.add_obj(HPBar(control_method.hp_bar_pos), 1)
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
@@ -827,7 +828,7 @@ class MegaMen:
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
             self.rigid_time += rigid * (
-                        (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) ** 0.5) * self.resist_coefficient ** self.rigid_time
+                    (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) ** 0.5) * self.resist_coefficient ** self.rigid_time
             self.speed[1] += self.weight / 100 * knock_up
             self.speed[0] = knock_back
         self.hp -= damage
