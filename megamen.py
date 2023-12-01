@@ -681,7 +681,8 @@ class MegaMen:
         if MegaMen.img == None:
             MegaMen.img = load_image('megamen.png')
         game_world.add_obj(Portrait(load_image("megamen_portrait.png"), control_method.portrait_pos), 1)
-        game_world.add_obj(HPBar(control_method.hp_bar_pos), 1)
+        self.HPBar = HPBar(control_method.hp_bar_pos, MegaMen.maxHp, control_method.hp_bar_dir)
+        game_world.add_obj(self.HPBar, 1)
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
@@ -767,6 +768,7 @@ class MegaMen:
             else:
                 self.speed[1] = -(self.speed[1] + 30)
         self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 100, 3)
+        self.HPBar.HP = self.hp
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time

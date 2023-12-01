@@ -753,7 +753,8 @@ class Mario:
         if Mario.img == None:
             Mario.img = load_image('mario.png')
         game_world.add_obj(Portrait(load_image("mario_portrait.png"), control_method.portrait_pos), 1)
-        game_world.add_obj(HPBar(control_method.hp_bar_pos), 1)
+        self.HPBar = HPBar(control_method.hp_bar_pos, Mario.maxHp, control_method.hp_bar_dir)
+        game_world.add_obj(self.HPBar, 1)
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
@@ -811,6 +812,7 @@ class Mario:
             else:
                 self.speed[1] = -(self.speed[1] + 30)
         self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 100, 3)
+        self.HPBar.HP = self.hp
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time

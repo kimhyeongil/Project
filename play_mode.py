@@ -16,18 +16,24 @@ from ground import Ground
 
 def init():
     megamen_projectile.projectile = load_image('megamen.png')
+    play_server.ground = Ground(100)
+    game_world.add_obj(play_server.ground, 1)
+    game_world.add_obj(Background(), 0)
+
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
     player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
+
     player2_control.portrait_pos = (get_canvas_width() - 100, get_canvas_height() - 100)
-    player2_control.hp_bar_pos = (get_canvas_width() - 100 - HPBar.size, get_canvas_height() - 75)
-    play_server.ground = Ground(100)
+    player2_control.hp_bar_pos = (get_canvas_width() - 100, get_canvas_height() - 75)
+
     player2_control.x = get_canvas_width() - 100
+
     play_server.player1 = Mario(player1_control)
     play_server.player2 = MegaMen(player2_control)
-    game_world.add_obj(Background(), 0)
-    game_world.add_obj(play_server.ground, 0)
-    game_world.add_obj(play_server.player1, 1)
-    game_world.add_obj(play_server.player2, 1)
+
+    game_world.add_obj(play_server.player1, 2)
+    game_world.add_obj(play_server.player2, 2)
+
     game_world.add_collision_pair("knuckle:ground", None, play_server.ground)
     game_world.add_collision_pair("Player1:Player2", None, play_server.player2)
     game_world.add_collision_pair("Player2:Player1", None, play_server.player1)

@@ -7,6 +7,7 @@ start_face = "r"
 
 portrait_pos = None
 hp_bar_pos = None
+hp_bar_dir = -1
 
 
 def move_r_down(e):
