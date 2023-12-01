@@ -12,6 +12,7 @@ from background import FixedBackground as Background
 from megamen import MegaMen
 import megamen_projectile
 from ground import Ground
+from timer import Timer
 
 
 def init():
@@ -19,7 +20,7 @@ def init():
     play_server.ground = Ground(100)
     game_world.add_obj(play_server.ground, 1)
     game_world.add_obj(Background(), 0)
-
+    game_world.add_obj(Timer(99, (get_canvas_width() / 2, get_canvas_height() - 100)), 1)
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
     player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
 
