@@ -5,6 +5,7 @@ from pico2d import *
 import game_framework
 import game_world
 import play_server
+from portrait import Portrait
 
 
 # state = JumpSuperPunch
@@ -12,25 +13,6 @@ import play_server
 #     print(f"({state.l[i]},{mario.img.h - state.t[i] - state.h[i]},{state.w[i]},{state.h[i]},),")
 # print(len(state.l))
 
-# state = TurnKick
-# int_frame = int(mario.frame)
-# dx, dy, sx, sy = state.FRAME_INFO[int_frame][2] * mario.size // 2, state.FRAME_INFO[int_frame][
-#     3] * mario.size // 2, 0, 0
-# if int_frame == 1:
-#     sx, sy = 25, 13
-# elif int_frame == 2:
-#     sx, sy = 20, 11
-#     dy -= 1
-# elif int_frame == 3:
-#     sx, sy = 15, 10
-#     dy -= 3
-# elif int_frame == 4:
-#     sx, sy = 12, 10
-#     dy -= 5
-# if int_frame <= 4:
-#     dx = dx - sx + 5
-#     print(f"{int_frame}:{(dx, dy, sx, sy)}")
-#     mario.set_atk_bb(dx, dy, sx, sy)
 def end_of_animation(e):
     return e[0] == "EOA"
 
@@ -279,10 +261,12 @@ class Jump:
 class JumpKick:
     FRAME_INFO = [(11, 2101, 31, 40,),
                   (48, 2110, 36, 30,),
+                  (48, 2110, 36, 30,),
+                  (48, 2110, 36, 30,),
                   (90, 2101, 30, 40,)]
 
-    nFrame = 3
-    FRAME_PER_SEC = 6
+    nFrame = 5
+    FRAME_PER_SEC = 15
     SPEED = 1
     ATK_BB_INFO = (26, 15, 20, 20)
     ATK_INFO = (5, 0.3, 0)
@@ -305,13 +289,13 @@ class JumpKick:
         mario.next_frame()
         state = JumpKick
         int_frame = int(mario.frame)
-        if int_frame == 1:
-            if int_frame != old_frame:
+        if int_frame != old_frame:
+            if int_frame == 1:
                 mario.y += 20
                 mario.set_atk_bb(*state.ATK_BB_INFO)
                 mario.set_atk_info(*state.ATK_INFO, abs(mario.speed[0]) + 5)
-        else:
-            mario.atk_box.box_info = None
+            elif int_frame == state.nFrame - 1:
+                mario.atk_box.box_info = None
         if not mario.isFall:
             mario.state_machine.handle_event(("LAND", 0))
 
@@ -767,6 +751,8 @@ class Mario:
         control_method.add_atk_collision(self.atk_box)
         if Mario.img == None:
             Mario.img = load_image('mario.png')
+        self.portrait = Portrait(load_image("mario_portrait.png"), control_method.portrait_pos)
+        game_world.add_obj(self.portrait, 1)
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
@@ -884,8 +870,9 @@ class Mario:
                 self.state_machine.handle_event(("DEFENSE_FAIL", 0))
         self.state_machine.handle_event(("HIT", 0))
         if self.state_machine.state == Hit:
-            self.rigid_time += rigid * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
-            self.speed[1] += 6 * (Mario.maxHp / (self.hp + Mario.maxHp)) * (damage + 2) / self.weight * 2 * knock_up
+            self.rigid_time += rigid * (
+                    Mario.maxHp / (self.hp + Mario.maxHp)) * self.resist_coefficient ** self.rigid_time
+            self.speed[1] += self.weight / 100 * knock_up
             self.speed[0] = knock_back
         self.hp -= damage
 

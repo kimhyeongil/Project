@@ -1,4 +1,4 @@
-from pico2d import get_events, clear_canvas, update_canvas, load_image, get_canvas_width
+from pico2d import get_events, clear_canvas, update_canvas, load_image, get_canvas_width, get_canvas_height
 from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
 import player1_control
@@ -15,6 +15,8 @@ from ground import Ground
 
 def init():
     megamen_projectile.projectile = load_image('megamen.png')
+    player1_control.portrait_pos = (0, get_canvas_height() - 100)
+    player2_control.portrait_pos = (get_canvas_width() - 100, get_canvas_height() - 100)
     play_server.ground = Ground(100)
     player2_control.x = get_canvas_width() - 100
     play_server.player1 = Mario(player1_control)
