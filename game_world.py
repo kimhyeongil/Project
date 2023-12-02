@@ -66,3 +66,13 @@ def handle_collisons():
                 if collide(a, b):
                     a.handle_collision(group, b)
                     b.handle_collision(group, a)
+
+
+def reset():
+    global world, collision_pairs
+    for layer in world:
+        if layer:
+            o = layer.pop()
+            del o
+    world = [[] for _ in range(10)]
+    collision_pairs = {}

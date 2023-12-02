@@ -1,6 +1,7 @@
 from pico2d import get_events, clear_canvas, update_canvas, load_image, get_canvas_width, get_canvas_height
 from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
+import ending_mode
 import player1_control
 import player2_control
 import game_framework
@@ -54,7 +55,8 @@ def handle_events():
 
 
 def finish():
-    pass
+    game_world.reset()
+    play_server.reset()
 
 
 def draw():
@@ -66,9 +68,10 @@ def draw():
 def update():
     game_world.update()
     if play_server.player1.hp <= 0:
-        game_framework.quit()
-    if play_server.player2.hp <= 0:
-        game_framework.quit()
-    if int(play_server.timer.limit) <= 0:
-        game_framework.quit()
+        game_framework.change_mode(ending_mode)
+    elif play_server.player2.hp <= 0:
+        game_framework.change_mode(ending_mode)
+    elif int(play_server.timer.limit) <= 0:
+        game_framework.change_mode(ending_mode)
+
     game_world.handle_collisons()
