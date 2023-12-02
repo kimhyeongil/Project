@@ -7,6 +7,7 @@ import game_world
 import play_server
 from hp_bar import HPBar
 from portrait import Portrait
+from gage_bar import GageBar
 
 
 # state = JumpSuperPunch
@@ -754,7 +755,9 @@ class Mario:
             Mario.img = load_image('mario.png')
         game_world.add_obj(Portrait(load_image("mario_portrait.png"), control_method.portrait_pos), 1)
         self.HPBar = HPBar(control_method.hp_bar_pos, Mario.maxHp, control_method.hp_bar_dir)
-        game_world.add_obj(self.HPBar, 1)
+        game_world.add_obj(self.HPBar, 2)
+        self.GageBar = GageBar(control_method.gage_pos, control_method.gage_dir)
+        game_world.add_obj(self.GageBar, 2)
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)

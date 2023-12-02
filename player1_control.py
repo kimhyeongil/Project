@@ -9,6 +9,9 @@ portrait_pos = None
 hp_bar_pos = None
 hp_bar_dir = -1
 
+gage_pos = None
+gage_dir = -1
+
 
 def move_r_down(e):
     return e[0] == "INPUT" and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_d

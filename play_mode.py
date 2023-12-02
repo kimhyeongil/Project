@@ -23,17 +23,18 @@ def init():
     game_world.add_obj(play_server.timer, 1)
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
     player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
+    player1_control.gage_pos = (50, 25)
 
     player2_control.portrait_pos = (get_canvas_width() - 100, get_canvas_height() - 100)
     player2_control.hp_bar_pos = (get_canvas_width() - 100, get_canvas_height() - 75)
-
+    player2_control.gage_pos = (get_canvas_width() - 50, 25)
     player2_control.x = get_canvas_width() - 100
 
     play_server.player1 = play_server.player1(player1_control)
     play_server.player2 = play_server.player2(player2_control)
 
-    game_world.add_obj(play_server.player1, 2)
-    game_world.add_obj(play_server.player2, 2)
+    game_world.add_obj(play_server.player1, 3)
+    game_world.add_obj(play_server.player2, 3)
 
     game_world.add_collision_pair("knuckle:ground", None, play_server.ground)
     game_world.add_collision_pair("Player1:Player2", None, play_server.player2)

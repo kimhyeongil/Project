@@ -3,6 +3,7 @@ import time
 from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_width
 import game_framework
 import game_world
+from gage_bar import GageBar
 from hp_bar import HPBar
 from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaCogwheel
 import play_server
@@ -683,6 +684,8 @@ class MegaMen:
         game_world.add_obj(Portrait(load_image("megamen_portrait.png"), control_method.portrait_pos), 1)
         self.HPBar = HPBar(control_method.hp_bar_pos, MegaMen.maxHp, control_method.hp_bar_dir)
         game_world.add_obj(self.HPBar, 1)
+        self.GageBar = GageBar(control_method.gage_pos, control_method.gage_dir)
+        game_world.add_obj(self.GageBar, 2)
 
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
