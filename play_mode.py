@@ -5,7 +5,6 @@ import player1_control
 import player2_control
 import game_framework
 import play_server
-from hp_bar import HPBar
 from mario import Mario
 import game_world
 from background import FixedBackground as Background
@@ -20,7 +19,7 @@ def init():
     play_server.ground = Ground(100)
     game_world.add_obj(play_server.ground, 1)
     game_world.add_obj(Background(), 0)
-    play_server.timer = Timer(99, (get_canvas_width() / 2, get_canvas_height() - 100))
+    play_server.timer = Timer(100, (get_canvas_width() / 2, get_canvas_height() - 100))
     game_world.add_obj(play_server.timer, 1)
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
     player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
@@ -30,8 +29,8 @@ def init():
 
     player2_control.x = get_canvas_width() - 100
 
-    play_server.player1 = Mario(player1_control)
-    play_server.player2 = MegaMen(player2_control)
+    play_server.player1 = play_server.player1(player1_control)
+    play_server.player2 = play_server.player2(player2_control)
 
     game_world.add_obj(play_server.player1, 2)
     game_world.add_obj(play_server.player2, 2)
@@ -69,6 +68,6 @@ def update():
         game_framework.quit()
     if play_server.player2.hp <= 0:
         game_framework.quit()
-    if play_server.timer.limit <= 0:
+    if int(play_server.timer.limit) <= 0:
         game_framework.quit()
     game_world.handle_collisons()
