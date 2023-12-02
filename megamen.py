@@ -675,7 +675,7 @@ class MegaMen:
         self.state_machine = StateMachine(self)
         self.rigid_time = 0
         self.hp = MegaMen.maxHp
-        self.ultimate_gage = 3
+        self.ultimate_gage = 0
         self.font = load_font('ENCR10B.TTF', 40)
         control_method.add_atk_collision(self.atk_box)
         self.up = False
@@ -731,13 +731,13 @@ class MegaMen:
 
     def draw(self):
         self.state_machine.draw()
-        int_frame = int(self.frame)
-        state = self.state_machine.state
-        draw_rectangle(*self.get_bb())
-        if self.atk_box.get_bb():
-            draw_rectangle(*self.atk_box.get_bb())
-        self.font.draw(self.x, self.y + state.FRAME_INFO[int_frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
-        self.font.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
+        # int_frame = int(self.frame)
+        # state = self.state_machine.state
+        # draw_rectangle(*self.get_bb())
+        # if self.atk_box.get_bb():
+        #     draw_rectangle(*self.atk_box.get_bb())
+        # self.font.draw(self.x, self.y + state.FRAME_INFO[int_frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        # self.font.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()

@@ -746,7 +746,7 @@ class Mario:
         self.speed = [0, 0]
         self.atk_box = AtkBox(self)
         self.rigid_time = 0
-        self.ultimate_gage = 3
+        self.ultimate_gage = 0
         self.font = load_font('ENCR10B.TTF', 40)
         self.state_machine = StateMachine(self)
         self.up = False
@@ -773,13 +773,13 @@ class Mario:
 
     def draw(self):
         self.state_machine.draw()
-        frame = int(self.frame)
-        state = self.state_machine.state
-        draw_rectangle(*self.get_bb())
-        if self.atk_box.get_bb():
-            draw_rectangle(*self.atk_box.get_bb())
-        self.font.draw(self.x, self.y + state.FRAME_INFO[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
-        self.font.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
+        # frame = int(self.frame)
+        # state = self.state_machine.state
+        # draw_rectangle(*self.get_bb())
+        # if self.atk_box.get_bb():
+        #     draw_rectangle(*self.atk_box.get_bb())
+        # self.font.draw(self.x, self.y + state.FRAME_INFO[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        # self.font.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
