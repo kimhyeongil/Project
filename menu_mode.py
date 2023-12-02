@@ -1,5 +1,5 @@
 from pico2d import hide_cursor, hide_lattice, clear_canvas, update_canvas, get_events, load_image, get_canvas_width, \
-    get_canvas_height
+    get_canvas_height, load_font
 from sdl2 import SDL_KEYDOWN, SDL_QUIT, SDLK_ESCAPE, SDLK_a, SDLK_RIGHT, SDLK_d, SDLK_LEFT, SDLK_f, SDLK_COMMA
 
 import game_framework
@@ -11,7 +11,9 @@ from megamen import MegaMen
 
 
 def init():
-    global menu, champions_portrait, player1, player2, champions
+    global menu, champions_portrait, player1, player2, champions, font
+    menu = load_image("menu.png")
+    font = load_font("ENCR10B.TTF", 40)
     champions_portrait = list()
     champions = dict()
     player1 = 0
@@ -70,6 +72,9 @@ def update():
 
 def draw():
     clear_canvas()
+    menu.clip_draw_to_origin(0, 0, menu.w, menu.h, 0, 0,
+                             get_canvas_width(), get_canvas_height())
+    font.draw(get_canvas_width() // 2 - 180, get_canvas_height() - 100, f"Character Select")
     champions_portrait[player1].clip_draw(0, 0, champions_portrait[player1].w, champions_portrait[player1].h,
                                           get_canvas_width() / 4, get_canvas_height() / 2, 200, 200)
     champions_portrait[player2].clip_draw(0, 0, champions_portrait[player2].w, champions_portrait[player2].h,
