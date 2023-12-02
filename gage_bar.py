@@ -4,21 +4,26 @@ from pico2d import load_image, load_font
 class GageBar:
     bar_img = None
     font = None
+    bar_back = None
     size = 150
 
     def __init__(self, O, dir):
         if GageBar.bar_img == None:
             GageBar.bar_img = load_image("gage_bar.png")
             GageBar.font = load_font("ENCR10B.TTF", 20)
+            GageBar.bar_back = load_image("gage_back.png")
         self.O = O
-        self.gage = 0.99
+        self.gage = 0
         self.dir = dir
         self.barW = GageBar.bar_img.w
         self.barH = GageBar.bar_img.h
 
     def draw(self):
+        GageBar.bar_back.clip_draw(0, 0, self.barW, self.barH,
+                                   self.O[0] - GageBar.size // 2 * self.dir + 2 * self.dir, self.O[1] - 12.5,
+                                   GageBar.size - 4, 25)
         GageBar.bar_img.clip_draw(0, 0, self.barW, self.barH,
-                                  self.O[0] - ((self.gage - int(self.gage)) * GageBar.size // 2 * self.dir),
+                                  self.O[0] - (self.gage - int(self.gage)) * GageBar.size // 2 * self.dir,
                                   self.O[1] - 12.5,
                                   ((self.gage - int(self.gage)) * GageBar.size // 2) * 2, 25)
         GageBar.bar_img.clip_draw(0, 0, self.barW, self.barH,

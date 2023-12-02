@@ -816,6 +816,7 @@ class Mario:
                 self.speed[1] = -(self.speed[1] + 30)
         self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 100, 3)
         self.HPBar.HP = self.hp
+        self.GageBar.gage = self.ultimate_gage
 
     def move(self):
         self.x += self.speed[0] * game_world.PIXEL_PER_METER * game_framework.frame_time
