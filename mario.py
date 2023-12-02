@@ -43,6 +43,36 @@ def defense_fail(e):
     return e[0] == "DEFENSE_FAIL"
 
 
+class Win:
+    FRAME_INFO = [(17, 602, 22, 40),
+                  (45, 602, 22, 40),
+                  (73, 602, 23, 38),
+                  (102, 602, 23, 38),
+                  (131, 602, 22, 37),
+                  (159, 602, 23, 38),
+                  (188, 602, 37, 39),
+                  (231, 602, 37, 39), ]
+    nFrame = 8
+    FRAME_PER_SEC = 9
+
+    @staticmethod
+    def exit(mario):
+        pass
+
+    @staticmethod
+    def enter(mario):
+        mario.frame = 0
+        mario.speed = [0, 0]
+
+    @staticmethod
+    def do(mario):
+        old_frame = int(mario.frame)
+        mario.next_frame()
+        int_frame = int(mario.frame)
+        if int_frame != old_frame and int_frame == 0:
+            mario.frame = Win.nFrame - 2
+
+
 class Fall:
     FRAME_INFO = [(78, 2401, 29, 42)]
     nFrame = 1
@@ -688,7 +718,7 @@ class StateMachine:
                       JumpKick: {land: Land},
                       JumpSpinKick: {land: Land},
                       JumpSuperPunch: {land: Land},
-                      Hit: {time_out: Idle},
+                      Hit: {time_out: Idle}, Win: {}
                       }
 
     def start(self):
@@ -759,6 +789,15 @@ class Mario:
         self.GageBar = GageBar(control_method.gage_pos, control_method.gage_dir)
         game_world.add_obj(self.GageBar, 2)
 
+    def win(self):
+        self.state_machine.state.exit(self)
+        self.state_machine.state = Win
+        self.state_machine.state.enter(self)
+        self.x = get_canvas_width() / 2
+        self.y = get_canvas_height() / 2 - 100
+        self.size = 5
+        self.isFall = False
+
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
         if self.face_dir == "r":
@@ -778,8 +817,8 @@ class Mario:
         # draw_rectangle(*self.get_bb())
         # if self.atk_box.get_bb():
         #     draw_rectangle(*self.atk_box.get_bb())
-        # self.font.draw(self.x, self.y + state.FRAME_INFO[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
-        # self.font.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
+        # self.font1.draw(self.x, self.y + state.FRAME_INFO[frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        # self.font1.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
@@ -805,15 +844,16 @@ class Mario:
                     self.rigid_time += 0.5 * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
                     self.speed[0] = 0
                     self.state_machine.handle_event(("HIT", 0))
-        if not game_world.collide(play_server.ground, self):
-            self.isFall = True
-        else:
-            self.y = play_server.ground.y
-            if self.speed[1] > -30:
-                self.speed[1] = 0
-                self.isFall = False
+        if play_server.ground:
+            if not game_world.collide(play_server.ground, self):
+                self.isFall = True
             else:
-                self.speed[1] = -(self.speed[1] + 30)
+                self.y = play_server.ground.y
+                if self.speed[1] > -30:
+                    self.speed[1] = 0
+                    self.isFall = False
+                else:
+                    self.speed[1] = -(self.speed[1] + 30)
         self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 100, 3)
         self.HPBar.HP = self.hp
         self.GageBar.gage = self.ultimate_gage

@@ -2,6 +2,7 @@ from pico2d import get_events, clear_canvas, update_canvas, load_image, get_canv
 from sdl2 import SDL_QUIT, SDL_KEYDOWN, SDLK_ESCAPE
 
 import ending_mode
+import ending_server
 import player1_control
 import player2_control
 import game_framework
@@ -20,7 +21,7 @@ def init():
     play_server.ground = Ground(100)
     game_world.add_obj(play_server.ground, 1)
     game_world.add_obj(Background(), 0)
-    play_server.timer = Timer(100, (get_canvas_width() / 2, get_canvas_height() - 100))
+    play_server.timer = Timer(10, (get_canvas_width() / 2, get_canvas_height() - 100))
     game_world.add_obj(play_server.timer, 1)
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
     player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
@@ -68,10 +69,20 @@ def draw():
 def update():
     game_world.update()
     if play_server.player1.hp <= 0:
+        ending_server.winner = play_server.player2
+        ending_server.winner_name = "Player2"
         game_framework.change_mode(ending_mode)
     elif play_server.player2.hp <= 0:
+        ending_server.winner = play_server.player1
+        ending_server.winner_name = "Player1"
         game_framework.change_mode(ending_mode)
     elif int(play_server.timer.limit) <= 0:
+        if play_server.player1.hp > play_server.player2.hp:
+            ending_server.winner = play_server.player1
+            ending_server.winner_name = "Player1"
+        else:
+            ending_server.winner = play_server.player2
+            ending_server.winner_name = "Player2"
         game_framework.change_mode(ending_mode)
 
     game_world.handle_collisons()

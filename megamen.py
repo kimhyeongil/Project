@@ -1,8 +1,9 @@
 import time
 
-from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_width
+from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_width, get_canvas_height
 import game_framework
 import game_world
+import play_mode
 from gage_bar import GageBar
 from hp_bar import HPBar
 from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaCogwheel
@@ -36,6 +37,43 @@ def hit(e):
 
 def defense_fail(e):
     return e[0] == "DEFENSE_FAIL"
+
+
+class Win:
+    FRAME_INFO = [(24, 871, 34, 46),
+                  (65, 871, 34, 45),
+                  (108, 871, 31, 45),
+                  (144, 871, 31, 50),
+                  (188, 871, 31, 51),
+                  (231, 871, 31, 50),
+                  ]
+    nFrame = 6
+    FRAME_PER_SEC = 9
+    l = [24, 65, 108, 144, 188, 231]
+    t = [1017, 1018, 1018, 1013, 1012, 1013]
+    w = [34, 34, 31, 31, 31, 31]
+    h = [46, 45, 45, 50, 51, 50]
+
+    @staticmethod
+    def exit(megamen, e):
+        pass
+
+    @staticmethod
+    def enter(megamen):
+        state = Win
+        for i in range(len(state.l)):
+            print(f"({state.l[i]},{megamen.img.h - state.t[i] - state.h[i]},{state.w[i]},{state.h[i]}),")
+        print(len(state.l))
+        megamen.frame = 0
+        megamen.speed = [0, 0]
+
+    @staticmethod
+    def do(megamen):
+        old_frame = int(megamen.frame)
+        megamen.next_frame()
+        int_frame = int(megamen.frame)
+        if int_frame != old_frame and int_frame == 0:
+            megamen.frame = Win.nFrame - 4
 
 
 class Defense:
@@ -617,7 +655,7 @@ class StateMachine:
                       UpTornado: {end_of_animation: Fall},
                       JumpKnuckle: {land: Land},
                       CogwheelShot: {end_of_animation: Idle},
-                      Hit: {time_out: Idle},
+                      Hit: {time_out: Idle}, Win: {},
                       Defense: {megamen.control_method.defence_up: Idle, defense_fail: Hit}, }
 
     def draw(self):
@@ -687,6 +725,15 @@ class MegaMen:
         self.GageBar = GageBar(control_method.gage_pos, control_method.gage_dir)
         game_world.add_obj(self.GageBar, 2)
 
+    def win(self):
+        self.state_machine.state.exit(self, ("", 0))
+        self.state_machine.state = Win
+        self.state_machine.state.enter(self)
+        self.x = get_canvas_width() / 2
+        self.y = get_canvas_height() / 2 - 100
+        self.size = 5
+        self.isFall = False
+
     def set_atk_bb(self, dx, dy, sx, sy):
         self.atk_box.box_info = (dx, dy, sx, sy)
         if self.face_dir == "r":
@@ -736,8 +783,8 @@ class MegaMen:
         # draw_rectangle(*self.get_bb())
         # if self.atk_box.get_bb():
         #     draw_rectangle(*self.atk_box.get_bb())
-        # self.font.draw(self.x, self.y + state.FRAME_INFO[int_frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
-        # self.font.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
+        # self.font1.draw(self.x, self.y + state.FRAME_INFO[int_frame][3] * self.size + 5, f"{self.hp}", (0, 0, 0))
+        # self.font1.draw(self.x, 300, f"{round(self.ultimate_gage, 2)}", (0, 0, 0))
 
     def update(self):
         self.state_machine.update()
@@ -761,15 +808,16 @@ class MegaMen:
                     self.rigid_time += 0.5 * self.resist_coefficient * self.resist_coefficient ** self.rigid_time
                     self.speed[0] = 0
                     self.state_machine.handle_event(("HIT", 0))
-        if not game_world.collide(play_server.ground, self):
-            self.isFall = True
-        else:
-            self.y = play_server.ground.y
-            if self.speed[1] > -30:
-                self.speed[1] = 0
-                self.isFall = False
+        if play_server.ground:
+            if not game_world.collide(play_server.ground, self):
+                self.isFall = True
             else:
-                self.speed[1] = -(self.speed[1] + 30)
+                self.y = play_server.ground.y
+                if self.speed[1] > -30:
+                    self.speed[1] = 0
+                    self.isFall = False
+                else:
+                    self.speed[1] = -(self.speed[1] + 30)
         self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 100, 3)
         self.HPBar.HP = self.hp
         self.GageBar.gage = self.ultimate_gage
