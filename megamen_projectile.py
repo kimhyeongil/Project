@@ -9,12 +9,23 @@ import play_server
 projectile = None
 
 
+class Sound:
+    def __init__(self, sound_name, volume=20):
+        self.sound = load_wav(sound_name)
+        self.sound.set_volume(volume)
+
+    def play(self):
+        self.sound.repeat_play()
+
+
 class MegaBuster:
     FRAME_INFO = [(546, 1439, 9, 7,),
                   (559, 1439, 10, 7,), ]
     FRAME_PER_SEC = 5
     nFrame = 2
     ATK_INFO = (1, 0.6, 0, 1)
+    shot_sound = None
+    atk_sound = None
 
     def __init__(self, x, y, dir):
         self.img = projectile
@@ -26,6 +37,12 @@ class MegaBuster:
         self.frame = 0
         self.size = get_canvas_height() / 200
         game_world.add_obj(self, 1)
+        if MegaBuster.shot_sound == None:
+            MegaBuster.shot_sound = load_wav("sound/megabuster.wav")
+            MegaBuster.shot_sound.set_volume(50)
+            MegaBuster.atk_sound = load_wav("sound/ouch.wav")
+            MegaBuster.atk_sound.set_volume(50)
+        MegaBuster.shot_sound.play()
 
     def draw(self):
         frame = int(self.frame)
@@ -55,6 +72,7 @@ class MegaBuster:
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
+            MegaBuster.atk_sound.play()
             if self.dir > 0:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[0])
             else:
@@ -73,6 +91,7 @@ class MegaTornado:
     nFrame = 3
     FRAME_PER_SEC = 18
     ATK_INFO = (1, 0.1)
+    wind_sound = None
 
     def __init__(self, x, y, speed):
         self.img = projectile
@@ -82,6 +101,9 @@ class MegaTornado:
         self.size = get_canvas_height() / 170
         self.cooltime = 0.01
         game_world.add_obj(self, 0)
+        if MegaTornado.wind_sound == None:
+            MegaTornado.wind_sound = load_wav("sound/wind_atk.wav")
+        self.wind_sound.set_volume(50)
 
     def draw(self):
         int_frame = int(self.frame)
@@ -106,6 +128,7 @@ class MegaTornado:
     def handle_collision(self, group, other):
         self.cooltime -= game_framework.frame_time
         if other.control_method.isHit(group) and self.cooltime <= 0:
+            self.wind_sound.play()
             other.hit(*self.ATK_INFO,
                       knock_back=-(int(other.x) - int(self.x)) / (abs(int(other.x) - int(self.x)) + 1) * abs(
                           self.speed), atk_pos=self.x)
@@ -122,6 +145,8 @@ class MegaChargingShot:
                   (484, 1615, 45, 48,),
                   (693, 1621, 94, 40,), ]
     nFrame = 4
+    shot_sound = None
+    atk_sound = None
 
     def __init__(self, x=0, y=0, dir=0, charged_time=0, megamen=None):
         self.img = projectile
@@ -138,6 +163,11 @@ class MegaChargingShot:
         back = 6 * max(charged_time - 0.5, 0) * dir
         up = 7 * max(charged_time - 0.7, 0)
         self.ATK_INFO = (damage, rigid, up, back)
+        if MegaChargingShot.shot_sound == None:
+            MegaChargingShot.shot_sound = load_wav("sound/megabuster.wav")
+            MegaChargingShot.shot_sound.set_volume(50)
+            MegaChargingShot.atk_sound = load_wav("sound/ouch.wav")
+            MegaChargingShot.atk_sound.set_volume(50)
         if megamen:
             if megamen.face_dir == "r":
                 self.dir = 1
@@ -147,6 +177,10 @@ class MegaChargingShot:
                                       2] * megamen.size // 2 + 10) * self.dir
             self.y = megamen.y + megamen.state_machine.state.FRAME_INFO[int(megamen.frame)][3] * megamen.size // 2 + 5
             self.megamen = megamen
+        else:
+            MegaChargingShot.shot_sound.play()
+        self.charging_sound = Sound("sound/charging.wav", 40)
+        self.charging_sound.play()
         game_world.add_obj(self, 1)
 
     def draw(self):
@@ -194,6 +228,7 @@ class MegaChargingShot:
 
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
+            MegaChargingShot.atk_sound.play()
             if self.dir > 0:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[0])
             else:
@@ -212,6 +247,7 @@ class MegaHurricane:
     FRAME_PER_SEC = 6
     nFrame = 3
     ATK_INFO = (5, 0.1, 5)
+    atk_sound = None
 
     def __init__(self, megamen):
         self.img = projectile
@@ -222,6 +258,9 @@ class MegaHurricane:
         self.frame = 0
         self.cooltime = 0
         game_world.add_obj(self, 1)
+        if MegaHurricane.atk_sound == None:
+            MegaHurricane.atk_sound = load_wav("sound/wind_atk.wav")
+            MegaHurricane.atk_sound.set_volume(128)
 
     def draw(self):
         frame = int(self.frame)
@@ -250,6 +289,7 @@ class MegaHurricane:
     def handle_collision(self, group, other):
         cur_time = time.time()
         if other.control_method.isHit(group) and cur_time - self.cooltime >= 0.1:
+            self.atk_sound.play()
             other.hit(*self.ATK_INFO, atk_pos=self.x)
             if group == "Player1:Player2":
                 play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
@@ -261,6 +301,7 @@ class MegaHurricane:
 class MegaKnuckle:
     FRAME_INFO = [(340, 326, 10, 15,)]
     ATK_INFO = (5, 2)
+    atk_sound = None
 
     def __init__(self, x, y, size):
         self.img = projectile
@@ -271,6 +312,9 @@ class MegaKnuckle:
         self.speed = -10
         game_world.add_obj(self, 1)
         game_world.add_collision_pair("knuckle:ground", self, None)
+        if MegaKnuckle.atk_sound == None:
+            MegaKnuckle.atk_sound = load_wav("sound/ouch.wav")
+            MegaKnuckle.atk_sound.set_volume(50)
 
     def draw(self):
         frame = self.frame
@@ -293,6 +337,7 @@ class MegaKnuckle:
         if group == "knuckle:ground":
             game_world.erase_obj(self)
         elif other.control_method.isHit(group):
+            MegaKnuckle.atk_sound.play()
             if self.dir > 0:
                 other.hit(*self.ATK_INFO, knock_up=self.speed - 20, atk_pos=self.get_bb()[0])
             else:
@@ -304,7 +349,7 @@ class MegaKnuckle:
             game_world.erase_obj(self)
 
 
-class MegaCogwheel:
+class MegaBlade:
     FRAME_INFO = [(307, 571, 20, 20,),
                   (332, 571, 20, 20,), ]
     FRAME_PER_SEC = 12
@@ -315,11 +360,13 @@ class MegaCogwheel:
         self.img = projectile
         self.x, self.y = x, y
         self.speed = 10 * dir
-        self.ATK_INFO = list(MegaCogwheel.ATK_INFO)
+        self.ATK_INFO = list(MegaBlade.ATK_INFO)
         self.ATK_INFO[3] *= dir
         self.dir = dir
         self.frame = 0
         self.size = get_canvas_height() / 200
+        self.sound = Sound("sound/blade_sound.wav")
+        self.sound.play()
         game_world.add_obj(self, 1)
 
     def draw(self):
@@ -359,4 +406,5 @@ class MegaCogwheel:
                 play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
             else:
                 play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+            self.sound = None
             game_world.erase_obj(self)

@@ -1,5 +1,5 @@
 from pico2d import hide_cursor, hide_lattice, clear_canvas, update_canvas, get_events, load_image, get_canvas_width, \
-    get_canvas_height, load_font
+    get_canvas_height, load_font, load_music
 from sdl2 import SDL_KEYDOWN, SDL_QUIT, SDLK_ESCAPE, SDLK_a, SDLK_RIGHT, SDLK_d, SDLK_LEFT, SDLK_f, SDLK_COMMA, \
     SDLK_SPACE, SDLK_RETURN
 
@@ -9,11 +9,14 @@ import menu_mode
 
 
 def init():
-    global background, font1, font2
+    global background, font1, font2, sound
     background = load_image("ending_scene.png")
     font1 = load_font("ENCR10B.TTF", 70)
     font2 = load_font("ENCR10B.TTF")
     ending_server.winner.win()
+    sound = load_music("sound/victory.mp3")
+    sound.set_volume(50)
+    sound.play(1)
 
 
 def finish():

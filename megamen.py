@@ -1,12 +1,12 @@
 import time
 
-from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_width, get_canvas_height
+from pico2d import load_image, draw_rectangle, load_font, clamp, get_canvas_width, get_canvas_height, load_wav
 import game_framework
 import game_world
 import play_mode
 from gage_bar import GageBar
 from hp_bar import HPBar
-from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaCogwheel
+from megamen_projectile import MegaChargingShot, MegaBuster, MegaTornado, MegaKnuckle, MegaHurricane, MegaBlade
 import play_server
 from portrait import Portrait
 
@@ -150,7 +150,7 @@ class Land:
         (184, 1622, 38, 39), ]
 
     nFrame = 3
-    FRAME_PER_SEC = 18
+    FRAME_PER_SEC = 30
 
     @staticmethod
     def exit(megamen, e):
@@ -285,6 +285,7 @@ class Jump:
     def enter(megamen):
         megamen.frame = 0
         megamen.speed[1] = Jump.JUMP_POWER
+        megamen.jump_sound.play()
 
     @staticmethod
     def do(megamen):
@@ -420,8 +421,8 @@ class CogwheelShot:
         int_frame = int(megamen.frame)
         if int_frame != old_frame:
             if int_frame == 3:
-                megamen.fire_cogwheel(CogwheelShot.FRAME_INFO[int_frame][2],
-                                      CogwheelShot.FRAME_INFO[int_frame][3] * megamen.size // 2 - 5)
+                megamen.fire_blade(CogwheelShot.FRAME_INFO[int_frame][2],
+                                   CogwheelShot.FRAME_INFO[int_frame][3] * megamen.size // 2 - 5)
             elif int_frame == 0:
                 megamen.state_machine.handle_event(("EOA", 0))
 
@@ -452,6 +453,7 @@ class ChargingShot:
     @staticmethod
     def exit(megamen, e):
         game_world.erase_obj(megamen.charged_effect)
+        megamen.charged_effect = None
         if not hit(e) and megamen.charged_time >= 0.5:
             megamen.fire_charging_shot(ChargingShot.FRAME_INFO[0][2] * megamen.size // 2,
                                        ChargingShot.FRAME_INFO[0][3] * megamen.size // 2)
@@ -594,10 +596,16 @@ class UpTornado:
         UpTornado.PROJECTILE = MegaHurricane(megamen)
         megamen.control_method.add_atk_collision(UpTornado.PROJECTILE)
         game_world.add_obj(UpTornado.PROJECTILE, 1)
+        megamen.set_atk_bb(0, 0, 72, 100)
+        megamen.set_atk_info(1, 0.1, 15, 0)
 
     @staticmethod
     def do(megamen):
+        old_frame = int(megamen.frame)
         megamen.next_frame()
+        int_frame = int(megamen.frame)
+        if int_frame != old_frame and int_frame == 1:
+            megamen.atk_box.reset()
         if int(megamen.frame) == UpTornado.nFrame - 1:
             game_world.erase_obj(UpTornado.PROJECTILE)
             megamen.state_machine.handle_event(("EOA", 0))
@@ -695,7 +703,7 @@ class MegaMen:
     maxHp = 125 * 1.5
     resist_coefficient = 0.375
     size = 2
-    weight = 100
+    jump_sound = None
 
     def __init__(self, control_method):
         self.isFall = True
@@ -719,6 +727,8 @@ class MegaMen:
         self.up = False
         if MegaMen.img == None:
             MegaMen.img = load_image('megamen.png')
+            MegaMen.jump_sound = load_wav("sound/megamen_jump.wav")
+            MegaMen.jump_sound.set_volume(20)
         game_world.add_obj(Portrait(load_image("megamen_portrait.png"), control_method.portrait_pos), 1)
         self.HPBar = HPBar(control_method.hp_bar_pos, MegaMen.maxHp, control_method.hp_bar_dir)
         game_world.add_obj(self.HPBar, 1)
@@ -752,11 +762,11 @@ class MegaMen:
         else:
             self.control_method.add_atk_collision(MegaBuster(self.x - fire_x, self.y + fire_y, -1))
 
-    def fire_cogwheel(self, fire_x, fire_y):
+    def fire_blade(self, fire_x, fire_y):
         if self.face_dir == "r":
-            self.control_method.add_atk_collision(MegaCogwheel(self.x + fire_x, self.y + fire_y, 1))
+            self.control_method.add_atk_collision(MegaBlade(self.x + fire_x, self.y + fire_y, 1))
         else:
-            self.control_method.add_atk_collision(MegaCogwheel(self.x - fire_x, self.y + fire_y, -1))
+            self.control_method.add_atk_collision(MegaBlade(self.x - fire_x, self.y + fire_y, -1))
 
     def fire_charging_shot(self, fire_x, fire_y):
         self.charged_time = min(self.charged_time, 2)
@@ -872,7 +882,7 @@ class MegaMen:
         pass
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0, atk_pos=None):
-        self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
+        self.ultimate_gage = min(self.ultimate_gage + damage / 20, 3)
         if self.state_machine.state == Defense:
             if (self.face_dir == "r" and atk_pos > self.x) or (self.face_dir == "l" and atk_pos < self.x):
                 damage /= 2
@@ -883,7 +893,7 @@ class MegaMen:
         if self.state_machine.state == Hit:
             self.rigid_time += rigid * (
                     (MegaMen.maxHp / (self.hp + MegaMen.maxHp)) ** 0.5) * self.resist_coefficient ** self.rigid_time
-            self.speed[1] += self.weight / 100 * knock_up
+            self.speed[1] += knock_up
             self.speed[0] = knock_back
         self.hp -= damage
 
@@ -895,6 +905,8 @@ class AtkBox:
         self.effect = None
         self.megamen = megamen
         self.x = None
+        self.sound = load_wav("sound/atk_sound.wav")
+        self.sound.set_volume(50)
 
     def get_bb(self):
         if self.box_info:
@@ -910,8 +922,9 @@ class AtkBox:
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
             if self.ATK_INFO[0] > 0:
+                self.sound.play()
                 other.hit(*self.ATK_INFO, atk_pos=self.x)
-                self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.ATK_INFO[0] / 10, 3)
                 if self.effect == "ignition":
                     other.debuff = "burn"
                     other.debuff_time = 3

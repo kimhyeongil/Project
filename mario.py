@@ -280,6 +280,7 @@ class Jump:
     def enter(mario):
         mario.frame = 0
         mario.speed[1] = Jump.JUMP_POWER
+        mario.jump_sound.play()
 
     @staticmethod
     def do(mario):
@@ -761,7 +762,7 @@ class Mario:
     resist_coefficient = 0.25
     size = 2
     maxHp = 100 * 1.5
-    weight = 75
+    jump_sound = None
 
     def __init__(self, control_method):
         self.isFall = True
@@ -783,6 +784,8 @@ class Mario:
         control_method.add_atk_collision(self.atk_box)
         if Mario.img == None:
             Mario.img = load_image('mario.png')
+            Mario.jump_sound = load_wav("sound/mario_jump.wav")
+            Mario.jump_sound.set_volume(10)
         game_world.add_obj(Portrait(load_image("mario_portrait.png"), control_method.portrait_pos), 1)
         self.HPBar = HPBar(control_method.hp_bar_pos, Mario.maxHp, control_method.hp_bar_dir)
         game_world.add_obj(self.HPBar, 2)
@@ -908,7 +911,7 @@ class Mario:
         pass
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0, atk_pos=None):
-        self.ultimate_gage = min(self.ultimate_gage + damage / 200, 3)
+        self.ultimate_gage = min(self.ultimate_gage + damage / 20, 3)
         if self.state_machine.state == Defense:
             if (self.face_dir == "r" and atk_pos > self.x) or (self.face_dir == "l" and atk_pos < self.x):
                 damage /= 2
@@ -919,7 +922,7 @@ class Mario:
         if self.state_machine.state == Hit:
             self.rigid_time += rigid * (
                     Mario.maxHp / (self.hp + Mario.maxHp)) * self.resist_coefficient ** self.rigid_time
-            self.speed[1] += self.weight / 100 * knock_up
+            self.speed[1] += knock_up
             self.speed[0] = knock_back
         self.hp -= damage
 
@@ -931,6 +934,8 @@ class AtkBox:
         self.effect = None
         self.mario = mario
         self.x = None
+        self.sound = load_wav("sound/atk_sound.wav")
+        self.sound.set_volume(50)
 
     def get_bb(self):
         if self.box_info:
@@ -946,6 +951,7 @@ class AtkBox:
     def handle_collision(self, group, other):
         if other.control_method.isHit(group):
             if self.ATK_INFO[0] > 0:
+                self.sound.play()
                 other.hit(*self.ATK_INFO, atk_pos=self.x)
                 if self.effect == "reflect":
                     if other.face_dir == "l":
@@ -955,7 +961,7 @@ class AtkBox:
                     other.dir *= -1
                     other.debuff_time = 5
                     other.debuff = "confusion"
-                self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.ATK_INFO[0] / 10, 3)
                 self.reset()
 
     def reset(self):

@@ -21,7 +21,7 @@ def init():
     play_server.ground = Ground(100)
     game_world.add_obj(play_server.ground, 1)
     game_world.add_obj(Background(), 0)
-    play_server.timer = Timer(10, (get_canvas_width() / 2, get_canvas_height() - 100))
+    play_server.timer = Timer(100, (get_canvas_width() / 2, get_canvas_height() - 100))
     game_world.add_obj(play_server.timer, 1)
     player1_control.portrait_pos = (0, get_canvas_height() - 100)
     player1_control.hp_bar_pos = (100, get_canvas_height() - 75)
