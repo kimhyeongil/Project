@@ -16,6 +16,8 @@ data_files = [
     "ENCR10B.TTF",
     "megamen_portrait.png",
     "remain_hp.png",
+    "title.png",
+    "instruction.png"
 ]
 
 # 데이타가 들어있는 폴더들을 지정하세요.
