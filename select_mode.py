@@ -11,8 +11,8 @@ from megamen import MegaMen
 
 
 def init():
-    global menu, champions_portrait, player1, player2, champions, font, mario_pick, timer, megamen_pick
-    menu = load_image("menu.png")
+    global select_back, champions_portrait, player1, player2, champions, font, mario_pick, timer, megamen_pick
+    select_back = load_image("select_back.png")
     font = load_font("ENCR10B.TTF", 40)
     champions_portrait = list()
     champions = dict()
@@ -32,8 +32,8 @@ def init():
 
 
 def finish():
-    global menu, champions_portrait, player1, player2, champions, mario_pick, megamen_pick
-    menu = None
+    global select_back, champions_portrait, player1, player2, champions, mario_pick, megamen_pick
+    select_back = None
     champions_portrait = None
     champions = None
     mario_pick = None
@@ -91,8 +91,8 @@ def update():
 
 def draw():
     clear_canvas()
-    menu.clip_draw_to_origin(0, 0, menu.w, menu.h, 0, 0,
-                             get_canvas_width(), get_canvas_height())
+    select_back.clip_draw_to_origin(0, 0, select_back.w, select_back.h, 0, 0,
+                                    get_canvas_width(), get_canvas_height())
     font.draw(get_canvas_width() // 2 - 180, get_canvas_height() - 100, f"Character Select")
     champions_portrait[player1].clip_draw(0, 0, champions_portrait[player1].w, champions_portrait[player1].h,
                                           get_canvas_width() / 4, get_canvas_height() / 2, 200, 200)

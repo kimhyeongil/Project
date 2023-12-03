@@ -1,11 +1,10 @@
-from pico2d import hide_cursor, hide_lattice, clear_canvas, update_canvas, get_events, load_image, get_canvas_width, \
+from pico2d import clear_canvas, update_canvas, get_events, load_image, get_canvas_width, \
     get_canvas_height, load_font, load_music
-from sdl2 import SDL_KEYDOWN, SDL_QUIT, SDLK_ESCAPE, SDLK_a, SDLK_RIGHT, SDLK_d, SDLK_LEFT, SDLK_f, SDLK_COMMA, \
-    SDLK_SPACE, SDLK_RETURN
+from sdl2 import SDL_KEYDOWN, SDL_QUIT, SDLK_ESCAPE, SDLK_RETURN
 
 import ending_server
 import game_framework
-import menu_mode
+import select_mode
 
 
 def init():
@@ -34,7 +33,7 @@ def handle_events():
             if event.key == SDLK_ESCAPE:
                 game_framework.quit()
             elif event.key == SDLK_RETURN:
-                game_framework.change_mode(menu_mode)
+                game_framework.change_mode(select_mode)
 
 
 def update():
