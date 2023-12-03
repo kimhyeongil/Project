@@ -1,0 +1,25 @@
+# 메인 파일 이름을 지정하세요.
+main_file = "main.py"
+
+# 데이타 파일들을 지정하세요.
+data_files = [
+    "ground.png",
+    "ending_scene.png",
+    "gage_bar.png",
+    "mario.png",
+    "gage_back.png",
+    "Background.png",
+    "megamen.png",
+    "mario_portrait.png",
+    "hp_back.png",
+    "select_back.png",
+    "ENCR10B.TTF",
+    "megamen_portrait.png",
+    "remain_hp.png",
+]
+
+# 데이타가 들어있는 폴더들을 지정하세요.
+data_folders = [
+    "sound"
+]
+
