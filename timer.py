@@ -10,7 +10,7 @@ class Timer:
         self.pos = pos
 
     def draw(self):
-        self.font.draw(self.pos[0] - 25, self.pos[1] + 25, f"{int(self.limit)}")
+        self.font.draw(self.pos[0] - 25, self.pos[1] + 50, f"{int(self.limit)}")
 
     def update(self):
         self.limit -= game_framework.frame_time
