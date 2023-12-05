@@ -882,7 +882,7 @@ class MegaMen:
         pass
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0, atk_pos=None):
-        self.ultimate_gage = min(self.ultimate_gage + damage / 20, 3)
+        self.ultimate_gage = min(self.ultimate_gage + damage / 100, 3)
         if self.state_machine.state == Defense:
             if (self.face_dir == "r" and atk_pos > self.x) or (self.face_dir == "l" and atk_pos < self.x):
                 damage /= 2
@@ -924,7 +924,7 @@ class AtkBox:
             if self.ATK_INFO[0] > 0:
                 self.sound.play()
                 other.hit(*self.ATK_INFO, atk_pos=self.x)
-                self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.ATK_INFO[0] / 10, 3)
+                self.megamen.ultimate_gage = min(self.megamen.ultimate_gage + self.ATK_INFO[0] / 50, 3)
                 if self.effect == "ignition":
                     other.debuff = "burn"
                     other.debuff_time = 3

@@ -39,7 +39,7 @@ class MegaBuster:
         game_world.add_obj(self, 1)
         if MegaBuster.shot_sound == None:
             MegaBuster.shot_sound = load_wav("sound/megabuster.wav")
-            MegaBuster.shot_sound.set_volume(50)
+            MegaBuster.shot_sound.set_volume(10)
             MegaBuster.atk_sound = load_wav("sound/ouch.wav")
             MegaBuster.atk_sound.set_volume(50)
         MegaBuster.shot_sound.play()
@@ -78,9 +78,9 @@ class MegaBuster:
             else:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             else:
-                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             game_world.erase_obj(self)
 
 
@@ -98,7 +98,7 @@ class MegaTornado:
         self.x, self.y = x, y
         self.speed = speed
         self.frame = 0
-        self.size = get_canvas_height() / 170
+        self.size = 3
         self.cooltime = 0.01
         game_world.add_obj(self, 0)
         if MegaTornado.wind_sound == None:
@@ -133,9 +133,9 @@ class MegaTornado:
                       knock_back=-(int(other.x) - int(self.x)) / (abs(int(other.x) - int(self.x)) + 1) * abs(
                           self.speed), atk_pos=self.x)
             if group == "Player1:Player2":
-                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             else:
-                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             self.cooltime = 0.01
 
 
@@ -165,7 +165,7 @@ class MegaChargingShot:
         self.ATK_INFO = (damage, rigid, up, back)
         if MegaChargingShot.shot_sound == None:
             MegaChargingShot.shot_sound = load_wav("sound/megabuster.wav")
-            MegaChargingShot.shot_sound.set_volume(50)
+            MegaChargingShot.shot_sound.set_volume(20)
             MegaChargingShot.atk_sound = load_wav("sound/ouch.wav")
             MegaChargingShot.atk_sound.set_volume(50)
         if megamen:
@@ -234,9 +234,9 @@ class MegaChargingShot:
             else:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             else:
-                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             game_world.erase_obj(self)
 
 
@@ -246,7 +246,7 @@ class MegaHurricane:
                   (379, 393, 35, 37,), ]
     FRAME_PER_SEC = 6
     nFrame = 3
-    ATK_INFO = (5, 0.1, 5)
+    ATK_INFO = (5, 0.1, 1)
     atk_sound = None
 
     def __init__(self, megamen):
@@ -292,9 +292,9 @@ class MegaHurricane:
             self.atk_sound.play()
             other.hit(*self.ATK_INFO, atk_pos=self.x)
             if group == "Player1:Player2":
-                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             else:
-                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             self.cooltime = cur_time
 
 
@@ -343,9 +343,9 @@ class MegaKnuckle:
             else:
                 other.hit(*self.ATK_INFO, knock_up=self.speed - 20, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             else:
-                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             game_world.erase_obj(self)
 
 
@@ -403,8 +403,8 @@ class MegaBlade:
             else:
                 other.hit(*self.ATK_INFO, atk_pos=self.get_bb()[2])
             if group == "Player1:Player2":
-                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player1.ultimate_gage = min(play_server.player1.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             else:
-                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 100, 3)
+                play_server.player2.ultimate_gage = min(play_server.player2.ultimate_gage + self.ATK_INFO[0] / 50, 3)
             self.sound = None
             game_world.erase_obj(self)

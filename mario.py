@@ -142,7 +142,7 @@ class Land:
                   (171, 2401, 26, 34,), ]
 
     nFrame = 3
-    FRAME_PER_SEC = 15
+    FRAME_PER_SEC = 23
 
     @staticmethod
     def exit(mario):
@@ -515,7 +515,7 @@ class Uppercut:
                   (96, 1939, 22, 53), ]
     nFrame = 3
     FRAME_PER_SEC = 15
-    JUMP_POWER = 13
+    JUMP_POWER = 10
     ATK_BB_INFO = [(17, 13.5, 13, 13),
                    (24, 38, 20, 20),
                    (12, 88.5, 20, 35)]
@@ -857,7 +857,7 @@ class Mario:
                     self.isFall = False
                 else:
                     self.speed[1] = -(self.speed[1] + 30)
-        self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 100, 3)
+        self.ultimate_gage = min(self.ultimate_gage + game_framework.frame_time / 200, 3)
         self.HPBar.HP = self.hp
         self.GageBar.gage = self.ultimate_gage
 
@@ -911,7 +911,7 @@ class Mario:
         pass
 
     def hit(self, damage, rigid=0, knock_up=0, knock_back=0, atk_pos=None):
-        self.ultimate_gage = min(self.ultimate_gage + damage / 20, 3)
+        self.ultimate_gage = min(self.ultimate_gage + damage / 100, 3)
         if self.state_machine.state == Defense:
             if (self.face_dir == "r" and atk_pos > self.x) or (self.face_dir == "l" and atk_pos < self.x):
                 damage /= 2
@@ -961,7 +961,7 @@ class AtkBox:
                     other.dir *= -1
                     other.debuff_time = 5
                     other.debuff = "confusion"
-                self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.ATK_INFO[0] / 10, 3)
+                self.mario.ultimate_gage = min(self.mario.ultimate_gage + self.ATK_INFO[0] / 50, 3)
                 self.reset()
 
     def reset(self):

@@ -26,7 +26,7 @@ def init():
     mario_pick = load_wav("sound/mario_pick.wav")
     mario_pick.set_volume(80)
     megamen_pick = load_wav("sound/megamen_pick.wav")
-    megamen_pick.set_volume(40)
+    megamen_pick.set_volume(20)
     hide_cursor()
     hide_lattice()
 
